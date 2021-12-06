@@ -1,13 +1,13 @@
 import { StatusBar } from "expo-status-bar";
 import React from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View, Button } from "react-native";
 // import { TestTheme as theme } from "..Theme/shared/Theme";
 import Card from "../components/Card";
 
-import { DarkTheme as theme } from "../shared/Theme";
+import { Themes } from "../shared/Theme";
+const theme = Themes.dark;
 
 const TestScreen = (props) => {
-  console.log(props);
   return (
     <View style={styles.container}>
       <ScrollView style={styles.scrollView}>

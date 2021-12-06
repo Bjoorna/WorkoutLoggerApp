@@ -7,13 +7,21 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import TestScreen from "../screens/TestScreen";
 import TestScreen1 from "../screens/TestScreen2";
 
-import { DarkTheme as theme } from "../shared/Theme";
+import UserOverviewScreen from "../screens/User/UserOverview";
+import UserDetailScreen from "../screens/User/UserDetail";
+
+import { Themes } from "../shared/Theme";
+import AuthScreen from "../screens/User/AuthScreen";
+const theme = Themes.dark;
 
 const defaultStyleOptions = {
 	headerStyle: {
 		backgroundColor: theme.surface,
 	},
 	headerTintColor: theme.onSurface,
+	cardStyle: {
+		backgroundColor: theme.surface,
+	},
 };
 
 const TabNavigator = createBottomTabNavigator();
@@ -30,6 +38,7 @@ export const AppTabNavigator = () => {
 					paddingTop: 12,
 				},
 				tabBarActiveTintColor: theme.onSurface,
+				tabBarInactiveTintColor: theme.onSurfaceVariant,
 			}}
 		>
 			<TabNavigator.Screen
@@ -55,6 +64,24 @@ export const AppTabNavigator = () => {
 				options={{
 					tabBarIcon: (props) => (
 						<MaterialIcons
+							name="analytics"
+							size={24}
+							color={
+								props.focused
+									? theme.onSecondaryContainer
+									: theme.onSurfaceVariant
+							}
+						/>
+					),
+				}}
+			/>
+			<TabNavigator.Screen
+				name="User"
+				component={UserStackScreen}
+				options={{
+					headerShown: false,
+					tabBarIcon: (props) => (
+						<MaterialIcons
 							name="account-circle"
 							size={24}
 							color={
@@ -70,9 +97,51 @@ export const AppTabNavigator = () => {
 	);
 };
 
-const customTab = (state, descriptor, navigation) => {
-	<View></View>;
+const UserStackNavigator = createStackNavigator();
+
+export const UserStackScreen = () => {
+	return (
+		<UserStackNavigator.Navigator>
+			<UserStackNavigator.Group>
+				<UserStackNavigator.Screen
+					name="UserOverview"
+					component={UserOverviewScreen}
+					options={{
+						...defaultStyleOptions,
+						headerTitle: "User",
+						presentation: "card",
+					}}
+				/>
+				<UserStackNavigator.Screen
+					name="UserDetail"
+					component={UserDetailScreen}
+					options={{ ...defaultStyleOptions, presentation: "card" }}
+				/>
+			</UserStackNavigator.Group>
+		</UserStackNavigator.Navigator>
+	);
 };
+
+const AuthStackNavigator = createStackNavigator();
+
+export const AuthStackScreen = () => {
+	return (
+		<AuthStackNavigator.Navigator>
+			<AuthStackNavigator.Screen
+				name="AuthScreen"
+				component={AuthScreen}
+				options={{
+					...defaultStyleOptions,
+					headerTitle: "Authentication",
+				}}
+			/>
+		</AuthStackNavigator.Navigator>
+	);
+};
+
+// const customTab = (state, descriptor, navigation) => {
+// 	<View></View>;
+// };
 
 const tabBarStyles = StyleSheet.create({
 	container: {

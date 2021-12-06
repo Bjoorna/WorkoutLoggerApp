@@ -37,47 +37,48 @@
 //   outline: "#899295",
 // };
 
-export const DarkTheme = {
-  // primary
-  primary: "#ffb4a4",
-  onPrimary: "#5f1609",
-  primaryContainer: "#7d2c1d",
-  onPrimaryContainer: "#ffdad1",
+export const Themes = {
+	dark: {
+		primary: "#ffb4a4",
+		onPrimary: "#5f1609",
+		primaryContainer: "#7d2c1d",
+		onPrimaryContainer: "#ffdad1",
 
-  // secondary
-  secondary: "#e7bdb5",
-  onSecondary: "#442924",
-  secondaryContainer: "#5d3f39",
-  onSecondaryContainer: "#ffdad2",
+		// secondary
+		secondary: "#e7bdb5",
+		onSecondary: "#442924",
+		secondaryContainer: "#5d3f39",
+		onSecondaryContainer: "#ffdad2",
 
-  // tertiary
-  tertiary: "#dcc48c",
-  onTertiary: "#3d2f05",
-  tertiaryContainer: "#554519",
-  onTertiaryContainer: "#f9e0a6",
+		// tertiary
+		tertiary: "#dcc48c",
+		onTertiary: "#3d2f05",
+		tertiaryContainer: "#554519",
+		onTertiaryContainer: "#f9e0a6",
 
-  // error
-  error: "#ffb4a9",
-  onError: "#680003",
-  errorContainer: "#930006",
-  onErrorContainer: "#ffdad4",
+		// error
+		error: "#ffb4a9",
+		onError: "#680003",
+		errorContainer: "#930006",
+		onErrorContainer: "#ffdad4",
 
-  // surfaces
-  surface: "#201a19",
-  surfaceE1: "#2b2220",
-  surfaceE2: "#312624",
-  surfaceE3: "#382b28",
-  surfaceE4: "#3b2d2a",
-  surfaceE5: "#3f2f2c",
-  onSurface: "#ede0dd",
+		// surfaces
+		surface: "#201a19",
+		surfaceE1: "#2b2220",
+		surfaceE2: "#312624",
+		surfaceE3: "#382b28",
+		surfaceE4: "#3b2d2a",
+		surfaceE5: "#3f2f2c",
+		onSurface: "#ede0dd",
 
-  surfaceVariant: "#534340",
-  onSurfaceVariant: "#d8c2be",
+		surfaceVariant: "#534340",
+		onSurfaceVariant: "#d8c2be",
 
-  // background
-  background: "#201a19",
-  onBackground: "#ede0dd",
+		// background
+		background: "#201a19",
+		onBackground: "#ede0dd",
 
-  // variants
-  outline: "#a08c88",
+		// variants
+		outline: "#a08c88",
+	},
 };

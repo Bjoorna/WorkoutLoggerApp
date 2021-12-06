@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { DarkTheme } from "../shared/Theme";
+import { Themes } from "../shared/Theme";
+const theme = Themes.dark
 
 const Card = (props) => {
   return (
@@ -18,13 +19,13 @@ const styles = StyleSheet.create({
     width: "90%",
     height: 150,
     borderRadius: 15,
-    backgroundColor: DarkTheme.surface,
+    backgroundColor: theme.surface,
     justifyContent: "center",
     alignItems: "center",
     marginVertical: 15,
   },
   baseText: {
-    color: DarkTheme.onSurface,
+    color: theme.onSurface,
     fontSize: 32
   },
 });
