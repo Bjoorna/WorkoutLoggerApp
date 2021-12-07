@@ -12,30 +12,31 @@ import {
 import * as AuthActions from "../../store/actions/auth";
 import { useDispatch, useSelector } from "react-redux";
 
-
 import USERS from "../../dummy/data/Users";
 
 import DisplayText from "../../components/Text/Display";
+import BodyText from "../../components/Text/Body";
 import FilledButton from "../../components/Buttons/FilledButton";
 import { Themes } from "../../shared/Theme";
 import OutlineButton from "../../components/Buttons/OutlineButton";
 const theme = Themes.dark;
 
-
 const UserOverviewScreen = (props) => {
-	const user = USERS.find((user) => user.name === "Dennis");
+	// const user = USERS.find((user) => user.name === "Dennis");
+	const user = useSelector((state) => state.user.user);
+	console.log("USER from UserOverview: ");
+	console.log(user);
 
-	const authDetails = useSelector(state => state.auth)
+	const authDetails = useSelector((state) => state.auth);
 	const dispatch = useDispatch();
 
 	const logoutUser = () => {
 		dispatch(AuthActions.logout());
-	}
+	};
 
 	const saveUser = () => {
-		dispatch(AuthActions.saveUser(user))
-	}
-
+		dispatch(AuthActions.saveUser(user));
+	};
 
 	return (
 		<SafeAreaView style={styles.safeView}>
@@ -47,17 +48,14 @@ const UserOverviewScreen = (props) => {
 					<Image
 						style={styles.image}
 						resizeMode="contain"
-						source={{ uri: user.profileImageUri }}
+						source={{ uri: user.profileImageURI }}
 					/>
 				</View>
 				<View style={styles.currentInfoView}>
-					<FilledButton onButtonPress={() => logoutUser()}>
+					<BodyText large={true}>{user.weight}</BodyText>
+					<OutlineButton onButtonPress={() => logoutUser()}>
 						Logout
-					</FilledButton>
-					<FilledButton onButtonPress={() => console.log(authDetails)}>
-						Print authdetails
-					</FilledButton>
-					<OutlineButton onButtonPress={() => saveUser()} >SAVE USER</OutlineButton>
+					</OutlineButton>
 				</View>
 			</ScrollView>
 		</SafeAreaView>

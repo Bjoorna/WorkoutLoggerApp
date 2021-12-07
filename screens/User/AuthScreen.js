@@ -18,6 +18,9 @@ import HeadlineText from "../../components/Text/Headline";
 import FilledButton from "../../components/Buttons/FilledButton";
 import OutlineButton from "../../components/Buttons/OutlineButton";
 import Input from "../../components/UI/Input";
+import TextButton from "../../components/Buttons/TextButton";
+
+import * as firebase from "../../firebase/firebase";
 
 const FORM_INPUT_UPDATE = "FORM_INPUT_UPDATE";
 
@@ -47,7 +50,6 @@ const formReducer = (state, action) => {
 
 const AuthScreen = (props) => {
 	const authStatus = useSelector((state) => state.auth);
-	console.log(authStatus);
 
 	const dispatch = useDispatch();
 	const [isSignup, setIsSignup] = useState(true); // CHANGE TO FALSE
@@ -91,18 +93,17 @@ const AuthScreen = (props) => {
 		}
 
 		setIsLoading(true);
-		console.log("LOADING: " + isLoading);
 
 		try {
 			await dispatch(action);
 		} catch (e) {
-			console.log("error: " + e);
+			console.log(e);
+			setIsLoading(false);
 		}
 	};
 
 	const inputChangeHandler = useCallback(
 		(inputIdentifier, inputValue, inputValidity) => {
-			console.log("HELLO FORM INPUTCHANGEHANDLER");
 			dispatchFormState({
 				type: FORM_INPUT_UPDATE,
 				value: inputValue,
@@ -112,6 +113,10 @@ const AuthScreen = (props) => {
 		},
 		[dispatchFormState]
 	);
+
+	const test = async () => {
+		firebase.writeDocumentToCollection("hello");
+	};
 
 	return (
 		<KeyboardAvoidingView
@@ -157,14 +162,23 @@ const AuthScreen = (props) => {
 						</View>
 
 						<View style={styles.authCardButtonRow}>
+							<TextButton onButtonPress={() => test()}>
+								Test
+							</TextButton>
 							<OutlineButton
 								onButtonPress={() => setIsSignup(!isSignup)}
-								style={{ width: 100, marginHorizontal: 5 }}
+								style={{
+									//  width: 100,
+									marginHorizontal: 5,
+								}}
 							>
 								{isSignup ? "Login" : "Signup"}
 							</OutlineButton>
 							<FilledButton
-								style={{ width: 100, marginHorizontal: 5 }}
+								style={{
+									// width: 100,
+									marginHorizontal: 5,
+								}}
 								onButtonPress={() => authHandler()}
 							>
 								{isSignup ? "Signup" : "Login"}
@@ -175,7 +189,6 @@ const AuthScreen = (props) => {
 			)}
 		</KeyboardAvoidingView>
 	);
-
 };
 
 const styles = StyleSheet.create({

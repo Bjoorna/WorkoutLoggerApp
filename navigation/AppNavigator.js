@@ -12,7 +12,6 @@ const theme = Themes.dark;
 const AppNavigator = (props) => {
 
 	const isUserAuthenticated = useSelector(state => !!state.auth.token)
-	console.log("ISUSERAYTH: " + isUserAuthenticated)
 
 
 	return (

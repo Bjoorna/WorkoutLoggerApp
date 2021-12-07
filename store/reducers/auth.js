@@ -1,13 +1,12 @@
 import { AUTH, LOGOUT, SAVE_USER } from "../actions/auth";
 const initialState = {
-	token: null,
+	token: null,	
 	userID: null,
 	autoLoginState: false,
 	userData: null
 };
 
 export default (state = initialState, action) => {
-	console.log(action);
 	switch (action.type) {
 		case AUTH:
 			return {

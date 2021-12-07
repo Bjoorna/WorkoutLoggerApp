@@ -1,6 +1,9 @@
 import "react-native-gesture-handler";
 import React, { useState } from "react";
 import { StyleSheet, View, Dimensions } from "react-native";
+import { LogBox } from 'react-native';
+
+LogBox.ignoreLogs(['Setting a timer']);
 
 import { createStore, combineReducers, applyMiddleware } from "redux";
 import { Provider } from "react-redux";
@@ -15,12 +18,14 @@ import AppLoading from "expo-app-loading";
 import * as Font from "expo-font";
 
 import authReducer from "./store/reducers/auth";
+import userReducer from './store/reducers/user';
 
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
 
 const rootReducer = combineReducers({
 	auth: authReducer,
+	user: userReducer
 });
 const store = createStore(rootReducer, applyMiddleware(ReduxThunk));
 

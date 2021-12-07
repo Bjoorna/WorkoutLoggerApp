@@ -2,10 +2,14 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { firebaseConfig } from "../../firebase/firebase";
 
+import * as firebase from '../../firebase/firebase';
+import * as userActions from '../actions/user'
+
 export const AUTH = "AUTH";
+export const WRITE_AUTH_TOKEN = "WRITE_AUTH_TOKEN";
 export const LOGOUT = "LOGOUT";
-export const UPDATE_USER = "UPDATE_USER";
-export const SAVE_USER = "SAVE_USER";
+// export const UPDATE_USER = "UPDATE_USER";
+// export const SAVE_USER = "SAVE_USER";
 
 const apikey = "AIzaSyAf6yOGx_V5wXyVUzot1sDgsICKPbDVgIs";
 
@@ -23,7 +27,6 @@ export const savedUser = (userData) => {
 
 export const signup = (email, password) => {
 	return async (dispatch) => {
-		console.log("From signup");
 
 		const response = await fetch(
 			`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${apikey}`,
@@ -42,7 +45,6 @@ export const signup = (email, password) => {
 
 		if (!response.ok) {
 			const errorData = await response.json();
-			console.log(errorData);
 			throw new Error("Error");
 		}
 		const resData = await response.json();
@@ -52,7 +54,6 @@ export const signup = (email, password) => {
 
 export const login = (email, password) => {
 	return async (dispatch) => {
-		console.log("From login");
 
 		const response = await fetch(
 			`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apikey}`,
@@ -69,25 +70,26 @@ export const login = (email, password) => {
 
 		if (!response.ok) {
 			const errorData = await response.json();
-			console.log(errorData);
-			throw new Error("Error");
+			throw new Error(errorData);
 		}
 
 		const resData = await response.json();
-		console.log(resData);
+		const userID = resData.localId;
+		const userData = await firebase.getDocumentFromCollection(userID, "users");
+		dispatch(userActions.saveUser(userData));
+		
+
 		dispatch(auth(resData.localId, resData.idToken));
 		await saveAuthDataToStorage(resData.idToken, resData.localId);
 	};
 };
 
 export const logout = () => {
-	console.log("Hello from logout action");
 	return { type: LOGOUT };
 };
 
 export const saveUser = (user) => {
 	return async (dispatch) => {
-		console.log("From saveUserAction: " + user);
 
 		let localSavedUserCreds = await AsyncStorage.getItem("userData");
 		console.log(localSavedUserCreds);

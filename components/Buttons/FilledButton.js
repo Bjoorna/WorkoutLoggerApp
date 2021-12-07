@@ -13,7 +13,7 @@ const FilledButton = (props) => {
 			<Pressable
 				onPressIn={() => setIsPressed(true)}
 				onPressOut={() => setIsPressed(false)}
-				style={isPressed ? styles.onPressStyle : styles.pressableButton}
+				style={isPressed ? {...styles.onPressStyle, ...styles.buttonBase} :  {...styles.pressableButton, ...styles.buttonBase}}
 				onPress={props.onButtonPress}
 			>
 				<LabelText
@@ -31,9 +31,11 @@ const styles = StyleSheet.create({
 	buttonBase: {
 		// flex: 1,
 		borderRadius: 40,
-		backgroundColor: theme.primary,
 		overflow: "hidden",
-		width: "100%",
+		backgroundColor: theme.primary,
+		paddingHorizontal: 12,
+		minWidth: 48
+
 	},
 	pressableButton: {
 		height: 40,
