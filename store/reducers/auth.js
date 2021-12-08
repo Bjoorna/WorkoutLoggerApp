@@ -15,11 +15,9 @@ export default (state = initialState, action) => {
 				autoLoginState: true,
 			};
 		case LOGOUT:
-			console.log("Hello from logout reducer");
 
 			return { ...initialState, autoLoginState: true };
 		case SAVE_USER:
-			console.log("SAVE USER FROM REDUCER: ");
 			return state;
 		default:
 			return state;

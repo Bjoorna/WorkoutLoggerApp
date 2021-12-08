@@ -2,8 +2,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { firebaseConfig } from "../../firebase/firebase";
 
-import * as firebase from '../../firebase/firebase';
-import * as userActions from '../actions/user'
+import * as firebase from "../../firebase/firebase";
+import * as userActions from "../actions/user";
 
 export const AUTH = "AUTH";
 export const WRITE_AUTH_TOKEN = "WRITE_AUTH_TOKEN";
@@ -27,62 +27,56 @@ export const savedUser = (userData) => {
 
 export const signup = (email, password) => {
 	return async (dispatch) => {
+		const tempTestData = {
+			name: "Marcus",
+			weight: 100,
+			height: 190,
+			profileImageURL:
+				"https://images.unsplash.com/photo-1506207803951-1ee93d7256ad?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1160&q=80",
+		};
 
-		const response = await fetch(
-			`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${apikey}`,
-			{
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					email: email,
-					password: password,
-					returnSecureToken: true,
-				}),
-			}
-		);
+		try {
+			const newUser = await firebase.signUpNewUserWithEmailAndPassword(
+				email,
+				password
+			);
+			console.log(newUser.stsTokenManager);
+			const userID = newUser.uid;
+			const userToken = newUser.stsTokenManager.accessToken;
+			await firebase.writeDocumentToCollection(tempTestData, "users", userID);
+			dispatch(auth(userID, userToken));
+			await saveAuthDataToStorage(userToken, userID);
 
-		if (!response.ok) {
-			const errorData = await response.json();
-			throw new Error("Error");
+		} catch (e) {
+			throw new Error(e);
 		}
-		const resData = await response.json();
-		dispatch(auth(resData.localId, resData.idToken));
+
 	};
 };
 
 export const login = (email, password) => {
 	return async (dispatch) => {
+		try {
+			const user = await firebase.loginWithEmailAndPassword(
+				email,
+				password
+			);
+			console.log(user.stsTokenManager);
+			const userID = user.uid;
+			const userToken = user.stsTokenManager.accessToken;
 
-		const response = await fetch(
-			`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apikey}`,
-			{
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({
-					email: email,
-					password: password,
-					returnSecureToken: true,
-				}),
-			}
-		);
+			const userDataFromServer = await firebase.getDocumentFromCollection(userID, "users");
 
-		if (!response.ok) {
-			const errorData = await response.json();
-			throw new Error(errorData);
+			dispatch(userActions.saveUser(userDataFromServer));
+
+			dispatch(auth(userID, userToken));
+			await saveAuthDataToStorage(userToken, userID);
+		} catch (e) {
+			throw new Error(e);
 		}
-
-		const resData = await response.json();
-		const userID = resData.localId;
-		const userData = await firebase.getDocumentFromCollection(userID, "users");
-		dispatch(userActions.saveUser(userData));
-		
-
-		dispatch(auth(resData.localId, resData.idToken));
-		await saveAuthDataToStorage(resData.idToken, resData.localId);
 	};
 };
+
 
 export const logout = () => {
 	return { type: LOGOUT };
@@ -90,16 +84,10 @@ export const logout = () => {
 
 export const saveUser = (user) => {
 	return async (dispatch) => {
-
 		let localSavedUserCreds = await AsyncStorage.getItem("userData");
 		console.log(localSavedUserCreds);
 		localSavedUserCreds = JSON.parse(localSavedUserCreds);
 
-		// const databaseURLWithAuth =
-		// 	firebaseConfig.databaseURL +
-		// 	"users/" +
-		// 	localSavedUserCreds.userID +
-		// 	`.json?auth=${localSavedUserCreds.token}`;
 
 		const databaseURLWithAuth =
 			firebaseConfig.databaseURL +

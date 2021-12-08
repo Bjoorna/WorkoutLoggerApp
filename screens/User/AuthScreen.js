@@ -7,9 +7,13 @@ import {
 	Alert,
 	KeyboardAvoidingView,
 	Platform,
+	Pressable,
+	Keyboard,
 } from "react-native";
 import * as AuthActions from "../../store/actions/auth";
 import { useDispatch, useSelector } from "react-redux";
+
+import { TextInput } from "react-native-paper";
 
 import { Themes } from "../../shared/Theme";
 const theme = Themes.dark;
@@ -18,9 +22,7 @@ import HeadlineText from "../../components/Text/Headline";
 import FilledButton from "../../components/Buttons/FilledButton";
 import OutlineButton from "../../components/Buttons/OutlineButton";
 import Input from "../../components/UI/Input";
-import TextButton from "../../components/Buttons/TextButton";
-
-import * as firebase from "../../firebase/firebase";
+import { SafeAreaInsetsContext } from "react-native-safe-area-context";
 
 const FORM_INPUT_UPDATE = "FORM_INPUT_UPDATE";
 
@@ -52,7 +54,9 @@ const AuthScreen = (props) => {
 	const authStatus = useSelector((state) => state.auth);
 
 	const dispatch = useDispatch();
-	const [isSignup, setIsSignup] = useState(true); // CHANGE TO FALSE
+	const [isSignup, setIsSignup] = useState(false);
+	const [email, setEmail] = useState("");
+	const [password, setPassword] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState();
 	const [formState, dispatchFormState] = useReducer(formReducer, {
@@ -67,37 +71,30 @@ const AuthScreen = (props) => {
 		isFormValid: false,
 	});
 
+	// error handling
 	useEffect(() => {
 		if (error) {
 			Alert.alert("Error on AuthAttempt", error, [{ text: "Dismiss" }]);
 		}
 	}, [error]);
 
-	const testLoginCreds = {
-		email: "marcusbjorna@gmail.com",
-		password: "123456",
-	};
-
 	const authHandler = async () => {
 		let action;
 		if (isSignup) {
-			action = AuthActions.signup(
-				formState.formValues.email,
-				formState.formValues.password
-			);
+			action = AuthActions.signup(email, password);
 		} else {
-			action = AuthActions.login(
-				formState.formValues.email,
-				formState.formValues.password
-			);
+			action = AuthActions.login(email, password);
 		}
 
 		setIsLoading(true);
+		setError(null);
 
 		try {
 			await dispatch(action);
 		} catch (e) {
+			console.log("AUTHSCREEN ERROR");
 			console.log(e);
+			setError(e.message);
 			setIsLoading(false);
 		}
 	};
@@ -114,79 +111,91 @@ const AuthScreen = (props) => {
 		[dispatchFormState]
 	);
 
-	const test = async () => {
-		firebase.writeDocumentToCollection("hello");
-	};
-
 	return (
 		<KeyboardAvoidingView
 			behavior="padding"
-			keyboardVerticalOffset={10}
+			keyboardVerticalOffset={1}
 			style={styles.screen}
 		>
-			{!isLoading && (
-				<View style={styles.authScreenContent}>
-					<View style={styles.authCardContainer}>
-						<View style={styles.authCardHeader}>
-							<HeadlineText
-								large={true}
-								style={{ color: theme.onSurfaceVariant }}
-							>
-								Login
-							</HeadlineText>
-						</View>
-						<View style={styles.authCardContent}>
-							<Input
-								id="email"
-								label="E-Mail"
-								keyboardType="email-address"
-								required
-								email
-								autoCapitalize="none"
-								errorText="Please enter a valid email address."
-								onInputChange={inputChangeHandler}
-								initialValue=""
-							/>
-							<Input
-								id="password"
-								label="Password"
-								keyboardType="default"
-								secureTextEntry
-								required
-								minLength={6}
-								autoCapitalize="none"
-								errorText="Please enter a valid password."
-								onInputChange={inputChangeHandler}
-								initialValue=""
-							/>
-						</View>
+			<Pressable
+				style={styles.pressable}
+				onPress={() => Keyboard.dismiss()}
+			>
+				{!isLoading && (
+					<View style={styles.authScreenContent}>
+						<View style={styles.authCardContainer}>
+							<View style={styles.authCardHeader}>
+								<HeadlineText
+									large={true}
+									style={{ color: theme.onSurfaceVariant }}
+								>
+									Login
+								</HeadlineText>
+							</View>
+							<View style={styles.authCardContent}>
+								<TextInput
+									style={styles.authTextInput}
+									outlineColor={theme.outline}
+									activeOutlineColor={
+										theme.onPrimaryContainer
+									}
+									selectionColor={theme.secondary}
+									mode="outlined"
+									label="Email"
+									email
+									theme={{
+										colors: {
+											text: theme.onPrimaryContainer,
+											placeholder: theme.onSurface,
+										},
+									}}
+									onChangeText={(text) => setEmail(text)}
+								/>
+								<TextInput
+									style={styles.authTextInput}
+									outlineColor={theme.outline}
+									activeOutlineColor={
+										theme.onPrimaryContainer
+									}
+									selectionColor={theme.secondary}
+									mode="outlined"
+									label="Password"
+									keyboardType="default"
+									secureTextEntry
+									theme={{
+										colors: {
+											text: theme.onPrimaryContainer,
+											placeholder: theme.onSurface,
+										},
+									}}
+									onChangeText={(text) => setPassword(text)}
+								/>
+							</View>
 
-						<View style={styles.authCardButtonRow}>
-							<TextButton onButtonPress={() => test()}>
-								Test
-							</TextButton>
-							<OutlineButton
-								onButtonPress={() => setIsSignup(!isSignup)}
-								style={{
-									//  width: 100,
-									marginHorizontal: 5,
-								}}
-							>
-								{isSignup ? "Login" : "Signup"}
-							</OutlineButton>
-							<FilledButton
-								style={{
-									// width: 100,
-									marginHorizontal: 5,
-								}}
-								onButtonPress={() => authHandler()}
-							>
-								{isSignup ? "Signup" : "Login"}
-							</FilledButton>
+							<View style={styles.authCardButtonRow}>
+								<OutlineButton
+									onButtonPress={() => setIsSignup(!isSignup)}
+									style={{
+										//  width: 100,
+										marginHorizontal: 5,
+									}}
+								>
+									{isSignup ? "Login" : "Signup"}
+								</OutlineButton>
+								<FilledButton
+									style={{
+										// width: 100,
+										marginHorizontal: 5,
+									}}
+									onButtonPress={() => authHandler()}
+								>
+									{isSignup ? "Signup" : "Login"}
+								</FilledButton>
+							</View>
 						</View>
 					</View>
-				</View>
-			)}
+				)}
+			</Pressable>
 		</KeyboardAvoidingView>
 	);
 };
@@ -195,15 +204,15 @@ const styles = StyleSheet.create({
 	screen: {
 		flex: 1,
 		backgroundColor: theme.surface,
-		// justifyContent: "center",
-		// alignItems: "center",
+	},
+	pressable: {
+		flex: 1,
 	},
 	authScreenContent: {
 		flex: 1,
 		height: "100%",
 		width: "100%",
 		paddingTop: 100,
-		// justifyContent: "center",
 		alignItems: "center",
 	},
 	loadingSpinner: {
@@ -221,8 +230,11 @@ const styles = StyleSheet.create({
 		borderRadius: 12,
 		backgroundColor: theme.surfaceVariant,
 	},
+	authCardHeader: {
+		paddingVertical: 10,
+	},
 	authCardContent: {
-		marginTop: 10,
+		// marginTop: 20,
 		// flexDirection: "row",
 		// justifyContent: "flex-end"
 	},
@@ -238,6 +250,10 @@ const styles = StyleSheet.create({
 		marginTop: 10,
 		flexDirection: "row",
 		justifyContent: "flex-end",
+	},
+	authTextInput: {
+		paddingVertical: 5,
+		backgroundColor: theme.surfaceVariant,
 	},
 });
 

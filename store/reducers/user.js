@@ -1,4 +1,4 @@
-import User from "../../dummy/model/User";
+import User from "../../models/User";
 import { GET_USER_FROM_DB, SAVE_USER } from "../actions/user";
 const initialState = {
 	user: null,

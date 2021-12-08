@@ -6,50 +6,95 @@ import {
 	setDoc,
 	getFirestore,
 	getDoc,
+	addDoc,
 } from "firebase/firestore";
+import {
+	getAuth,
+	createUserWithEmailAndPassword,
+	signInWithEmailAndPassword,
+} from "firebase/auth";
 import { useSelector } from "react-redux";
 
 import * as firebaseConfig from "./config";
 
-// export const firebaseConfig = {
-//     apiKey: "AIzaSyAf6yOGx_V5wXyVUzot1sDgsICKPbDVgIs",
-//     authDomain: "workoutlogger-48f71.firebaseapp.com",
-//     databaseURL: "https://workoutlogger-48f71-default-rtdb.europe-west1.firebasedatabase.app/",
-//     storageBucket: "gs://workoutlogger-48f71.appspot.com"
-// };
+// APPSETUO
 const app = initializeApp(firebaseConfig.firebaseConfig);
 
+// FIRESTORE
 const database = getFirestore(app);
 
-export const writeDocumentToCollection = async (document, collection, optionalID) => {
-    
-    console.log("doc: " + document);
-	// const id = "qvx7oSGJIXgzlyKIZhX11VstvEq2";
-	// const userData = {
-	// 	name: "Dennis",
-	// 	weight: 100,
-	// 	height: 190,
-	// 	profileImageURL:
-	// 		"https://images.unsplash.com/photo-1506207803951-1ee93d7256ad?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1160&q=80",
-	// };
-
-	// try {
-	// 	return await setDoc(doc(database, "users", id), userData);
-	// } catch (e) {
-	// 	console.log(e);
-	// }
+export const writeDocumentToCollection = async (
+	document,
+	dbCollection,
+	optionalID,
+	shouldMerge = true
+) => {
+	console.log("doc: " + document);
+	if (optionalID) {
+		try {
+			const docRef = doc(database, dbCollection, optionalID);
+			return await setDoc(docRef, document, { merge: shouldMerge });
+		} catch (e) {
+			console.log("From WriteDocumentToCOllection");
+			console.log(e);
+		}
+	} else {
+		try {
+			return await addDoc(collection(db, dbCollection), document);
+		} catch (e) {
+			console.log("From WriteDocumentToCOllection, with no specified ID");
+			console.log(e);
+		}
+	}
 };
 
 export const getDocumentFromCollection = async (docID, collectionName) => {
-    console.log(docID, collectionName);
-    const docRef = doc(database, collectionName, docID);
-    const docSnap = await getDoc(docRef);
+	console.log(docID, collectionName);
+	const docRef = doc(database, collectionName, docID);
+	const docSnap = await getDoc(docRef);
 
-    if(docSnap.exists()){
-        // console.log("Document Data: ");
-        // console.log( docSnap.data());
+	if (docSnap.exists()) {
+		// console.log("Document Data: ");
+		// console.log( docSnap.data());
 		return docSnap.data();
-    }else{
-        console.log("No such document");
-    }
-}
+	} else {
+		console.log("No such document");
+	}
+};
+
+// AUTHENTICATION
+const auth = getAuth();
+
+export const signUpNewUserWithEmailAndPassword = async (email, password) => {
+	try {
+		const userCredentials = await createUserWithEmailAndPassword(
+			auth,
+			email,
+			password
+		);
+		return userCredentials.user;
+	} catch (error) {
+		const errorCode = error.code;
+		const errorMessage = error.message;
+		console.log(error.message);
+		// TODO, return better errorsmessages
+		throw new Error(error);
+	}
+};
+
+export const loginWithEmailAndPassword = async (email, password) => {
+	try {
+		const userCredentials = await signInWithEmailAndPassword(
+			auth,
+			email,
+			password
+		);
+		return userCredentials.user;
+	} catch (e) {
+		const errorCode = error.code;
+		const errorMessage = error.message;
+		console.log(error.message);
+		// TODO, return better errorsmessages
+		throw new Error(error);
+	}
+};

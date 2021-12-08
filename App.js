@@ -1,31 +1,41 @@
 import "react-native-gesture-handler";
-import React, { useState } from "react";
-import { StyleSheet, View, Dimensions } from "react-native";
-import { LogBox } from 'react-native';
 
-LogBox.ignoreLogs(['Setting a timer']);
+// React
+import React, { useState } from "react";
+
+// react native
+import { StyleSheet, View, Dimensions } from "react-native";
+import { LogBox } from "react-native";
+LogBox.ignoreLogs(["Setting a timer"]);
+LogBox.ignoreLogs(["AsyncStorage has been"]);
+
+// redux
 
 import { createStore, combineReducers, applyMiddleware } from "redux";
 import { Provider } from "react-redux";
 import ReduxThunk from "redux-thunk";
 
+// Navigator
 import AppNavigator from "./navigation/AppNavigator";
 
+// themeing
 import { Themes } from "./shared/Theme";
 const theme = Themes.dark;
 
+// Expo
 import AppLoading from "expo-app-loading";
 import * as Font from "expo-font";
 
+// Reducers
 import authReducer from "./store/reducers/auth";
-import userReducer from './store/reducers/user';
+import userReducer from "./store/reducers/user";
 
-const screenWidth = Dimensions.get("window").width;
-const screenHeight = Dimensions.get("window").height;
+// react native paper
+import { Provider as PaperProvider } from "react-native-paper";
 
 const rootReducer = combineReducers({
 	auth: authReducer,
-	user: userReducer
+	user: userReducer,
 });
 const store = createStore(rootReducer, applyMiddleware(ReduxThunk));
 
@@ -48,11 +58,13 @@ export default function App() {
 		);
 	}
 	return (
-		<View style={styles.baseScreen}>
+		<PaperProvider>
 			<Provider store={store}>
-				<AppNavigator />
+				<View style={styles.baseScreen}>
+					<AppNavigator />
+				</View>
 			</Provider>
-		</View>
+		</PaperProvider>
 	);
 }
 

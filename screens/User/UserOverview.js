@@ -56,6 +56,9 @@ const UserOverviewScreen = (props) => {
 					<OutlineButton onButtonPress={() => logoutUser()}>
 						Logout
 					</OutlineButton>
+					<OutlineButton onButtonPress={() => console.log(authDetails)}>
+						authDetails
+					</OutlineButton>
 				</View>
 			</ScrollView>
 		</SafeAreaView>
