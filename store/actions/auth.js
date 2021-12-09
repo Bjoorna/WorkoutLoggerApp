@@ -11,8 +11,6 @@ export const LOGOUT = "LOGOUT";
 // export const UPDATE_USER = "UPDATE_USER";
 // export const SAVE_USER = "SAVE_USER";
 
-const apikey = "AIzaSyAf6yOGx_V5wXyVUzot1sDgsICKPbDVgIs";
-
 export const auth = (userID, token) => {
 	return (dispatch) => {
 		dispatch({ type: AUTH, token: token, userID: userID });

@@ -111,6 +111,11 @@ const AuthScreen = (props) => {
 		[dispatchFormState]
 	);
 
+	const setTempLoginCreds = () =>  {
+		setEmail("marcusbjorna@gmail.com");
+		setPassword("123456");
+	}
+
 	return (
 		<KeyboardAvoidingView
 			behavior="padding"
@@ -121,6 +126,11 @@ const AuthScreen = (props) => {
 				style={styles.pressable}
 				onPress={() => Keyboard.dismiss()}
 			>
+				{isLoading && (
+					<View style={styles.loadingSpinner}>
+						<ActivityIndicator size="large" color={theme.primary}  />
+					</View>
+				)} 
 				{!isLoading && (
 					<View style={styles.authScreenContent}>
 						<View style={styles.authCardContainer}>
@@ -173,6 +183,7 @@ const AuthScreen = (props) => {
 							</View>
 
 							<View style={styles.authCardButtonRow}>
+								<OutlineButton onButtonPress={() => setTempLoginCreds()}>SetCredsTEMP</OutlineButton>
 								<OutlineButton
 									onButtonPress={() => setIsSignup(!isSignup)}
 									style={{

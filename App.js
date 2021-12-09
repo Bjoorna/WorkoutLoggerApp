@@ -29,6 +29,7 @@ import * as Font from "expo-font";
 // Reducers
 import authReducer from "./store/reducers/auth";
 import userReducer from "./store/reducers/user";
+import workoutReducer  from "./store/reducers/workout";
 
 // react native paper
 import { Provider as PaperProvider } from "react-native-paper";
@@ -36,6 +37,7 @@ import { Provider as PaperProvider } from "react-native-paper";
 const rootReducer = combineReducers({
 	auth: authReducer,
 	user: userReducer,
+	workout: workoutReducer
 });
 const store = createStore(rootReducer, applyMiddleware(ReduxThunk));
 

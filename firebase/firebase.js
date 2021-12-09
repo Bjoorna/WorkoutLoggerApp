@@ -26,11 +26,11 @@ const database = getFirestore(app);
 export const writeDocumentToCollection = async (
 	document,
 	dbCollection,
-	optionalID,
+	optionalID = "",
 	shouldMerge = true
 ) => {
 	console.log("doc: " + document);
-	if (optionalID) {
+	if (optionalID !== "") {
 		try {
 			const docRef = doc(database, dbCollection, optionalID);
 			return await setDoc(docRef, document, { merge: shouldMerge });
@@ -40,7 +40,7 @@ export const writeDocumentToCollection = async (
 		}
 	} else {
 		try {
-			return await addDoc(collection(db, dbCollection), document);
+			return await addDoc(collection(database, dbCollection), document);
 		} catch (e) {
 			console.log("From WriteDocumentToCOllection, with no specified ID");
 			console.log(e);

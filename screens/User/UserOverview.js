@@ -10,20 +10,21 @@ import {
 } from "react-native";
 
 import * as AuthActions from "../../store/actions/auth";
+import * as WorkoutActions from '../../store/actions/workout';
 import { useDispatch, useSelector } from "react-redux";
-
-import USERS from "../../dummy/data/Users";
 
 import DisplayText from "../../components/Text/Display";
 import BodyText from "../../components/Text/Body";
-import FilledButton from "../../components/Buttons/FilledButton";
-import { Themes } from "../../shared/Theme";
 import OutlineButton from "../../components/Buttons/OutlineButton";
+import { Themes } from "../../shared/Theme";
 const theme = Themes.dark;
+
+import Workout from "../../models/workout";
 
 const UserOverviewScreen = (props) => {
 	// const user = USERS.find((user) => user.name === "Dennis");
 	const user = useSelector((state) => state.user.user);
+	const userID = useSelector(state => state.auth.userID)
 	console.log("USER from UserOverview: ");
 	console.log(user);
 
@@ -37,6 +38,11 @@ const UserOverviewScreen = (props) => {
 	const saveUser = () => {
 		dispatch(AuthActions.saveUser(user));
 	};
+
+	const testWorkout = new Workout(new Date(), false, "This is a workout", userID);
+	const saveWorkout = () => {
+		dispatch(WorkoutActions.addWorkout(testWorkout));
+	}
 
 	return (
 		<SafeAreaView style={styles.safeView}>
@@ -58,6 +64,9 @@ const UserOverviewScreen = (props) => {
 					</OutlineButton>
 					<OutlineButton onButtonPress={() => console.log(authDetails)}>
 						authDetails
+					</OutlineButton>
+					<OutlineButton onButtonPress={() => saveWorkout()}>
+						AddWorkoutTest
 					</OutlineButton>
 				</View>
 			</ScrollView>
