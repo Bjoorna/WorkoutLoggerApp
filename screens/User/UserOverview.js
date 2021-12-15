@@ -10,7 +10,7 @@ import {
 } from "react-native";
 
 import * as AuthActions from "../../store/actions/auth";
-import * as WorkoutActions from '../../store/actions/workout';
+import * as WorkoutActions from "../../store/actions/workout";
 import { useDispatch, useSelector } from "react-redux";
 
 import DisplayText from "../../components/Text/Display";
@@ -24,7 +24,7 @@ import Workout from "../../models/workout";
 const UserOverviewScreen = (props) => {
 	// const user = USERS.find((user) => user.name === "Dennis");
 	const user = useSelector((state) => state.user.user);
-	const userID = useSelector(state => state.auth.userID)
+	const userID = useSelector((state) => state.auth.userID);
 	console.log("USER from UserOverview: ");
 	console.log(user);
 
@@ -39,10 +39,15 @@ const UserOverviewScreen = (props) => {
 		dispatch(AuthActions.saveUser(user));
 	};
 
-	const testWorkout = new Workout(new Date(), false, "This is a workout", userID);
+	const testWorkout = new Workout(
+		Date.now(),
+		false,
+		"This is a workout",
+		userID
+	);
 	const saveWorkout = () => {
 		dispatch(WorkoutActions.addWorkout(testWorkout));
-	}
+	};
 
 	return (
 		<SafeAreaView style={styles.safeView}>
@@ -62,7 +67,9 @@ const UserOverviewScreen = (props) => {
 					<OutlineButton onButtonPress={() => logoutUser()}>
 						Logout
 					</OutlineButton>
-					<OutlineButton onButtonPress={() => console.log(authDetails)}>
+					<OutlineButton
+						onButtonPress={() => console.log(authDetails)}
+					>
 						authDetails
 					</OutlineButton>
 					<OutlineButton onButtonPress={() => saveWorkout()}>

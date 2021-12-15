@@ -34,11 +34,11 @@ export const signup = (email, password) => {
 		};
 
 		try {
+			
 			const newUser = await firebase.signUpNewUserWithEmailAndPassword(
 				email,
 				password
 			);
-			console.log(newUser.stsTokenManager);
 			const userID = newUser.uid;
 			const userToken = newUser.stsTokenManager.accessToken;
 			await firebase.writeDocumentToCollection(tempTestData, "users", userID);
@@ -55,16 +55,17 @@ export const signup = (email, password) => {
 export const login = (email, password) => {
 	return async (dispatch) => {
 		try {
+			console.log("Logging in user...");
 			const user = await firebase.loginWithEmailAndPassword(
 				email,
 				password
 			);
-			console.log(user.stsTokenManager);
+			console.log("User logged in");
 			const userID = user.uid;
 			const userToken = user.stsTokenManager.accessToken;
-
+			console.log("Getting userData from server");
 			const userDataFromServer = await firebase.getDocumentFromCollection(userID, "users");
-
+			console.log("User retrieved");
 			dispatch(userActions.saveUser(userDataFromServer));
 
 			dispatch(auth(userID, userToken));

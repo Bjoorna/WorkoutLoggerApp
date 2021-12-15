@@ -13,9 +13,10 @@ import {
 	createUserWithEmailAndPassword,
 	signInWithEmailAndPassword,
 } from "firebase/auth";
-import { useSelector } from "react-redux";
 
 import * as firebaseConfig from "./config";
+
+import Workout from "../models/workout";
 
 // APPSETUO
 const app = initializeApp(firebaseConfig.firebaseConfig);
@@ -23,11 +24,14 @@ const app = initializeApp(firebaseConfig.firebaseConfig);
 // FIRESTORE
 const database = getFirestore(app);
 
+export const writeWorkoutToCollection = async (workout, ) => {}
+
 export const writeDocumentToCollection = async (
 	document,
 	dbCollection,
 	optionalID = "",
-	shouldMerge = true
+	shouldMerge = true,
+	converter
 ) => {
 	console.log("doc: " + document);
 	if (optionalID !== "") {
@@ -40,7 +44,7 @@ export const writeDocumentToCollection = async (
 		}
 	} else {
 		try {
-			return await addDoc(collection(database, dbCollection), document);
+			return (await addDoc(collection(database, dbCollection), document)).withConverter(converter);
 		} catch (e) {
 			console.log("From WriteDocumentToCOllection, with no specified ID");
 			console.log(e);
@@ -97,4 +101,21 @@ export const loginWithEmailAndPassword = async (email, password) => {
 		// TODO, return better errorsmessages
 		throw new Error(error);
 	}
+};
+
+// converters
+
+const workoutConverter = {
+	toFirestore: (workout) => {
+		return {
+			date: workout.date,
+			complete: workout.complete,
+			note: workout.note,
+			owner: workout.owner,
+		};
+	},
+	fromFirestore: (snapshot, options) => {
+		const data = snapshot.data(options);
+		return new Workout(data.date, data.complete, data.note, data.owner);
+	},
 };

@@ -10,6 +10,8 @@ import TestScreen1 from "../screens/TestScreen2";
 import UserOverviewScreen from "../screens/User/UserOverview";
 import UserDetailScreen from "../screens/User/UserDetail";
 
+import AddWorkoutScreen from "../screens/Workout/AddWorkoutScreen";
+
 import { Themes } from "../shared/Theme";
 import AuthScreen from "../screens/User/AuthScreen";
 const theme = Themes.dark;
@@ -39,6 +41,7 @@ export const AppTabNavigator = () => {
 				},
 				tabBarActiveTintColor: theme.onSurface,
 				tabBarInactiveTintColor: theme.onSurfaceVariant,
+				headerShown: false
 			}}
 		>
 			<TabNavigator.Screen
@@ -55,8 +58,8 @@ export const AppTabNavigator = () => {
 						/>
 					),
 				}}
-				name="Test"
-				component={TestScreen}
+				name="Workout"
+				component={WorkoutStackScreen}
 			/>
 			<TabNavigator.Screen
 				name="Test1"
@@ -94,6 +97,25 @@ export const AppTabNavigator = () => {
 				}}
 			/>
 		</TabNavigator.Navigator>
+	);
+};
+
+const WorkoutStackNavigator = createStackNavigator();
+
+export const WorkoutStackScreen = () => {
+	return (
+		<WorkoutStackNavigator.Navigator>
+			<WorkoutStackNavigator.Screen
+				name="TestFrontPage"
+				component={TestScreen}
+				options={{ ...defaultStyleOptions }}
+			/>
+			<WorkoutStackNavigator.Screen
+				name="AddWorkout"
+				component={AddWorkoutScreen}
+				options={{ ...defaultStyleOptions, headerTitle: "Add Workout" }}
+			/>
+		</WorkoutStackNavigator.Navigator>
 	);
 };
 
