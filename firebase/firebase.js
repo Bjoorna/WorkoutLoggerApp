@@ -1,3 +1,4 @@
+
 import { initializeApp } from "firebase/app";
 import { getDatabase } from "firebase/database";
 import {
@@ -7,6 +8,8 @@ import {
 	getFirestore,
 	getDoc,
 	addDoc,
+	Timestamp,
+	writeBatch
 } from "firebase/firestore";
 import {
 	getAuth,
@@ -15,16 +18,61 @@ import {
 } from "firebase/auth";
 
 import * as firebaseConfig from "./config";
-
 import Workout from "../models/workout";
 
+import {nanoid} from 'nanoid';
 // APPSETUO
 const app = initializeApp(firebaseConfig.firebaseConfig);
 
 // FIRESTORE
 const database = getFirestore(app);
 
-export const writeWorkoutToCollection = async (workout, ) => {}
+export const writeExercisesToDatabase = async (exercises) => {
+	try {
+		const batch = writeBatch(database);
+		let arrayOfExerciseIDs = [];
+		for(let exercise of exercises) {
+			const exerciseID = nanoid();
+			const exerciseTransform = {
+				exercise: exercise.exercise,
+				weight: exercise.weight,
+				reps: exercise.reps,
+				sets: exercise.sets
+			};
+			const exerciseRef = doc(database, "exercises", exerciseID);
+			arrayOfExerciseIDs.push(exerciseID);
+			batch.set(exerciseRef, exerciseTransform);
+		}
+		await batch.commit();
+		return arrayOfExerciseIDs;
+	} catch (error) {
+		console.log(error);
+	}
+}
+
+export const writeWorkoutToCollection = async (workout) => {
+	try {
+		const exerciseIDs = await writeExercisesToDatabase(workout.exercises)
+
+		const newWorkout = {
+			exercises: exerciseIDs,
+			date: Timestamp.now(),
+			complete: workout.complete,
+			note: workout.note,
+			owner: workout.owner,
+		};
+
+		const newUUID = nanoid();
+		console.log(newUUID);
+
+		const docRef = doc(database, "workouts", newUUID);
+		return await setDoc(docRef, newWorkout);
+	} catch (e) {
+		console.log("From WriteWrokoutToCOllection");
+		console.log(e);
+
+	}
+};
 
 export const writeDocumentToCollection = async (
 	document,
@@ -44,7 +92,9 @@ export const writeDocumentToCollection = async (
 		}
 	} else {
 		try {
-			return (await addDoc(collection(database, dbCollection), document)).withConverter(converter);
+			return (
+				await addDoc(collection(database, dbCollection), document)
+			).withConverter(converter);
 		} catch (e) {
 			console.log("From WriteDocumentToCOllection, with no specified ID");
 			console.log(e);

@@ -50,33 +50,26 @@ const styles = StyleSheet.create({
 		borderColor: theme.outline,
 		paddingHorizontal: 24,
 		minWidth: 48,
+		height: 40,
 	},
 	buttonBaseOnPress: {
 		backgroundColor: theme.primary,
 		opacity: 0.12,
 	},
 	pressableButton: {
-		height: 40,
+		height: "100%",
+		width: "100%",
+
 		alignItems: "center",
 		justifyContent: "center",
 	},
 	pressableButtonOnPress: {
-		height: 40,
+		height: "100%",
 		alignItems: "center",
 		justifyContent: "center",
-		// // borderRadius: 40,
-		// overflow: "hidden",
-		// borderWidth: 1,
-		// borderStyle: "solid",
-		// borderColor: theme.outline,
-		// paddingHorizontal: 24,
-		// minWidth: 48,
 	},
 	text: {
 		color: theme.primary,
-		// marginBottom: 2,
-		// textAlign: "center",
 	},
 });
-
 export default OutlineButton;

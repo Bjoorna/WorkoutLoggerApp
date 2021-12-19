@@ -39,9 +39,11 @@ export const AppTabNavigator = () => {
 					paddingBottom: 16,
 					paddingTop: 12,
 				},
+				
 				tabBarActiveTintColor: theme.onSurface,
 				tabBarInactiveTintColor: theme.onSurfaceVariant,
-				headerShown: false
+				headerShown: false,
+				tabBarHideOnKeyboard: true
 			}}
 		>
 			<TabNavigator.Screen

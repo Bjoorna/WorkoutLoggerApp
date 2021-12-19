@@ -44,13 +44,14 @@ const styles = StyleSheet.create({
 		overflow: "hidden",
 		paddingHorizontal: 12,
 		minWidth: 48,
+		height: 40
 	},
 	buttonBaseOnPress: {
 		backgroundColor: theme.primary,
 		opacity: 0.12,
 	},
 	pressableButton: {
-		height: 40,
+		height: "100%",
 		alignItems: "center",
 		justifyContent: "center",
 	},

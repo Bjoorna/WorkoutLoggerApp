@@ -1,4 +1,5 @@
 import "react-native-gesture-handler";
+import 'react-native-get-random-values';
 
 // React
 import React, { useState } from "react";

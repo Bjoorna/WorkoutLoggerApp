@@ -34,17 +34,18 @@ const styles = StyleSheet.create({
 		overflow: "hidden",
 		backgroundColor: theme.primary,
 		paddingHorizontal: 12,
-		minWidth: 48
+		minWidth: 48,
+		height: 40,
 
 	},
 	pressableButton: {
-		height: 40,
+		height: "100%",
 		alignItems: "center",
 		justifyContent: "center",
 	},
 	onPressStyle: {
 		backgroundColor: theme.onPrimary,
-		height: 40,
+		height: "100%",
 		alignItems: "center",
 		justifyContent: "center",
 		opacity: 0.12
