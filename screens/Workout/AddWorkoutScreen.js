@@ -25,9 +25,9 @@ const theme = Themes.dark;
 
 const ExerciseArray = ["Squat", "Deadlift", "Bench-Press"];
 
+// TODO make this separate component?
 const ExerciseList = (props) => {
 	const [isPressed, setIsPressed] = useState(false);
-
 	return (
 		<View style={modalStyles.exerciseListItem}>
 			<Pressable
@@ -54,12 +54,21 @@ const workoutReducer = (state, action) => {
 		case ADD_EXERCISE:
 			let newExerciseArray = [...state.workout.exercises];
 			newExerciseArray.push(action.exercise);
-			let newWorkout = { ...state.workout };
-			newWorkout.exercises = newExerciseArray;
+			let workoutWithAddedExercise = { ...state.workout };
+			workoutWithAddedExercise.exercises = newExerciseArray;
 			// console.log("From WorkoutReduce");
 			// console.log(newWorkout);
-			return { ...state, workout: newWorkout };
+			return { ...state, workout: workoutWithAddedExercise };
 		case REMOVE_EXERCISE:
+			console.log(action.exercise);
+			const exerciseToRemove = action.exercise;
+			let exArray = [...state.workout.exercises];
+			exArray = exArray.filter(
+				(exercise) => exercise !== exerciseToRemove
+			);
+			let workoutWithRemovedExercise = { ...state.workout };
+			workoutWithRemovedExercise.exercises = exArray;
+			return { ...state, workout: workoutWithRemovedExercise };
 
 		default:
 			return state;
@@ -86,33 +95,19 @@ const AddWorkoutScreen = (props) => {
 		hideModal();
 	};
 
-	const clearSelectedExercise = () => {
-		setSelectedExercise("");
-	};
-
-	const [exercises, setExercises] = useState([]);
-	const [exerciseArrayUpdated, setExerciseArrayUpdated] = useState(false);
-
 	const addExercise = () => {
 		const newExercise = new Exercise(
 			selectedExercise,
 			selectedWeight,
 			selectedReps,
 			selectedSets,
-			8
+			selectedRPE
 		);
-		let exerciseArray = [...exercises];
-		// exerciseArray.push(newExercise);
-		// setExercises(exerciseArray);
-		// setExerciseArrayUpdated(!exerciseArrayUpdated);
 		dispatch({ type: ADD_EXERCISE, exercise: newExercise });
 	};
 
-	const removeExercise = (index) => {
-		let oldArray = exercises;
-		oldArray.splice(index, 1);
-		const newArray = [...oldArray];
-		setExercises(newArray);
+	const removeExercise = (exerciseToRemove) => {
+		dispatch({ type: REMOVE_EXERCISE, exercise: exerciseToRemove });
 	};
 
 	const saveWorkout = async () => {
@@ -129,19 +124,15 @@ const AddWorkoutScreen = (props) => {
 	const [exerciseDisplay, setExerciseDisplay] = useState([]);
 
 	useEffect(() => {
-		console.log("USEEFECT");
-		console.log(workoutState.workout.exercises);
 		setExerciseDisplay(workoutState.workout.exercises);
-		// console.log(exerciseDisplay);
 	}, [workoutState]);
 
-	// const [exerciseIsSelected, toggleExerciseIsSelected] = useState(false);
 	// exercise states
 	const [selectedExercise, setSelectedExercise] = useState("");
 	const [selectedWeight, setSelectedWeight] = useState();
 	const [selectedReps, setSelectedReps] = useState();
 	const [selectedSets, setSelectedSets] = useState();
-	const [selectedRPE, setSelectedRPE] = useState();
+	const [selectedRPE, setSelectedRPE] = useState(8);
 
 	return (
 		<KeyboardAvoidingView behavior="padding" style={styles.container}>
@@ -236,7 +227,7 @@ const AddWorkoutScreen = (props) => {
 								index={itemData.index}
 								exercise={itemData.item}
 								removeExercise={() =>
-									removeExercise(itemData.index)
+									removeExercise(itemData.item)
 								}
 							/>
 						);
@@ -244,9 +235,6 @@ const AddWorkoutScreen = (props) => {
 				/>
 			</View>
 			<View style={styles.saveWorkoutContainer}>
-				<OutlineButton onButtonPress={() => console.log(workoutState)}>
-					PrintReducerState
-				</OutlineButton>
 				<FilledButton
 					onButtonPress={() => saveWorkout()}
 					style={{ width: "100%" }}
