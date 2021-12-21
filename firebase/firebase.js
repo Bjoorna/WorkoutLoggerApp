@@ -27,7 +27,7 @@ const app = initializeApp(firebaseConfig.firebaseConfig);
 // FIRESTORE
 const database = getFirestore(app);
 
-export const writeExercisesToDatabase = async (exercises) => {
+export const writeExercisesToDatabase = async (exercises, userID, timestamp) => {
 	try {
 		const batch = writeBatch(database);
 		let arrayOfExerciseIDs = [];
@@ -37,7 +37,10 @@ export const writeExercisesToDatabase = async (exercises) => {
 				exercise: exercise.exercise,
 				weight: exercise.weight,
 				reps: exercise.reps,
-				sets: exercise.sets
+				sets: exercise.sets,
+				rpe: exercise.rpe,
+				date: timestamp,
+				owner: userID
 			};
 			const exerciseRef = doc(database, "exercises", exerciseID);
 			arrayOfExerciseIDs.push(exerciseID);
@@ -47,16 +50,17 @@ export const writeExercisesToDatabase = async (exercises) => {
 		return arrayOfExerciseIDs;
 	} catch (error) {
 		console.log(error);
+		throw new Error(error);
 	}
 }
 
 export const writeWorkoutToCollection = async (workout) => {
 	try {
-		const exerciseIDs = await writeExercisesToDatabase(workout.exercises)
-
+		const timestamp = Timestamp.now();
+		const exerciseIDs = await writeExercisesToDatabase(workout.exercises, workout.owner, timestamp);
 		const newWorkout = {
 			exercises: exerciseIDs,
-			date: Timestamp.now(),
+			date: timestamp,
 			complete: workout.complete,
 			note: workout.note,
 			owner: workout.owner,
@@ -79,7 +83,6 @@ export const writeDocumentToCollection = async (
 	dbCollection,
 	optionalID = "",
 	shouldMerge = true,
-	converter
 ) => {
 	console.log("doc: " + document);
 	if (optionalID !== "") {
@@ -94,7 +97,7 @@ export const writeDocumentToCollection = async (
 		try {
 			return (
 				await addDoc(collection(database, dbCollection), document)
-			).withConverter(converter);
+			);
 		} catch (e) {
 			console.log("From WriteDocumentToCOllection, with no specified ID");
 			console.log(e);
@@ -153,19 +156,3 @@ export const loginWithEmailAndPassword = async (email, password) => {
 	}
 };
 
-// converters
-
-const workoutConverter = {
-	toFirestore: (workout) => {
-		return {
-			date: workout.date,
-			complete: workout.complete,
-			note: workout.note,
-			owner: workout.owner,
-		};
-	},
-	fromFirestore: (snapshot, options) => {
-		const data = snapshot.data(options);
-		return new Workout(data.date, data.complete, data.note, data.owner);
-	},
-};

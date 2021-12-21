@@ -1,4 +1,4 @@
-import React, { cloneElement, useEffect, useState } from "react";
+import React, { cloneElement, useEffect, useReducer, useState } from "react";
 import {
 	View,
 	TextInput,
@@ -13,22 +13,19 @@ import BodyText from "../../components/Text/Body";
 import TitleText from "../../components/Text/Title";
 import Divider from "../../components/UI/Divider";
 import ExerciseSummaryView from "../../components/ExerciseSummaryItem";
+import NumberInput from "../../components/UI/NumberInput";
 
 import { Themes } from "../../shared/Theme";
 import Exercise from "../../models/Exercise";
 import Workout from "../../models/workout";
 import { useSelector } from "react-redux";
-import * as firebase from '../../firebase/firebase';
+import * as firebase from "../../firebase/firebase";
+import OutlineButton from "../../components/Buttons/OutlineButton";
 const theme = Themes.dark;
 
 const ExerciseArray = ["Squat", "Deadlift", "Bench-Press"];
 
-const TestInput = (props) => {
-	return <TextInput {...props} style={{ ...styles.input, ...props.style }} />;
-};
-
 const ExerciseList = (props) => {
-	// console.log(props.item);
 	const [isPressed, setIsPressed] = useState(false);
 
 	return (
@@ -48,15 +45,43 @@ const ExerciseList = (props) => {
 	);
 };
 
+const ADD_EXERCISE = "ADD_EXERCISE";
+const ADD_WORKSET = "ADD_WORKSET";
+const REMOVE_EXERCISE = "REMOVE_EXERCISE";
+
+const workoutReducer = (state, action) => {
+	switch (action.type) {
+		case ADD_EXERCISE:
+			let newExerciseArray = [...state.workout.exercises];
+			newExerciseArray.push(action.exercise);
+			let newWorkout = { ...state.workout };
+			newWorkout.exercises = newExerciseArray;
+			// console.log("From WorkoutReduce");
+			// console.log(newWorkout);
+			return { ...state, workout: newWorkout };
+		case REMOVE_EXERCISE:
+
+		default:
+			return state;
+	}
+};
+
+// TODO save users workout when page is exited before user has saved workout to server
+// https://reactnavigation.org/docs/function-after-focusing-screen/
+
 const AddWorkoutScreen = (props) => {
+	// Modal stuff
 	const [modalVisible, setModalVisible] = useState(false);
 	const showModal = () => setModalVisible(true);
 	const hideModal = () => setModalVisible(false);
+	const userID = useSelector((state) => state.auth.userID);
 
-	const userID = useSelector(state => state.auth.userID);
+	// WorkoutState
+	const [workoutState, dispatch] = useReducer(workoutReducer, {
+		workout: new Workout([], Date.now(), false, "", userID),
+	});
 
 	const selectExercise = (exercise) => {
-		console.log("SELECETEXERCISE IS: " + exercise);
 		setSelectedExercise(exercise);
 		hideModal();
 	};
@@ -73,38 +98,43 @@ const AddWorkoutScreen = (props) => {
 			selectedExercise,
 			selectedWeight,
 			selectedReps,
-			selectedSets
+			selectedSets,
+			8
 		);
 		let exerciseArray = [...exercises];
-		exerciseArray.push(newExercise);
-		setExercises(exerciseArray);
-		console.log(exercises);
-		setExerciseArrayUpdated(!exerciseArrayUpdated);
-	};
-
-	const [testArray, addToTestArray] = useState(["Hello1"]);
-
-	const updateTestArray = () => {
-		let newArray = [...testArray];
-		newArray.push("Hello");
-		addToTestArray(newArray);
+		// exerciseArray.push(newExercise);
+		// setExercises(exerciseArray);
+		// setExerciseArrayUpdated(!exerciseArrayUpdated);
+		dispatch({ type: ADD_EXERCISE, exercise: newExercise });
 	};
 
 	const removeExercise = (index) => {
 		let oldArray = exercises;
 		oldArray.splice(index, 1);
-		console.log(oldArray);
 		const newArray = [...oldArray];
 		setExercises(newArray);
 	};
 
-	const saveWorkout = async() => {
-
-		const newWorkout = new Workout(exercises, Date.now(), true, "This is a workout", userID);
-		console.log(newWorkout);
+	const saveWorkout = async () => {
+		const newWorkout = new Workout(
+			workoutState.workout.exercises,
+			Date.now(),
+			true,
+			"Note Goes Here",
+			userID
+		);
 		await firebase.writeWorkoutToCollection(newWorkout);
-	}
- 
+	};
+
+	const [exerciseDisplay, setExerciseDisplay] = useState([]);
+
+	useEffect(() => {
+		console.log("USEEFECT");
+		console.log(workoutState.workout.exercises);
+		setExerciseDisplay(workoutState.workout.exercises);
+		// console.log(exerciseDisplay);
+	}, [workoutState]);
+
 	// const [exerciseIsSelected, toggleExerciseIsSelected] = useState(false);
 	// exercise states
 	const [selectedExercise, setSelectedExercise] = useState("");
@@ -159,7 +189,7 @@ const AddWorkoutScreen = (props) => {
 
 				<View style={styles.newExerciseValues}>
 					<View style={styles.newExerciseWeight}>
-						<TestInput
+						<NumberInput
 							placeholder="Weight"
 							keyboardType="numeric"
 							textAlign="center"
@@ -169,7 +199,7 @@ const AddWorkoutScreen = (props) => {
 						<BodyText>Weight</BodyText>
 					</View>
 					<View style={styles.newExerciseWeight}>
-						<TestInput
+						<NumberInput
 							placeholder="Reps"
 							keyboardType="numeric"
 							textAlign="center"
@@ -179,7 +209,7 @@ const AddWorkoutScreen = (props) => {
 						<BodyText>Reps</BodyText>
 					</View>
 					<View style={styles.newExerciseWeight}>
-						<TestInput
+						<NumberInput
 							placeholder="Sets"
 							keyboardType="numeric"
 							textAlign="center"
@@ -198,21 +228,31 @@ const AddWorkoutScreen = (props) => {
 				<FlatList
 					style={{ width: "100%" }}
 					keyExtractor={(item, index) => index}
-					data={exercises}
-					extraData={exercises}
+					data={exerciseDisplay}
+					extraData={exerciseDisplay}
 					renderItem={(itemData) => {
 						return (
 							<ExerciseSummaryView
 								index={itemData.index}
 								exercise={itemData.item}
-								removeExercise={() => removeExercise(itemData.index)}
+								removeExercise={() =>
+									removeExercise(itemData.index)
+								}
 							/>
 						);
 					}}
 				/>
 			</View>
 			<View style={styles.saveWorkoutContainer}>
-				<FilledButton onButtonPress={() => saveWorkout()} style={{width: "100%"}}>Save workout</FilledButton>
+				<OutlineButton onButtonPress={() => console.log(workoutState)}>
+					PrintReducerState
+				</OutlineButton>
+				<FilledButton
+					onButtonPress={() => saveWorkout()}
+					style={{ width: "100%" }}
+				>
+					Save workout
+				</FilledButton>
 			</View>
 		</KeyboardAvoidingView>
 	);
@@ -238,12 +278,6 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		alignItems: "center",
 		borderRadius: 12,
-	},
-	input: {
-		height: 80,
-		backgroundColor: theme.onSecondaryContainer,
-		borderRadius: 20,
-		width: "90%",
 	},
 	newExerciseContainer: {
 		// justifyContent: "center",

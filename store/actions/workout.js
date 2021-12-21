@@ -1,7 +1,6 @@
 export const ADD_WORKOUT = "ADD_WORKOUT";
 export const GET_WORKOUTS = "GET_WORKOUTS";
 
-import * as converters from "../../firebase/converters";
 
 import * as firebase from "../../firebase/firebase";
 
@@ -19,7 +18,6 @@ export const addWorkout = (workout) => {
 				"workouts",
 				"",
 				false,
-                converters.workoutConverter
 			);
 
 			console.log(saveNewWorkout.id);

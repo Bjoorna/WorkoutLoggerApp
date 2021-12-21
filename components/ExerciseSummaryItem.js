@@ -6,7 +6,6 @@ import { ThemeProvider } from 'react-native-paper'
 
 
 const ExerciseSummaryView = props => {
-    console.log(props);
     return <View style={styles.exerciseSummaryView}>
         <TitleText large={true} >{props.exercise.exercise}</TitleText>
         <TextButton onButtonPress={props.removeExercise}>Delete</TextButton>
