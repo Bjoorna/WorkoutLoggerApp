@@ -14,6 +14,7 @@ import AddWorkoutScreen from "../screens/Workout/AddWorkoutScreen";
 
 import { Themes } from "../shared/Theme";
 import AuthScreen from "../screens/User/AuthScreen";
+import WeightCalculatorScreen from "../screens/Workout/WeightCalculatorScreen";
 const theme = Themes.dark;
 
 const defaultStyleOptions = {
@@ -63,6 +64,24 @@ export const AppTabNavigator = () => {
 				name="Workout"
 				component={WorkoutStackScreen}
 			/>
+			<TabNavigator.Screen
+				name="Calculator"
+				component={WeightCalculatorScreen}
+				options={{
+					tabBarIcon: (props) => (
+						<MaterialIcons
+							name="calculate"
+							size={24}
+							color={
+								props.focused
+									? theme.onSecondaryContainer
+									: theme.onSurfaceVariant
+							}
+						/>
+					),
+				}}
+
+			 />
 			<TabNavigator.Screen
 				name="Test1"
 				component={TestScreen1}
