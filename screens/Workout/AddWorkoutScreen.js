@@ -6,7 +6,7 @@ import {
 	FlatList,
 	Pressable,
 	KeyboardAvoidingView,
-	Vibration
+	Vibration,
 } from "react-native";
 import { Modal, Portal } from "react-native-paper";
 import FilledButton from "../../components/Buttons/FilledButton";
@@ -15,6 +15,7 @@ import TitleText from "../../components/Text/Title";
 import Divider from "../../components/UI/Divider";
 import ExerciseSummaryView from "../../components/ExerciseSummaryItem";
 import NumberInput from "../../components/UI/NumberInput";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 import { Themes } from "../../shared/Theme";
 import Exercise from "../../models/Exercise";
@@ -86,10 +87,15 @@ const AddWorkoutScreen = (props) => {
 	const hideModal = () => setModalVisible(false);
 	const userID = useSelector((state) => state.auth.userID);
 
+	// datePickerModal
+	const [datePickerModalVisible, setDatePickerModalVisible] = useState(false);
+	const [hasSetCustomDate, setHasSetCustomDate] = useState(false);
+
 	// WorkoutState
 	const [workoutState, dispatch] = useReducer(workoutReducer, {
 		workout: new Workout([], Date.now(), false, "", userID),
 	});
+	const [selectedDate, setSelectedDate] = useState(new Date());
 
 	const selectExercise = (exercise) => {
 		setSelectedExercise(exercise);
@@ -114,9 +120,15 @@ const AddWorkoutScreen = (props) => {
 	};
 
 	const saveWorkout = async () => {
+		let workoutDate;
+		if(hasSetCustomDate){
+			workoutDate = selectedDate.getTime();
+		}else{
+			workoutDate = Date.now();
+		}
 		const newWorkout = new Workout(
 			workoutState.workout.exercises,
-			Date.now(),
+			workoutDate,
 			true,
 			"Note Goes Here",
 			userID
@@ -138,7 +150,16 @@ const AddWorkoutScreen = (props) => {
 	const [selectedRPE, setSelectedRPE] = useState();
 
 	const vibrateDevice = () => {
-		Vibration.vibrate(50 );
+		Vibration.vibrate(50);
+	};
+
+	// for datepicker
+	const onChange = (event, newDate) => {
+		setDatePickerModalVisible(false);
+		setHasSetCustomDate(true);
+		console.log(event);
+		const currentDate = newDate || selectedDate;
+		setSelectedDate(currentDate);
 	}
 
 	return (
@@ -243,10 +264,35 @@ const AddWorkoutScreen = (props) => {
 						</View>
 					</View>
 				</View>
-				<FilledButton onButtonPress={addExercise}>
-					Add Exercise
-				</FilledButton>
+				<View
+					style={{
+						flexDirection: "row",
+						width: "100%",
+						justifyContent: "space-around",
+					}}
+				>
+					<FilledButton onButtonPress={addExercise}>
+						Add Exercise
+					</FilledButton>
+					<OutlineButton
+						onButtonPress={() => setDatePickerModalVisible(true)}
+					>
+						Set Date
+					</OutlineButton>
+				</View>
+				<BodyText large={true}>{selectedDate.toDateString()}</BodyText>
+
 			</View>
+			{datePickerModalVisible && (
+				<DateTimePicker
+					testID="datepicker"
+					value={selectedDate}
+					mode={"date"}
+					is24Hour={true}
+					display={"default"}
+					onChange={onChange}
+				/>
+			)}
 			<Divider width="90%" />
 			<View style={styles.workoutSummary}>
 				<FlatList

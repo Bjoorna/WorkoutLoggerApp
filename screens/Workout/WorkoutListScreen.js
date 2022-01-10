@@ -1,6 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import React from "react";
-import { ScrollView, StyleSheet, View, Button } from "react-native";
+import { ScrollView, StyleSheet, View, Appearance, useColorScheme } from "react-native";
 // import { TestTheme as theme } from "..Theme/shared/Theme";
 import { useDimensions } from "@react-native-community/hooks";
 import * as firebase from '../../firebase/firebase';
@@ -11,6 +11,7 @@ import { useSelector } from "react-redux";
 const theme = Themes.dark;
 
 const WorkoutListScreen = (props) => {
+	console.log(useColorScheme());
 	const { width, height } = useDimensions().window;
 
 	const userID = useSelector((state) => state.auth.userID);

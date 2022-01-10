@@ -77,7 +77,7 @@ export const getUserWorkouts = async(userID) => {
 
 export const writeWorkoutToCollection = async (workout) => {
 	try {
-		const timestamp = Timestamp.now();
+		const timestamp = Timestamp.fromMillis(workout.date);
 		const exerciseIDs = await writeExercisesToDatabase(workout.exercises, workout.owner, timestamp);
 		const newWorkout = {
 			exercises: exerciseIDs,
