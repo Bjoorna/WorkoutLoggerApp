@@ -6,6 +6,7 @@ import {
 	FlatList,
 	Pressable,
 	KeyboardAvoidingView,
+	Vibration
 } from "react-native";
 import { Modal, Portal } from "react-native-paper";
 import FilledButton from "../../components/Buttons/FilledButton";
@@ -96,6 +97,7 @@ const AddWorkoutScreen = (props) => {
 	};
 
 	const addExercise = () => {
+		console.log("IS pressedonly once");
 		const newExercise = new Exercise(
 			selectedExercise,
 			selectedWeight,
@@ -104,6 +106,7 @@ const AddWorkoutScreen = (props) => {
 			selectedRPE
 		);
 		dispatch({ type: ADD_EXERCISE, exercise: newExercise });
+		vibrateDevice();
 	};
 
 	const removeExercise = (exerciseToRemove) => {
@@ -132,7 +135,11 @@ const AddWorkoutScreen = (props) => {
 	const [selectedWeight, setSelectedWeight] = useState();
 	const [selectedReps, setSelectedReps] = useState();
 	const [selectedSets, setSelectedSets] = useState();
-	const [selectedRPE, setSelectedRPE] = useState(8);
+	const [selectedRPE, setSelectedRPE] = useState();
+
+	const vibrateDevice = () => {
+		Vibration.vibrate(50 );
+	}
 
 	return (
 		<KeyboardAvoidingView behavior="padding" style={styles.container}>
@@ -179,35 +186,61 @@ const AddWorkoutScreen = (props) => {
 				</View>
 
 				<View style={styles.newExerciseValues}>
-					<View style={styles.newExerciseWeight}>
-						<NumberInput
-							placeholder="Weight"
-							keyboardType="numeric"
-							textAlign="center"
-							selectionColor={theme.tertiary}
-							onChangeText={(number) => setSelectedWeight(number)}
-						/>
-						<BodyText>Weight</BodyText>
+					<View style={styles.newExerciseValuesRow}>
+						<View style={styles.newExerciseInputValues}>
+							<NumberInput
+								style={{ height: 50 }}
+								placeholder="Weight"
+								keyboardType="numeric"
+								textAlign="center"
+								selectionColor={theme.tertiary}
+								onChangeText={(number) =>
+									setSelectedWeight(number)
+								}
+							/>
+							<BodyText>Weight</BodyText>
+						</View>
+						<View style={styles.newExerciseInputValues}>
+							<NumberInput
+								style={{ height: 50 }}
+								placeholder="Reps"
+								keyboardType="numeric"
+								textAlign="center"
+								selectionColor={theme.tertiary}
+								onChangeText={(number) =>
+									setSelectedReps(number)
+								}
+							/>
+							<BodyText>Reps</BodyText>
+						</View>
 					</View>
-					<View style={styles.newExerciseWeight}>
-						<NumberInput
-							placeholder="Reps"
-							keyboardType="numeric"
-							textAlign="center"
-							selectionColor={theme.tertiary}
-							onChangeText={(number) => setSelectedReps(number)}
-						/>
-						<BodyText>Reps</BodyText>
-					</View>
-					<View style={styles.newExerciseWeight}>
-						<NumberInput
-							placeholder="Sets"
-							keyboardType="numeric"
-							textAlign="center"
-							selectionColor={theme.tertiary}
-							onChangeText={(number) => setSelectedSets(number)}
-						/>
-						<BodyText>Sets</BodyText>
+					<View style={styles.newExerciseValuesRow}>
+						<View style={styles.newExerciseInputValues}>
+							<NumberInput
+								style={{ height: 50 }}
+								placeholder="Sets"
+								keyboardType="numeric"
+								textAlign="center"
+								selectionColor={theme.tertiary}
+								onChangeText={(number) =>
+									setSelectedSets(number)
+								}
+							/>
+							<BodyText>Sets</BodyText>
+						</View>
+						<View style={styles.newExerciseInputValues}>
+							<NumberInput
+								style={{ height: 50 }}
+								placeholder="RPE"
+								keyboardType="numeric"
+								textAlign="center"
+								selectionColor={theme.tertiary}
+								onChangeText={(number) =>
+									setSelectedRPE(number)
+								}
+							/>
+							<BodyText>RPE</BodyText>
+						</View>
 					</View>
 				</View>
 				<FilledButton onButtonPress={addExercise}>
@@ -259,7 +292,7 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 	},
 	workoutSummary: {
-		marginTop: 20,
+		marginTop: 10,
 		width: "90%",
 		height: 300,
 		backgroundColor: theme.surfaceVariant,
@@ -275,7 +308,7 @@ const styles = StyleSheet.create({
 		marginVertical: 10,
 	},
 	selectNewExercise: {
-		width: "90%",
+		// width: "90%",
 		height: 60,
 		borderRadius: 16,
 		backgroundColor: theme.secondaryContainer,
@@ -287,17 +320,22 @@ const styles = StyleSheet.create({
 	newExerciseValues: {
 		marginVertical: 10,
 		width: "100%",
-		flexDirection: "row",
-		justifyContent: "space-around",
+		// flexDirection: "row",
+		// justifyContent: "space-around",
 		// ,backgroundColor: theme.secondary
 		borderStyle: "solid",
 		borderColor: theme.outline,
 		borderWidth: 1,
 		borderRadius: 16,
 	},
-	newExerciseWeight: {
-		height: 120,
-		width: 120,
+	newExerciseValuesRow: {
+		marginVertical: 5,
+		flexDirection: "row",
+		justifyContent: "space-around",
+	},
+	newExerciseInputValues: {
+		height: 80,
+		width: 100,
 		// backgroundColor: theme.secondaryContainer,
 		alignItems: "center",
 		justifyContent: "space-around",

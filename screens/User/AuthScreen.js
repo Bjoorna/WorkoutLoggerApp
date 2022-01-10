@@ -64,11 +64,6 @@ const AuthScreen = (props) => {
 			email: "",
 			password: "",
 		},
-		isFormValuesValid: {
-			email: false,
-			password: false,
-		},
-		isFormValid: false,
 	});
 
 	// error handling
@@ -77,6 +72,10 @@ const AuthScreen = (props) => {
 			Alert.alert("Error on AuthAttempt", error, [{ text: "Dismiss" }]);
 		}
 	}, [error]);
+
+	useEffect(() => {
+		dispatchFormState({type: FORM_INPUT_UPDATE, })
+	},[email, password])
 
 	const authHandler = async () => {
 		let action;
@@ -99,17 +98,17 @@ const AuthScreen = (props) => {
 		}
 	};
 
-	const inputChangeHandler = useCallback(
-		(inputIdentifier, inputValue, inputValidity) => {
-			dispatchFormState({
-				type: FORM_INPUT_UPDATE,
-				value: inputValue,
-				isValid: inputValidity,
-				input: inputIdentifier,
-			});
-		},
-		[dispatchFormState]
-	);
+	// const inputChangeHandler = useCallback(
+	// 	(inputIdentifier, inputValue, inputValidity) => {
+	// 		dispatchFormState({
+	// 			type: FORM_INPUT_UPDATE,
+	// 			value: inputValue,
+	// 			isValid: inputValidity,
+	// 			input: inputIdentifier,
+	// 		});
+	// 	},
+	// 	[dispatchFormState]
+	// );
 
 	const setTempLoginCreds = () =>  {
 		setEmail("marcusbjorna@gmail.com");

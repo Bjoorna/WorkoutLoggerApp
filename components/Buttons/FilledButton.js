@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View, Vibration } from "react-native";
 
 import { Themes } from "../../shared/Theme";
 import LabelText from "../Text/Label";
@@ -7,14 +7,23 @@ const theme = Themes.dark;
 
 const FilledButton = (props) => {
 	const [isPressed, setIsPressed] = useState(false);
+	const shouldVibrate = props.vibration;
+
+	const handleOnPressIn = () => {
+		// props.onButtonPress();
+		setIsPressed(true)
+		Vibration.vibrate(100);
+	}
 
 	return (
 		<View style={{ ...styles.buttonBase, ...props.style }}>
 			<Pressable
-				onPressIn={() => setIsPressed(true)}
+				onPressIn={handleOnPressIn}
 				onPressOut={() => setIsPressed(false)}
 				style={isPressed ? {...styles.onPressStyle, ...styles.buttonBase} :  {...styles.pressableButton, ...styles.buttonBase}}
 				onPress={props.onButtonPress}
+				// onPress={handleButtonPress}
+
 			>
 				<LabelText
 					large={true}

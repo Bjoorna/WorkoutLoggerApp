@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { Themes } from "../../shared/Theme";
@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
 		overflow: "hidden",
 		paddingHorizontal: 12,
 		minWidth: 48,
-		height: 40
+		height: 40,
 	},
 	buttonBaseOnPress: {
 		backgroundColor: theme.primary,

@@ -54,22 +54,57 @@ const FabButton = (props) => {
 	);
 };
 
+// const styles = StyleSheet.create({
+// 	buttonBase: {
+// 		borderRadius: 16,
+// 		overflow: "hidden",
+// 		backgroundColor: theme.primaryContainer,
+// 		padding: 16,
+// 		minWidth: 80,
+// 	},
+// 	pressableButton: {
+// 		height: 56,
+// 		alignItems: "center",
+// 		justifyContent: "center",
+// 	},
+// 	onPressStyle: {
+// 		backgroundColor: theme.onPrimaryContainer,
+// 		height: 56,
+// 		alignItems: "center",
+// 		justifyContent: "center",
+// 		opacity: 0.12,
+// 	},
+// 	text: {
+// 		color: theme.onPrimaryContainer,
+// 	},
+// 	insideButton: {
+// 		justifyContent: "center",
+// 		alignItems: "center",
+// 		flexDirection: "row",
+// 	},
+// });
+
 const styles = StyleSheet.create({
 	buttonBase: {
+		flexDirection: "row",
 		borderRadius: 16,
 		overflow: "hidden",
 		backgroundColor: theme.primaryContainer,
 		padding: 16,
 		minWidth: 80,
+		height: 56,
+		justifyContent: "center",
+		alignItems: "center",
 	},
 	pressableButton: {
-		height: 56,
+		height: "100%",
+		// width: "100%",
 		alignItems: "center",
 		justifyContent: "center",
 	},
 	onPressStyle: {
 		backgroundColor: theme.onPrimaryContainer,
-		height: 56,
+		height: "100%",
 		alignItems: "center",
 		justifyContent: "center",
 		opacity: 0.12,
@@ -78,10 +113,9 @@ const styles = StyleSheet.create({
 		color: theme.onPrimaryContainer,
 	},
 	insideButton: {
-		justifyContent: "center",
-		alignItems: "center",
 		flexDirection: "row",
+		// justifyContent: "center",
+		alignItems: "center",
 	},
 });
-
 export default FabButton;

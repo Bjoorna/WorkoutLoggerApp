@@ -15,6 +15,7 @@ import AddWorkoutScreen from "../screens/Workout/AddWorkoutScreen";
 import { Themes } from "../shared/Theme";
 import AuthScreen from "../screens/User/AuthScreen";
 import WeightCalculatorScreen from "../screens/Workout/WeightCalculatorScreen";
+import WorkoutListScreen from "../screens/Workout/WorkoutListScreen";
 const theme = Themes.dark;
 
 const defaultStyleOptions = {
@@ -127,8 +128,8 @@ export const WorkoutStackScreen = () => {
 	return (
 		<WorkoutStackNavigator.Navigator>
 			<WorkoutStackNavigator.Screen
-				name="TestFrontPage"
-				component={TestScreen}
+				name="Workouts"
+				component={WorkoutListScreen}
 				options={{ ...defaultStyleOptions }}
 			/>
 			<WorkoutStackNavigator.Screen

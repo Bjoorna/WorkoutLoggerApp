@@ -9,7 +9,10 @@ import {
 	getDoc,
 	addDoc,
 	Timestamp,
-	writeBatch
+	writeBatch,
+	where,
+	query,
+	getDocs
 } from "firebase/firestore";
 import {
 	getAuth,
@@ -30,7 +33,7 @@ const database = getFirestore(app);
 export const writeExercisesToDatabase = async (exercises, userID, timestamp) => {
 	try {
 		const batch = writeBatch(database);
-		let arrayOfExerciseIDs = [];
+		const arrayOfExerciseIDs = [];
 		for(let exercise of exercises) {
 			const exerciseID = nanoid();
 			const exerciseTransform = {
@@ -51,6 +54,24 @@ export const writeExercisesToDatabase = async (exercises, userID, timestamp) => 
 	} catch (error) {
 		console.log(error);
 		throw new Error(error);
+	}
+}
+
+export const getUserWorkouts = async(userID) => {
+	try {
+		const q = query(collection(database, "workouts"), where("owner", "==", userID));
+		let workoutsArray= [];
+		console.log("Getting User Worktouts");
+		const querySnapshot = await getDocs(q);
+		console.log("Found User Worktouts");
+		querySnapshot.forEach((doc) => {
+			console.log(doc.data())
+			workoutsArray.push(doc.data());
+		})
+		return workoutsArray;
+		
+	} catch (error) {
+		console.log(error);
 	}
 }
 
