@@ -112,8 +112,11 @@ const AddWorkoutScreen = (props) => {
 			selectedRPE
 		);
 		dispatch({ type: ADD_EXERCISE, exercise: newExercise });
+		setSelectedExercise("");
+		setSelectedWeight(undefined);
 		vibrateDevice();
 	};
+
 
 	const removeExercise = (exerciseToRemove) => {
 		dispatch({ type: REMOVE_EXERCISE, exercise: exerciseToRemove });
@@ -121,9 +124,9 @@ const AddWorkoutScreen = (props) => {
 
 	const saveWorkout = async () => {
 		let workoutDate;
-		if(hasSetCustomDate){
+		if (hasSetCustomDate) {
 			workoutDate = selectedDate.getTime();
-		}else{
+		} else {
 			workoutDate = Date.now();
 		}
 		const newWorkout = new Workout(
@@ -160,7 +163,7 @@ const AddWorkoutScreen = (props) => {
 		console.log(event);
 		const currentDate = newDate || selectedDate;
 		setSelectedDate(currentDate);
-	}
+	};
 
 	return (
 		<KeyboardAvoidingView behavior="padding" style={styles.container}>
@@ -280,8 +283,6 @@ const AddWorkoutScreen = (props) => {
 						Set Date
 					</OutlineButton>
 				</View>
-				<BodyText large={true}>{selectedDate.toDateString()}</BodyText>
-
 			</View>
 			{datePickerModalVisible && (
 				<DateTimePicker
@@ -295,6 +296,12 @@ const AddWorkoutScreen = (props) => {
 			)}
 			<Divider width="90%" />
 			<View style={styles.workoutSummary}>
+				<View style={styles.workoutSummaryInfo}>
+					<BodyText large={true}>Workout Summary</BodyText>
+					<BodyText large={true} style={{ marginLeft: 20 }}>
+						Date: {selectedDate.toDateString()}
+					</BodyText>
+				</View>
 				<FlatList
 					style={{ width: "100%" }}
 					keyExtractor={(item, index) => index}
@@ -342,9 +349,21 @@ const styles = StyleSheet.create({
 		width: "90%",
 		height: 300,
 		backgroundColor: theme.surfaceVariant,
-		justifyContent: "center",
+		// justifyContent: "center",
 		alignItems: "center",
 		borderRadius: 12,
+	},
+	workoutSummaryInfo: {
+		flexDirection: "row",
+		height: 40,
+		padding: 10,
+		width: "100%",
+		borderRadius: 12,
+		alignItems: "baseline",
+		// borderStyle: "solid",
+		// borderBottomWidth: 1,
+		// borderBottomColor: theme.outline
+	
 	},
 	newExerciseContainer: {
 		// justifyContent: "center",
