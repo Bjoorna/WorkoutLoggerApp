@@ -57,23 +57,34 @@ export const writeExercisesToDatabase = async (exercises, userID, timestamp) => 
 	}
 }
 
+// export const getUserWorkouts = async(userID) => {
+// 	try {
+// 		const q = query(collection(database, "workouts"), where("owner", "==", userID));
+// 		const workoutsArray= [];
+// 		const querySnapshot = await getDocs(q);
+// 		querySnapshot.forEach((doc) => {
+// 			console.log(doc.id);
+// 			console.log(doc.data())
+// 			workoutsArray.push(doc.data());
+// 		})
+// 		return workoutsArray;
+		
+// 	} catch (error) {
+// 		console.log(error);
+// 	}
+// }
+
 export const getUserWorkouts = async(userID) => {
 	try {
 		const q = query(collection(database, "workouts"), where("owner", "==", userID));
-		let workoutsArray= [];
-		console.log("Getting User Worktouts");
 		const querySnapshot = await getDocs(q);
-		console.log("Found User Worktouts");
-		querySnapshot.forEach((doc) => {
-			console.log(doc.data())
-			workoutsArray.push(doc.data());
-		})
-		return workoutsArray;
+		return querySnapshot;
 		
 	} catch (error) {
 		console.log(error);
 	}
 }
+
 
 export const writeWorkoutToCollection = async (workout) => {
 	try {

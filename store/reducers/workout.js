@@ -1,4 +1,4 @@
-import { ADD_WORKOUT } from "../actions/workout";
+import { ADD_WORKOUT, GET_WORKOUTS } from "../actions/workout";
 
 const initalState = {
 	workouts: [],
@@ -8,7 +8,10 @@ export default (state = initalState, action) => {
 	switch (action.type) {
         case ADD_WORKOUT:
             console.log(action.workout);
-            return {workouts: []}
+            return {workouts: []};
+		case GET_WORKOUTS: 
+			console.log(action.workouts);
+			return {workouts: action.workouts};
 		default:
 			return state;
 	}
