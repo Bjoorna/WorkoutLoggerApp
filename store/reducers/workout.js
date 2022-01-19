@@ -10,7 +10,6 @@ export default (state = initalState, action) => {
             console.log(action.workout);
             return {workouts: []};
 		case GET_WORKOUTS: 
-			console.log(action.workouts);
 			return {workouts: action.workouts};
 		default:
 			return state;

@@ -12,7 +12,9 @@ import {
 	writeBatch,
 	where,
 	query,
-	getDocs
+	getDocs,
+	FieldPath,
+	
 } from "firebase/firestore";
 import {
 	getAuth,
@@ -57,23 +59,6 @@ export const writeExercisesToDatabase = async (exercises, userID, timestamp) => 
 	}
 }
 
-// export const getUserWorkouts = async(userID) => {
-// 	try {
-// 		const q = query(collection(database, "workouts"), where("owner", "==", userID));
-// 		const workoutsArray= [];
-// 		const querySnapshot = await getDocs(q);
-// 		querySnapshot.forEach((doc) => {
-// 			console.log(doc.id);
-// 			console.log(doc.data())
-// 			workoutsArray.push(doc.data());
-// 		})
-// 		return workoutsArray;
-		
-// 	} catch (error) {
-// 		console.log(error);
-// 	}
-// }
-
 export const getUserWorkouts = async(userID) => {
 	try {
 		const q = query(collection(database, "workouts"), where("owner", "==", userID));
@@ -85,6 +70,29 @@ export const getUserWorkouts = async(userID) => {
 	}
 }
 
+export const getExercisesInWorkout = async(exercises, userID) => {
+	try{
+		// const q = query(collection(database, "exercises"), where(FieldPath.))
+		// const q = query(collection(database, "exercises"), where("uid", "in", workouts));
+		// const querySnapshot = await getDocs(q);
+		// querySnapshot.forEach(doc => {
+		// 	console.log("An Exercise: " + doc.data());
+		// })
+		const docRefs = exercises.map(exercise => getDoc(doc(database, "exercises", exercise)));
+		const docSnaps = await Promise.all(docRefs);
+		return docSnaps;
+		// docSnaps.forEach(doc => {
+		// 	if(doc.exists){
+		// 		console.log(doc.data());
+		// 	}
+		// });
+		
+
+
+	}catch(e){
+
+	}
+}
 
 export const writeWorkoutToCollection = async (workout) => {
 	try {
