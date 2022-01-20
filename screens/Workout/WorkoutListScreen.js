@@ -1,6 +1,6 @@
 import { StatusBar } from "expo-status-bar";
-import React, { useEffect, useState } from "react";
-import { FlatList, ScrollView, StyleSheet, View } from "react-native";
+import React, { useCallback, useEffect, useState } from "react";
+import { FlatList, ScrollView, StyleSheet, View, RefreshControl } from "react-native";
 // import { TestTheme as theme } from "..Theme/shared/Theme";
 import { useDimensions } from "@react-native-community/hooks";
 import * as firebase from "../../firebase/firebase";
@@ -18,8 +18,8 @@ const theme = Themes.dark;
 
 const TestWorkoutView = (props) => {
 	return (
-		<View style={{ width: "100%", height: 100}}>
-			<BodyText style={{ color: theme.primary  }}>
+		<View style={{ width: "100%", height: 100 }}>
+			<BodyText style={{ color: theme.primary }}>
 				{props.workout.id}
 			</BodyText>
 		</View>
@@ -33,6 +33,7 @@ const WorkoutListScreen = (props) => {
 	const userID = useSelector((state) => state.auth.userID);
 	const reduxWorkoutRef = useSelector((state) => state.workout.workouts);
 	const [workouts, setWorkouts] = useState([]);
+	const [refreshing, setRefreshing] = useState(false);
 
 	// const getUserWorkoutsFromServer = async () => {
 	// 	const serverWorkouts = await firebase.getUserWorkouts(userID);
@@ -68,11 +69,17 @@ const WorkoutListScreen = (props) => {
 		}
 	};
 
+	const onRefresh = useCallback(() => {
+		setRefreshing(true);
+		dispatch(WorkoutActions.getUserWorkouts(userID));
+	}, [])
+
 	useEffect(() => {
 		// console.log(reduxWorkoutRef);
 		console.log("Page Loaded");
 		const newArray = [...reduxWorkoutRef];
 		setWorkouts(newArray);
+		setRefreshing(false);
 	}, [reduxWorkoutRef]);
 
 	// load workouts on page open
@@ -99,8 +106,13 @@ const WorkoutListScreen = (props) => {
 					style={styles.flatListStyle}
 					data={workouts}
 					keyExtractor={(item) => item.id}
+					refreshing={refreshing}
+					onRefresh={onRefresh}
 					renderItem={(itemData) => (
-						<WorkoutListItem userID={userID} workout={itemData.item} />
+						<WorkoutListItem
+							userID={userID}
+							workout={itemData.item}
+						/>
 					)}
 				/>
 			</View>
@@ -115,11 +127,10 @@ const styles = StyleSheet.create({
 	},
 	contentView: {
 		width: "100%",
-		height: 300,
+		// height: 300,
 		alignItems: "center",
 		// justifyContent: "center",
 		marginTop: 40,
-		
 	},
 	flatListStyle: {
 		width: "90%",

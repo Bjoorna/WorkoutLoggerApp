@@ -112,8 +112,6 @@ const AddWorkoutScreen = (props) => {
 			selectedRPE
 		);
 		dispatch({ type: ADD_EXERCISE, exercise: newExercise });
-		setSelectedExercise("");
-		setSelectedWeight(undefined);
 		vibrateDevice();
 	};
 
