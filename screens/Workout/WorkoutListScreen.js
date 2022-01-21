@@ -1,6 +1,12 @@
 import { StatusBar } from "expo-status-bar";
 import React, { useCallback, useEffect, useState } from "react";
-import { FlatList, ScrollView, StyleSheet, View, RefreshControl } from "react-native";
+import {
+	FlatList,
+	ScrollView,
+	StyleSheet,
+	View,
+	RefreshControl,
+} from "react-native";
 // import { TestTheme as theme } from "..Theme/shared/Theme";
 import { useDimensions } from "@react-native-community/hooks";
 import * as firebase from "../../firebase/firebase";
@@ -72,7 +78,7 @@ const WorkoutListScreen = (props) => {
 	const onRefresh = useCallback(() => {
 		setRefreshing(true);
 		dispatch(WorkoutActions.getUserWorkouts(userID));
-	}, [])
+	}, []);
 
 	useEffect(() => {
 		// console.log(reduxWorkoutRef);
@@ -106,8 +112,16 @@ const WorkoutListScreen = (props) => {
 					style={styles.flatListStyle}
 					data={workouts}
 					keyExtractor={(item) => item.id}
-					refreshing={refreshing}
-					onRefresh={onRefresh}
+					// refreshing={refreshing}
+					// onRefresh={onRefresh}
+					refreshControl={
+						<RefreshControl
+							refreshing={refreshing}
+							onRefresh={onRefresh}
+							colors={[theme.onPrimary]}
+							progressBackgroundColor={theme.primary}
+						/>
+					}
 					renderItem={(itemData) => (
 						<WorkoutListItem
 							userID={userID}
