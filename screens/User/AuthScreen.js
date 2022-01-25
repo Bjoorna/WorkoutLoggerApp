@@ -23,6 +23,8 @@ import FilledButton from "../../components/Buttons/FilledButton";
 import OutlineButton from "../../components/Buttons/OutlineButton";
 import Input from "../../components/UI/Input";
 import { SafeAreaInsetsContext } from "react-native-safe-area-context";
+import Divider from "../../components/UI/Divider";
+import TextButton from "../../components/Buttons/TextButton";
 
 const FORM_INPUT_UPDATE = "FORM_INPUT_UPDATE";
 
@@ -74,8 +76,13 @@ const AuthScreen = (props) => {
 	}, [error]);
 
 	useEffect(() => {
-		dispatchFormState({type: FORM_INPUT_UPDATE, })
-	},[email, password])
+		console.log("Authstatus: ");
+		console.log(authStatus);
+	},[])
+
+	useEffect(() => {
+		dispatchFormState({ type: FORM_INPUT_UPDATE });
+	}, [email, password]);
 
 	const authHandler = async () => {
 		let action;
@@ -110,15 +117,15 @@ const AuthScreen = (props) => {
 	// 	[dispatchFormState]
 	// );
 
-	const setTempLoginCreds = () =>  {
+	const setTempLoginCreds = () => {
 		setEmail("marcusbjorna@gmail.com");
 		setPassword("123456");
-	}
+	};
 
 	return (
-		<KeyboardAvoidingView
-			behavior="padding"
-			keyboardVerticalOffset={1}
+		<View
+			// behavior="padding"
+			// keyboardVerticalOffset={1}
 			style={styles.screen}
 		>
 			<Pressable
@@ -127,9 +134,9 @@ const AuthScreen = (props) => {
 			>
 				{isLoading && (
 					<View style={styles.loadingSpinner}>
-						<ActivityIndicator size="large" color={theme.primary}  />
+						<ActivityIndicator size="large" color={theme.primary} />
 					</View>
-				)} 
+				)}
 				{!isLoading && (
 					<View style={styles.authScreenContent}>
 						<View style={styles.authCardContainer}>
@@ -182,7 +189,26 @@ const AuthScreen = (props) => {
 							</View>
 
 							<View style={styles.authCardButtonRow}>
-								<OutlineButton onButtonPress={() => setTempLoginCreds()}>SetCredsTEMP</OutlineButton>
+								<FilledButton
+									onButtonPress={() => {
+										authHandler();
+									}}
+									style={{ width: "100%", marginBottom: 10 }}
+								>
+									Login
+								</FilledButton>
+								<TextButton onButtonPress={()=>{
+									props.navigation.navigate("NewUserScreen");
+								}} style={{ width: "100%" }}>
+									Create new user
+								</TextButton>
+								<TextButton
+									style={{ width: "100%" }}
+									onButtonPress={() => setTempLoginCreds()}
+								>
+									Set TempCreds
+								</TextButton>
+								{/* <OutlineButton onButtonPress={() => setTempLoginCreds()}>SetCredsTEMP</OutlineButton>
 								<OutlineButton
 									onButtonPress={() => setIsSignup(!isSignup)}
 									style={{
@@ -200,13 +226,13 @@ const AuthScreen = (props) => {
 									onButtonPress={() => authHandler()}
 								>
 									{isSignup ? "Signup" : "Login"}
-								</FilledButton>
+								</FilledButton> */}
 							</View>
 						</View>
 					</View>
 				)}
 			</Pressable>
-		</KeyboardAvoidingView>
+		</View>
 	);
 };
 
@@ -258,8 +284,9 @@ const styles = StyleSheet.create({
 	},
 	authCardButtonRow: {
 		marginTop: 10,
-		flexDirection: "row",
-		justifyContent: "flex-end",
+		flexDirection: "column",
+		alignItems: "center",
+		// justifyContent: "flex-end",
 	},
 	authTextInput: {
 		paddingVertical: 5,

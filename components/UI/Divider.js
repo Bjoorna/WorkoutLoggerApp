@@ -9,6 +9,8 @@ const theme = Themes.dark;
  * UI component, divider
  * @param {*} props - Standard React props
  * @param {string} width -  Specify the width of the divider as a percentage of parent component
+ * @param {string} color -  Color of the divider
+
  */
 
  
@@ -17,8 +19,8 @@ const Divider = props => {
     return (
 		<View
 			style={{
-				height: 2,
-				borderTopColor: theme.outline,
+				height: 1,
+				borderTopColor: props.color,
 				width: props.width,
 				borderStyle: "solid",
 				borderWidth: 1,

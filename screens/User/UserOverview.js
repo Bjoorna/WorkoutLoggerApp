@@ -45,9 +45,6 @@ const UserOverviewScreen = (props) => {
 		"This is a workout",
 		userID
 	);
-	const saveWorkout = () => {
-		dispatch(WorkoutActions.addWorkout(testWorkout));
-	};
 
 	return (
 		<SafeAreaView style={styles.safeView}>
@@ -71,9 +68,6 @@ const UserOverviewScreen = (props) => {
 						onButtonPress={() => console.log(authDetails)}
 					>
 						authDetails
-					</OutlineButton>
-					<OutlineButton onButtonPress={() => saveWorkout()}>
-						AddWorkoutTest
 					</OutlineButton>
 				</View>
 			</ScrollView>

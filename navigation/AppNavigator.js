@@ -11,12 +11,12 @@ const theme = Themes.dark;
 
 const AppNavigator = (props) => {
 
-	const isUserAuthenticated = useSelector(state => !!state.auth.token)
-
+	const isUserAuthenticated = useSelector(state => !!state.auth.token);
+	const isNewUserCreation = useSelector(state => state.auth.newUserCreation)
 
 	return (
 		<NavigationContainer theme={{dark: true, colors:{background: theme.surface}}} style={styles.navigatorBackground}>
-			{isUserAuthenticated && <AppTabNavigator />} 
+			{isUserAuthenticated && !isNewUserCreation && <AppTabNavigator />} 
 			{!isUserAuthenticated && <AuthStackScreen />}
 			{/* <AppTabNavigator /> */}
 		</NavigationContainer>

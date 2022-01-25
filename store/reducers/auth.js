@@ -1,9 +1,10 @@
 import { AUTH, LOGOUT, SAVE_USER } from "../actions/auth";
 const initialState = {
-	token: null,	
+	token: null,
 	userID: null,
 	autoLoginState: false,
-	userData: null
+	userData: null,
+	newUserCreation: false,
 };
 
 export default (state = initialState, action) => {
@@ -15,7 +16,6 @@ export default (state = initialState, action) => {
 				autoLoginState: true,
 			};
 		case LOGOUT:
-
 			return { ...initialState, autoLoginState: true };
 		case SAVE_USER:
 			return state;

@@ -81,57 +81,57 @@ export const logout = () => {
 	return { type: LOGOUT };
 };
 
-export const saveUser = (user) => {
-	return async (dispatch) => {
-		let localSavedUserCreds = await AsyncStorage.getItem("userData");
-		console.log(localSavedUserCreds);
-		localSavedUserCreds = JSON.parse(localSavedUserCreds);
+// export const saveUser = (user) => {
+// 	return async (dispatch) => {
+// 		let localSavedUserCreds = await AsyncStorage.getItem("userData");
+// 		console.log(localSavedUserCreds);
+// 		localSavedUserCreds = JSON.parse(localSavedUserCreds);
 
 
-		const databaseURLWithAuth =
-			firebaseConfig.databaseURL +
-			"users/" +
-			localSavedUserCreds.userID +
-			`.json?auth=${localSavedUserCreds.token}`;
-		console.log(localSavedUserCreds);
-		const userID = localSavedUserCreds.userID;
-		console.log("USERID: " + userID);
-		const userPackage = JSON.stringify({
-			userID: {
-				name: user.name,
-				age: user.age + 30,
-				weight: user.weight,
-				height: user.weight,
-				profileImageURI: user.profileImageURI,
-			},
-		});
+// 		const databaseURLWithAuth =
+// 			firebaseConfig.databaseURL +
+// 			"users/" +
+// 			localSavedUserCreds.userID +
+// 			`.json?auth=${localSavedUserCreds.token}`;
+// 		console.log(localSavedUserCreds);
+// 		const userID = localSavedUserCreds.userID;
+// 		console.log("USERID: " + userID);
+// 		const userPackage = JSON.stringify({
+// 			userID: {
+// 				name: user.name,
+// 				age: user.age + 30,
+// 				weight: user.weight,
+// 				height: user.weight,
+// 				profileImageURI: user.profileImageURI,
+// 			},
+// 		});
 
-		console.log(userPackage);
+// 		console.log(userPackage);
 
-		console.log(databaseURLWithAuth);
-		const response = await fetch(databaseURLWithAuth, {
-			method: "PUT",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({
-				name: user.name,
-				age: user.age,
-				weight: user.weight,
-				height: user.weight,
-				profileImageURI: user.profileImageURI,
-			}),
-		});
+// 		console.log(databaseURLWithAuth);
+// 		const response = await fetch(databaseURLWithAuth, {
+// 			method: "PUT",
+// 			headers: { "Content-Type": "application/json" },
+// 			body: JSON.stringify({
+// 				name: user.name,
+// 				age: user.age,
+// 				weight: user.weight,
+// 				height: user.weight,
+// 				profileImageURI: user.profileImageURI,
+// 			}),
+// 		});
 
-		if (!response.ok) {
-			const errorData = await response.json();
-			console.log(errorData);
-			throw new Error("Error");
-		}
-		const resData = await response.json();
-		console.log(resData);
-		// // dispatch(savedUser())
-		return { type: SAVE_USER };
-	};
-};
+// 		if (!response.ok) {
+// 			const errorData = await response.json();
+// 			console.log(errorData);
+// 			throw new Error("Error");
+// 		}
+// 		const resData = await response.json();
+// 		console.log(resData);
+// 		// // dispatch(savedUser())
+// 		return { type: SAVE_USER };
+// 	};
+// };
 
 const saveAuthDataToStorage = async (token, userID) => {
 	try {

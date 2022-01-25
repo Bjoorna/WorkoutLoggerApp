@@ -8,6 +8,7 @@ const theme = Themes.dark;
 const FilledButton = (props) => {
 	const [isPressed, setIsPressed] = useState(false);
 	const shouldVibrate = props.vibration;
+	const isDisabled = props.disabled;
 
 	const handleOnPressIn = () => {
 		// props.onButtonPress();
@@ -16,7 +17,7 @@ const FilledButton = (props) => {
 	}
 
 	return (
-		<View style={{ ...styles.buttonBase, ...props.style }}>
+		<View style={isDisabled ? {...styles.disabledButtonBase} : { ...styles.buttonBase, ...props.style }}>
 			<Pressable
 				onPressIn={handleOnPressIn}
 				onPressOut={() => setIsPressed(false)}
@@ -27,7 +28,7 @@ const FilledButton = (props) => {
 			>
 				<LabelText
 					large={true}
-					style={{ ...styles.text, ...props.textStyle }}
+					style={isDisabled ? {...styles.disabledText} : { ...styles.text, ...props.textStyle }}
 				>
 					{props.children}
 				</LabelText>
@@ -42,13 +43,15 @@ const styles = StyleSheet.create({
 		borderRadius: 40,
 		overflow: "hidden",
 		backgroundColor: theme.primary,
-		paddingHorizontal: 12,
+		// paddingHorizontal: 12,
 		minWidth: 48,
 		height: 40,
 
 	},
 	pressableButton: {
-		height: "100%",
+		flex: 1,
+		// height: "100%",
+		// width: "100%",
 		alignItems: "center",
 		justifyContent: "center",
 	},
@@ -62,6 +65,19 @@ const styles = StyleSheet.create({
 	text: {
 		color: theme.onPrimary,
 	},
+	disabledText: {
+		color: theme.onSurface,
+		// opacity: 
+	},
+	disabledButtonBase: {
+		borderRadius: 40,
+		overflow: "hidden",
+		backgroundColor: theme.onSurface,
+		opacity: 0.12,
+		// paddingHorizontal: 12,
+		minWidth: 48,
+		height: 40
+	}
 });
 
 export default FilledButton;

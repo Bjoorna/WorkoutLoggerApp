@@ -58,11 +58,8 @@ const workoutReducer = (state, action) => {
 			newExerciseArray.push(action.exercise);
 			let workoutWithAddedExercise = { ...state.workout };
 			workoutWithAddedExercise.exercises = newExerciseArray;
-			// console.log("From WorkoutReduce");
-			// console.log(newWorkout);
 			return { ...state, workout: workoutWithAddedExercise };
 		case REMOVE_EXERCISE:
-			console.log(action.exercise);
 			const exerciseToRemove = action.exercise;
 			let exArray = [...state.workout.exercises];
 			exArray = exArray.filter(
@@ -103,7 +100,6 @@ const AddWorkoutScreen = (props) => {
 	};
 
 	const addExercise = () => {
-		console.log("IS pressedonly once");
 		const newExercise = new Exercise(
 			selectedExercise,
 			selectedWeight,
@@ -158,7 +154,6 @@ const AddWorkoutScreen = (props) => {
 	const onChange = (event, newDate) => {
 		setDatePickerModalVisible(false);
 		setHasSetCustomDate(true);
-		console.log(event);
 		const currentDate = newDate || selectedDate;
 		setSelectedDate(currentDate);
 	};

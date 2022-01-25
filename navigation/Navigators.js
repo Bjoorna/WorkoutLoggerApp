@@ -16,6 +16,7 @@ import { Themes } from "../shared/Theme";
 import AuthScreen from "../screens/User/AuthScreen";
 import WeightCalculatorScreen from "../screens/Workout/WeightCalculatorScreen";
 import WorkoutListScreen from "../screens/Workout/WorkoutListScreen";
+import NewUserScreen from "../screens/User/NewUserScreen";
 const theme = Themes.dark;
 
 const defaultStyleOptions = {
@@ -41,11 +42,11 @@ export const AppTabNavigator = () => {
 					paddingBottom: 16,
 					paddingTop: 12,
 				},
-				
+
 				tabBarActiveTintColor: theme.onSurface,
 				tabBarInactiveTintColor: theme.onSurfaceVariant,
 				headerShown: false,
-				tabBarHideOnKeyboard: true
+				tabBarHideOnKeyboard: true,
 			}}
 		>
 			<TabNavigator.Screen
@@ -81,8 +82,7 @@ export const AppTabNavigator = () => {
 						/>
 					),
 				}}
-
-			 />
+			/>
 			<TabNavigator.Screen
 				name="Test1"
 				component={TestScreen1}
@@ -178,6 +178,15 @@ export const AuthStackScreen = () => {
 					...defaultStyleOptions,
 					headerTitle: "Authentication",
 				}}
+			/>
+			<AuthStackNavigator.Screen
+				name="NewUserScreen"
+				component={NewUserScreen}
+				options={{
+					...defaultStyleOptions,
+					headerTitle: "Create New User",
+				}}
+
 			/>
 		</AuthStackNavigator.Navigator>
 	);

@@ -15,6 +15,7 @@ import TitleText from "../../components/Text/Title";
 import DisplayText from "../../components/Text/Display";
 
 import Divider from "../../components/UI/Divider";
+import FilledButton from "../../components/Buttons/FilledButton";
 const theme = Themes.dark;
 
 const SET_KWEIGHT = "SET_KWEIGHT";
@@ -48,17 +49,16 @@ const initialState = {
 	kRPE: -1,
 	wReps: -1,
 	wRPE: -1,
+	isValid: false,
 };
 
-const WeightCalculatorScreen = (props) => {
+const WeightCalculatorScreen = (props) => { 
 	const rpeCalc = new RPEMap();
 	const [rpeState, dispatch] = useReducer(rpeReducer, initialState);
 	const [isValid, setIsValid] = useState(false);
+	const [calcWeight, setCalcWeight] = useState(0);
 
 	useEffect(() => {
-		console.log("RPESTATE IS CHANGED");
-		console.log(rpeState);
-		console.log("FormIsValid: " + isValid);
 		if (checkValidState()) {
 			console.log("ISVALID");
 			setIsValid(true);
@@ -69,6 +69,15 @@ const WeightCalculatorScreen = (props) => {
 
 	const checkValidState = () => {
 		console.log("Checkisvalid");
+		if (
+			rpeState.kWeight == undefined ||
+			rpeState.kReps == undefined ||
+			rpeState.kRPE == undefined ||
+			rpeState.wReps == undefined ||
+			rpeState.wRPE == undefined
+		) {
+			return false;
+		}
 		if (
 			rpeState.kWeight >= 1 &&
 			10 >= rpeState.kReps &&
@@ -82,23 +91,27 @@ const WeightCalculatorScreen = (props) => {
 		) {
 			return true;
 		} else return false;
-		// dispatch({ type: CHECK_ISVALID, isValid: true });
 	};
 
 	const calculateWeight = () => {
-		const intensity = rpeCalc.getIntensity(rpeState.kRPE, rpeState.kReps);
-		const estimated1RM = Math.round(rpeState.kWeight / (intensity / 100));
-
-		const wantedIntensity = rpeCalc.getIntensity(
-			rpeState.wRPE,
-			rpeState.wReps
-		);
-		return Math.round(estimated1RM * (wantedIntensity / 100));
+		if(isValid){
+			const intensity = rpeCalc.getIntensity(rpeState.kRPE, rpeState.kReps);
+			const estimated1RM = Math.round(rpeState.kWeight / (intensity / 100));
+	
+			const wantedIntensity = rpeCalc.getIntensity(
+				rpeState.wRPE,
+				rpeState.wReps
+			);
+			// return Math.round(estimated1RM * (wantedIntensity / 100));
+			setCalcWeight(Math.round(estimated1RM * (wantedIntensity / 100)))
+			return;
+		}
 	};
 
 	return (
 		<View style={styles.container}>
 			<Pressable style={{ flex: 1 }} onPress={() => Keyboard.dismiss()}>
+
 				<View style={styles.knownContainer}>
 					<TitleText
 						large={true}
@@ -194,21 +207,24 @@ const WeightCalculatorScreen = (props) => {
 							<BodyText large={true}>At RPE</BodyText>
 						</View>
 					</View>
+					<FilledButton onButtonPress={() => calculateWeight()} style={{width: 300}}>Calculate</FilledButton>
+
 				</View>
-				{isValid && (
+
+				{calcWeight > 0 && (
 					<View style={styles.resultContainer}>
 						<TitleText
 							style={{ color: theme.onSecondaryContainer }}
 							large={true}
 						>
-							Target Weight On Bar
+							Target Weight
 						</TitleText>
 						<View style={styles.result}>
 							<DisplayText
 								style={{ color: theme.onSecondaryContainer }}
 								large={true}
 							>
-								{calculateWeight()}kg
+								{calcWeight}kg
 							</DisplayText>
 						</View>
 					</View>
@@ -235,7 +251,7 @@ const styles = StyleSheet.create({
 		borderWidth: 1,
 		borderRadius: 16,
 		alignItems: "center",
-		paddingVertical: 10
+		paddingVertical: 10,
 		// justifyContent: "center"
 	},
 	wantedContainer: {

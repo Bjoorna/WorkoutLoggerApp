@@ -72,7 +72,6 @@ const WorkoutListItem = (props) => {
 			const exercisesArray = [];
 			exercisesQuery.forEach((query) => {
 				const data = query.data();
-				console.log(query.id);
 				const newExercise = new Exercise(
 					data.exercise,
 					data.weight,
@@ -85,7 +84,6 @@ const WorkoutListItem = (props) => {
 				);
 				exercisesArray.push(newExercise);
 			});
-			console.log("From WOlistitem");
 			setExercises(exercisesArray);
 		};
 
@@ -98,7 +96,6 @@ const WorkoutListItem = (props) => {
 				style={styles.pressableView}
 				onPress={() => {
 					if (exercises.length > 0) {
-						console.log(exercises);
 					}
 				}}
 			>
