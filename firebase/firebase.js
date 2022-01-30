@@ -68,6 +68,7 @@ export const getUserWorkouts = async(userID) => {
 		
 	} catch (error) {
 		console.log(error);
+		throw new Error(error);
 	}
 }
 
@@ -90,8 +91,8 @@ export const getExercisesInWorkout = async(exercises, userID) => {
 		
 
 
-	}catch(e){
-
+	}catch(error){
+		throw new Error(error);
 	}
 }
 
@@ -118,6 +119,22 @@ export const writeWorkoutToCollection = async (workout) => {
 
 	}
 };
+
+export const saveUserToCollection = async(user, userID) => {
+	try {
+		const docRef = doc(database, "users", userID);
+		const userTransform = {
+			name: user.name,
+			dob: user.dob,
+			weight: user.weight,
+			height: user.height,
+			profileImageURI: user.profileImageURI,
+		}
+		return await setDoc(docRef, userTransform, {merge: true});
+	} catch (error) {
+		throw new Error(error);
+	}
+}
 
 export const writeDocumentToCollection = async (
 	document,

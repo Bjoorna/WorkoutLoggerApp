@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { View, Pressable, StyleSheet, Keyboard } from "react-native";
+import {
+	View,
+	Pressable,
+	StyleSheet,
+	Keyboard,
+	Alert,
+	ActivityIndicator,
+} from "react-native";
 import { Divider, TextInput } from "react-native-paper";
 import DisplayText from "../../components/Text/Display";
 import TitleText from "../../components/Text/Title";
@@ -7,24 +14,32 @@ import BodyText from "../../components/Text/Body";
 
 import { Themes } from "../../shared/Theme";
 import TextButton from "../../components/Buttons/TextButton";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import FilledButton from "../../components/Buttons/FilledButton";
+import * as firebase from "../../firebase/firebase";
+import * as AuthActions from "../../store/actions/auth";
+
 const theme = Themes.dark;
 
 const NewUserScreen = (props) => {
 	const authToken = useSelector((state) => state.auth.token);
+	const dispatch = useDispatch();
 
 	const [newEmail, setNewEmail] = useState();
 	const [newPassword, setNewPassword] = useState();
 	const [confirmPassword, setConfirmPassword] = useState();
-	const [isLoggedIn, setIsLoggedIn] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
 	const [isValid, setIsValid] = useState(false);
 
+	const [error, setError] = useState();
+
 	useEffect(() => {
-		if(newPassword == undefined || confirmPassword == undefined){{
-			setIsValid(false);
-		}}
+		if (newPassword == undefined || confirmPassword == undefined) {
+			{
+				setIsValid(false);
+				return;
+			}
+		}
 		if (newPassword == confirmPassword) {
 			setIsValid(true);
 		} else {
@@ -32,9 +47,33 @@ const NewUserScreen = (props) => {
 		}
 	}, [newPassword, confirmPassword]);
 
-	useEffect(() => {}, [authToken]);
+	useEffect(() => {
+		console.log("AUTHTOKEN CHANGED");
+		setIsLoading(false);
+	}, [authToken]);
 
-	const [name, setName] = useState("");
+	useEffect(() => {
+		if (error) {
+			Alert.alert("Error when creating user!", error, [{ text: "Okay" }]);
+		}
+	}, [error]);
+
+	const signUpUser = async () => {
+		if (!isValid) {
+			return;
+		}
+		setIsLoading(true);
+		console.log("Is Signing up user");
+		setError(null);
+
+		try {
+			await dispatch(AuthActions.createUser(newEmail, newPassword));
+		} catch (error) {
+			console.log(error);
+			setError(error.message);
+			setIsLoading(false);
+		}
+	};
 
 	return (
 		<View style={styles.screen}>
@@ -43,8 +82,16 @@ const NewUserScreen = (props) => {
 				onPress={() => Keyboard.dismiss()}
 			>
 				<View style={styles.contentView}>
-					<View style={styles.card}>
-						{!isLoggedIn && !isLoading && (
+					{isLoading && (
+						<View style={styles.loadingSpinner}>
+							<ActivityIndicator
+								size="large"
+								color={theme.primary}
+							/>
+						</View>
+					)}
+					{!isLoading && (
+						<View style={styles.card}>
 							<View style={styles.cardContent}>
 								<View style={styles.personalInfoHeader}>
 									<TitleText
@@ -120,65 +167,22 @@ const NewUserScreen = (props) => {
 									/>
 								</View>
 								<View style={styles.buttonRow}>
-									<FilledButton disabled={!isValid}>
+									<DisplayText style={{ color: "red" }}>
+										isValid:{" "}
+										{isValid ? "valid" : "not valid"}
+									</DisplayText>
+									<FilledButton
+										onButtonPress={() => {
+											signUpUser();
+										}}
+										disabled={!isValid}
+									>
 										Create user
 									</FilledButton>
 								</View>
 							</View>
-						)}
-						{isLoggedIn && !isLoading && (
-							<View style={styles.cardContent}>
-								<View style={styles.personalInfoHeader}>
-									<TitleText
-										style={{ color: theme.onSurface }}
-										large={true}
-									>
-										Enter Personal Info
-									</TitleText>
-								</View>
-								<View style={styles.personalInfoInput}>
-									<TextInput
-										style={styles.textInput}
-										outlineColor={theme.outline}
-										activeOutlineColor={
-											theme.onPrimaryContainer
-										}
-										selectionColor={theme.secondary}
-										theme={{
-											colors: {
-												text: theme.onPrimaryContainer,
-												placeholder: theme.onSurface,
-											},
-										}}
-										mode="outlined"
-										onChangeText={(text) => setName(text)}
-										keyboardType="default"
-										label="Name"
-									/>
-									<View
-										style={styles.personalInfoDetailInput}
-									>
-										<View
-											style={{
-												flexDirection: "row",
-												justifyContent: "space-around",
-												alignItems: "baseline",
-												paddingVertical: 10,
-												borderBottomColor:
-													theme.outline,
-												borderBottomWidth: 1,
-											}}
-										>
-											<BodyText>Enter details</BodyText>
-											<TextButton>
-												Continue without
-											</TextButton>
-										</View>
-									</View>
-								</View>
-							</View>
-						)}
-					</View>
+						</View>
+					)}
 				</View>
 			</Pressable>
 		</View>
@@ -222,6 +226,13 @@ const styles = StyleSheet.create({
 	},
 	buttonRow: {
 		marginVertical: 10,
+	},
+	loadingSpinner: {
+		flex: 1,
+		height: "100%",
+		width: "100%",
+		justifyContent: "center",
+		alignItems: "center",
 	},
 });
 

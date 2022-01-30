@@ -1,11 +1,10 @@
 class User {
-	constructor(name, age, weight, height, profileImageURI, workouts = []) {
+	constructor(name, dob, weight, height, profileImageURI) {
 		this.name = name;
-		this.age = age;
+		this.dob = dob;
 		this.weight = weight;
 		this.height = height;
         this.profileImageURI = profileImageURI;
-		this.workouts = workouts;
 	}
 }
 

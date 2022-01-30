@@ -17,6 +17,7 @@ import AuthScreen from "../screens/User/AuthScreen";
 import WeightCalculatorScreen from "../screens/Workout/WeightCalculatorScreen";
 import WorkoutListScreen from "../screens/Workout/WorkoutListScreen";
 import NewUserScreen from "../screens/User/NewUserScreen";
+import NewUserDetailScreen from "../screens/User/NewUserDetailScreen";
 const theme = Themes.dark;
 
 const defaultStyleOptions = {
@@ -191,6 +192,24 @@ export const AuthStackScreen = () => {
 		</AuthStackNavigator.Navigator>
 	);
 };
+
+const CreateUserStackNavigator = createStackNavigator();
+
+export const CreateUserStackScreen = () => {
+	return (
+		<CreateUserStackNavigator.Navigator>
+			<CreateUserStackNavigator.Screen
+			name="CreateNewUser"
+			component={NewUserDetailScreen}
+			options={{
+				...defaultStyleOptions,
+				headerTitle: "Enter Personal Details"
+			}}
+			/>
+
+			</CreateUserStackNavigator.Navigator>
+	)
+}
 
 // const customTab = (state, descriptor, navigation) => {
 // 	<View></View>;

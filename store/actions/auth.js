@@ -8,6 +8,8 @@ import * as userActions from "../actions/user";
 export const AUTH = "AUTH";
 export const WRITE_AUTH_TOKEN = "WRITE_AUTH_TOKEN";
 export const LOGOUT = "LOGOUT";
+export const SIGNUP_USER = "SIGNUP_USER";
+export const INIT_SAVE_USER = "INIT_SAVE_USER";
 // export const UPDATE_USER = "UPDATE_USER";
 // export const SAVE_USER = "SAVE_USER";
 
@@ -17,40 +19,66 @@ export const auth = (userID, token) => {
 	};
 };
 
-export const savedUser = (userData) => {
-	return (dispatch) => {
-		dispatch({ type: SAVE_USER, userData: userData });
-	};
-};
+// export const signup = (email, password) => {
+// 	return async (dispatch) => {
+// 		const tempTestData = {
+// 			name: "Marcus",
+// 			weight: 100,
+// 			height: 190,
+// 			profileImageURL:
+// 				"https://images.unsplash.com/photo-1506207803951-1ee93d7256ad?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1160&q=80",
+// 		};
 
-export const signup = (email, password) => {
-	return async (dispatch) => {
-		const tempTestData = {
-			name: "Marcus",
-			weight: 100,
-			height: 190,
-			profileImageURL:
-				"https://images.unsplash.com/photo-1506207803951-1ee93d7256ad?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1160&q=80",
-		};
-
-		try {
+// 		try {
 			
-			const newUser = await firebase.signUpNewUserWithEmailAndPassword(
-				email,
-				password
-			);
-			const userID = newUser.uid;
-			const userToken = newUser.stsTokenManager.accessToken;
-			await firebase.writeDocumentToCollection(tempTestData, "users", userID);
-			dispatch(auth(userID, userToken));
-			await saveAuthDataToStorage(userToken, userID);
+// 			const newUser = await firebase.signUpNewUserWithEmailAndPassword(
+// 				email,
+// 				password
+// 			);
+// 			const userID = newUser.uid;
+// 			const userToken = newUser.stsTokenManager.accessToken;
+// 			await firebase.writeDocumentToCollection(tempTestData, "users", userID);
+// 			dispatch(auth(userID, userToken));
+// 			await saveAuthDataToStorage(userToken, userID);
 
-		} catch (e) {
-			throw new Error(e);
+// 		} catch (e) {
+// 			throw new Error(e);
+// 		}
+// 	};
+// };
+
+export const initSaveUser = (userID, user) => {
+	return async(dispatch) => {
+		try {
+			// save user
+			await firebase.saveUserToCollection(user, userID);
+			console.log("User Saved");
+			// get user
+			const savedUser = await firebase.getDocumentFromCollection(userID, "users");
+			console.log(savedUser)
+			dispatch(userActions.saveUser(savedUser));
+			dispatch({type: INIT_SAVE_USER})
+
+		} catch (error) {
+			throw new Error(error);
 		}
+	}
+}
 
-	};
-};
+export const createUser = (email, password) => {
+	return async(dispatch) => {
+		try{
+			const createdUser = await firebase.signUpNewUserWithEmailAndPassword(email, password);
+			const userID = createdUser.uid;
+			const userToken = createdUser.stsTokenManager.accessToken
+			dispatch({type: SIGNUP_USER, token: userToken, userID: userID});
+			await saveAuthDataToStorage(userToken, userID);
+		}catch(error){
+			console.log(error);
+			throw new Error(error)
+		}
+	}
+}
 
 export const login = (email, password) => {
 	return async (dispatch) => {

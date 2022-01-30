@@ -8,15 +8,16 @@ export default (state = initialState, action) => {
 	switch (action.type) {
 		case SAVE_USER:
 			const userdata = action.user;
+			console.log(userdata);
 			const newUser = new User(
 				userdata.name,
-				userdata.age,
+				userdata.dob,
 				userdata.weight,
 				userdata.height,
 				userdata.profileImageURL
 			);
-			return { user: newUser };
+			return {...state, user: newUser };
 		default:
-			return state;
+			return {...state};
 	}
 };
