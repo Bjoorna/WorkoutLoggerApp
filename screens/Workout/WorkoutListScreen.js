@@ -100,8 +100,8 @@ const WorkoutListScreen = (props) => {
 				iconName="add"
 				style={{
 					...styles.fabButtonPlacement,
-					left: width - 200,
-					top: height - 250,
+					left: width - 160,
+					top: height - 200,
 				}}
 			>
 				New Workout
