@@ -5,6 +5,8 @@ import { Themes } from "../../shared/Theme";
 import LabelText from "../Text/Label";
 const theme = Themes.dark;
 
+
+// TODO
 const FilledButton = (props) => {
 	const [isPressed, setIsPressed] = useState(false);
 	const shouldVibrate = props.vibration;
@@ -23,10 +25,6 @@ const FilledButton = (props) => {
 					...styles.disabledButtonStyle,
 					...props.style,
 				}}
-				// disabled button, pressing does nothing
-				// onPressIn={handleOnPressIn}
-				// onPressOut={() => setIsPressed(false)}
-				// onPress={props.onButtonPress}
 			>
 				<LabelText style={styles.disabledText} large={true}>
 					{props.children}
@@ -47,32 +45,11 @@ const FilledButton = (props) => {
 			</Pressable>
 		);
 	}
-
-	// <View style={isDisabled ? {...styles.disabledButtonBase, ...props.style} : { ...styles.buttonBase, ...props.style }}>
-	// 	<Pressable
-	// 		onPressIn={handleOnPressIn}
-	// 		onPressOut={() => setIsPressed(false)}
-	// 		style={isPressed ? {...styles.onPressStyle, ...styles.buttonBase} :  {...styles.pressableButton, ...styles.buttonBase}}
-	// 		onPress={props.onButtonPress}
-	// 		// style={isPressed ? {...styles.onPressStyle, ...styles.buttonBase} :  {...styles.pressableButton}}
-
-	// 		// onPress={handleButtonPress}
-
-	// 	>
-	// 		<LabelText
-	// 			large={true}
-	// 			style={isDisabled ? {...styles.disabledText} : { ...styles.text, ...props.textStyle }}
-	// 		>
-	// 			{props.children}
-	// 		</LabelText>
-	// 	</Pressable>
-	// </View>
 };
 
 const styles = StyleSheet.create({
 	baseButtonStyle: {
 		minWidth: 48,
-		// width: 300,
 		height: 40,
 		borderRadius: 20,
 		overflow: "hidden",
@@ -92,44 +69,12 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		opacity: 0.12,
 	},
-	buttonBase: {
-		// flex: 1,
-		borderRadius: 20,
-		overflow: "hidden",
-		backgroundColor: theme.primary,
-		paddingHorizontal: 24,
-		// minWidth: 48,
-		height: 40,
-	},
-	pressableButton: {
-		flex: 1,
-		// height: "100%",
-		// width: "100%",
-		alignItems: "center",
-		justifyContent: "center",
-	},
-	onPressStyle: {
-		backgroundColor: theme.onPrimary,
-		height: "100%",
-		alignItems: "center",
-		justifyContent: "center",
-		opacity: 0.12,
-	},
 	text: {
 		color: theme.onPrimary,
 	},
 	disabledText: {
 		color: theme.onSurface,
 		opacity: 0.38,
-	},
-	disabledButtonBase: {
-		borderRadius: 20,
-		overflow: "hidden",
-		backgroundColor: theme.onSurface,
-		opacity: 0.12,
-		paddingHorizontal: 24,
-		// minWidth: 48,
-		height: 40,
 	},
 });
 

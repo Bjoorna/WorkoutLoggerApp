@@ -65,6 +65,8 @@ const UserOverviewScreen = (props) => {
 						Logout
 					</OutlineButton>
 					<OutlineButton
+						disabled={false}
+						// style={{width: 300}}
 						onButtonPress={() => console.log(authDetails)}
 					>
 						authDetails
@@ -89,6 +91,10 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		alignItems: "center",
 		width: "100%",
+	},
+	currentInfoView: {
+		width: "90%",
+		alignItems: "center"
 	},
 	headerText: {
 		color: theme.onSurface,
