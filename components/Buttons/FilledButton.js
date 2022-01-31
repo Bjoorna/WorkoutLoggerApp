@@ -6,7 +6,7 @@ import LabelText from "../Text/Label";
 const theme = Themes.dark;
 
 
-// TODO
+// TODO style onPress to conform to material standards
 const FilledButton = (props) => {
 	const [isPressed, setIsPressed] = useState(false);
 	const shouldVibrate = props.vibration;

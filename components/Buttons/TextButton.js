@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Vibration } from "react-native";
 
 import { Themes } from "../../shared/Theme";
 import LabelText from "../Text/Label";
@@ -7,53 +7,80 @@ const theme = Themes.dark;
 
 const TextButton = (props) => {
 	const [isPressed, setIsPressed] = useState(false);
+	const isDisabled = props.disabled;
 
-	return (
-		<View
-			style={
-				isPressed
-					? {
-							...styles.buttonBase,
-							...styles.buttonBaseOnPress,
-							...props.style,
-					  }
-					: { ...styles.buttonBase, ...props.style }
-			}
-		>
+	const handleOnPressIn = () => {
+		// props.onButtonPress();
+		setIsPressed(true);
+		Vibration.vibrate(100);
+	};
+
+	if (isDisabled) {
+		return (
 			<Pressable
-				onPressIn={() => setIsPressed(true)}
-				onPressOut={() => setIsPressed(false)}
-				style={styles.pressableButton}
-				onPress={props.onButtonPress}
+				style={{
+					...styles.disabledButtonStyle,
+					...props.style,
+				}}
 			>
-				<LabelText
-					large={true}
-					style={{ ...styles.text, ...props.textStyle }}
-				>
+				<LabelText large={true} style={styles.disabledText}>
 					{props.children}
 				</LabelText>
 			</Pressable>
-		</View>
-	);
+		);
+	} else {
+		return (
+			<Pressable
+				style={
+					isPressed
+						? { ...styles.pressedButtonStyle, ...props.style }
+						: { ...styles.baseButtonStyle, ...props.style }
+				}
+				onPressIn={handleOnPressIn}
+				onPressOut={() => setIsPressed(false)}
+				onPress={props.onButtonPress}
+			>
+				<LabelText style={styles.text} large={true}>
+					{props.children}
+				</LabelText>
+			</Pressable>
+		);
+	}
 };
 
 const styles = StyleSheet.create({
-	buttonBase: {
-		// flex: 1,
-		borderRadius: 40,
-		overflow: "hidden",
-		paddingHorizontal: 12,
-		minWidth: 48,
+	baseButtonStyle: {
 		height: 40,
+		minWidth: 48,
+		paddingHorizontal: 12,
+		borderRadius: 20,
+		overflow: "hidden",
+		alignItems: "center",
+		justifyContent: "center",
 	},
-	buttonBaseOnPress: {
+	pressedButtonStyle: {
+		height: 40,
+		minWidth: 48,
+		paddingHorizontal: 12,
+		borderRadius: 20,
+		overflow: "hidden",
+		alignItems: "center",
+		justifyContent: "center",
 		backgroundColor: theme.primary,
 		opacity: 0.12,
 	},
-	pressableButton: {
-		height: "100%",
+	disabledButtonStyle: {
+		height: 40,
+		minWidth: 48,
+		paddingHorizontal: 12,
+		borderRadius: 20,
+		overflow: "hidden",
 		alignItems: "center",
 		justifyContent: "center",
+	},
+	disabledText: {
+		color: theme.onSurface,
+		opacity: 0.38,
 	},
 	text: {
 		color: theme.primary,

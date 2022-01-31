@@ -16,6 +16,7 @@ import { useDispatch, useSelector } from "react-redux";
 import DisplayText from "../../components/Text/Display";
 import BodyText from "../../components/Text/Body";
 import OutlineButton from "../../components/Buttons/OutlineButton";
+import TextButton from "../../components/Buttons/TextButton";
 import { Themes } from "../../shared/Theme";
 const theme = Themes.dark;
 
@@ -71,6 +72,9 @@ const UserOverviewScreen = (props) => {
 					>
 						authDetails
 					</OutlineButton>
+					<TextButton disabled={false}>
+						TestButton
+					</TextButton>
 				</View>
 			</ScrollView>
 		</SafeAreaView>

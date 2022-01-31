@@ -167,10 +167,6 @@ const NewUserScreen = (props) => {
 									/>
 								</View>
 								<View style={styles.buttonRow}>
-									<DisplayText style={{ color: "red" }}>
-										isValid:{" "}
-										{isValid ? "valid" : "not valid"}
-									</DisplayText>
 									<FilledButton
 										onButtonPress={() => {
 											signUpUser();
