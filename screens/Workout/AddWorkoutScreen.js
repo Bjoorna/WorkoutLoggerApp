@@ -7,6 +7,8 @@ import {
 	Pressable,
 	KeyboardAvoidingView,
 	Vibration,
+	Keyboard,
+	ActivityIndicator,
 } from "react-native";
 import { Modal, Portal } from "react-native-paper";
 import FilledButton from "../../components/Buttons/FilledButton";
@@ -94,6 +96,8 @@ const AddWorkoutScreen = (props) => {
 	});
 	const [selectedDate, setSelectedDate] = useState(new Date());
 
+	const [isLoading, setIsLoading] = useState(false);
+
 	const selectExercise = (exercise) => {
 		setSelectedExercise(exercise);
 		hideModal();
@@ -111,12 +115,12 @@ const AddWorkoutScreen = (props) => {
 		vibrateDevice();
 	};
 
-
 	const removeExercise = (exerciseToRemove) => {
 		dispatch({ type: REMOVE_EXERCISE, exercise: exerciseToRemove });
 	};
 
 	const saveWorkout = async () => {
+		setIsLoading(true);
 		let workoutDate;
 		if (hasSetCustomDate) {
 			workoutDate = selectedDate.getTime();
@@ -130,7 +134,10 @@ const AddWorkoutScreen = (props) => {
 			"Note Goes Here",
 			userID
 		);
+
 		await firebase.writeWorkoutToCollection(newWorkout);
+		setIsLoading(false);
+		props.navigation.navigate("Workouts");
 	};
 
 	const [exerciseDisplay, setExerciseDisplay] = useState([]);
@@ -159,169 +166,200 @@ const AddWorkoutScreen = (props) => {
 	};
 
 	return (
-		<KeyboardAvoidingView behavior="padding" style={styles.container}>
-			{/* Modal component, ignore for layoutpurposes */}
-			<Portal>
-				<Modal
-					contentContainerStyle={modalStyles.modalStyle}
-					visible={modalVisible}
-					onDismiss={hideModal}
-				>
-					<FlatList
-						keyExtractor={(item) => Math.random()}
-						data={ExerciseArray}
-						renderItem={(itemData) => (
-							<ExerciseList
-								selectExercise={selectExercise}
-								item={itemData.item}
-							/>
-						)}
-					/>
-					<FilledButton onButtonPress={hideModal}>
-						Dismiss
-					</FilledButton>
-				</Modal>
-			</Portal>
-
-			<View style={styles.newExerciseContainer}>
-				<View style={styles.selectNewExercise}>
-					<Pressable
-						style={{
-							height: "100%",
-							width: "100%",
-							justifyContent: "center",
-							alignItems: "center",
-						}}
-						onPress={showModal}
+		<View style={styles.container}>
+			<Pressable
+				style={styles.pressable}
+				onPress={() => Keyboard.dismiss()}
+			>
+				{/* Modal component, ignore for layoutpurposes */}
+				<Portal>
+					<Modal
+						contentContainerStyle={modalStyles.modalStyle}
+						visible={modalVisible}
+						onDismiss={hideModal}
 					>
-						<TitleText style={{ color: theme.onSurfaceVariant }}>
-							{selectedExercise === ""
-								? "Press to select exercise..."
-								: selectedExercise}
-						</TitleText>
-					</Pressable>
-				</View>
+						<FlatList
+							keyExtractor={(item) => Math.random()}
+							data={ExerciseArray}
+							renderItem={(itemData) => (
+								<ExerciseList
+									selectExercise={selectExercise}
+									item={itemData.item}
+								/>
+							)}
+						/>
+						<FilledButton onButtonPress={hideModal}>
+							Dismiss
+						</FilledButton>
+					</Modal>
+				</Portal>
+				<View style={styles.contentView}>
+					{isLoading && (
+						<View style={styles.loadingSpinner}>
+							<ActivityIndicator
+								size="large"
+								color={theme.primary}
+							/>
+						</View>
+					)}
+					{!isLoading && (
+						<View style={styles.newExerciseContainer}>
+							<View style={styles.selectNewExercise}>
+								<Pressable
+									style={{
+										height: "100%",
+										width: "90%",
+										justifyContent: "center",
+										alignItems: "center",
+									}}
+									onPress={showModal}
+								>
+									<TitleText
+										style={{
+											color: theme.onSurfaceVariant,
+										}}
+									>
+										{selectedExercise === ""
+											? "Press to select exercise..."
+											: selectedExercise}
+									</TitleText>
+								</Pressable>
+							</View>
 
-				<View style={styles.newExerciseValues}>
-					<View style={styles.newExerciseValuesRow}>
-						<View style={styles.newExerciseInputValues}>
-							<NumberInput
-								style={{ height: 50 }}
-								placeholder="Weight"
-								keyboardType="numeric"
-								textAlign="center"
-								selectionColor={theme.tertiary}
-								onChangeText={(number) =>
-									setSelectedWeight(number)
-								}
-							/>
-							<BodyText>Weight</BodyText>
+							<View style={styles.newExerciseValues}>
+								<View style={styles.newExerciseValuesRow}>
+									<View style={styles.newExerciseInputValues}>
+										<NumberInput
+											style={{ height: 50 }}
+											placeholder="Weight"
+											keyboardType="numeric"
+											textAlign="center"
+											selectionColor={theme.tertiary}
+											onChangeText={(number) =>
+												setSelectedWeight(number)
+											}
+										/>
+										<BodyText>Weight</BodyText>
+									</View>
+									<View style={styles.newExerciseInputValues}>
+										<NumberInput
+											style={{ height: 50 }}
+											placeholder="Reps"
+											keyboardType="numeric"
+											textAlign="center"
+											selectionColor={theme.tertiary}
+											onChangeText={(number) =>
+												setSelectedReps(number)
+											}
+										/>
+										<BodyText>Reps</BodyText>
+									</View>
+								</View>
+								<View style={styles.newExerciseValuesRow}>
+									<View style={styles.newExerciseInputValues}>
+										<NumberInput
+											style={{ height: 50 }}
+											placeholder="Sets"
+											keyboardType="numeric"
+											textAlign="center"
+											selectionColor={theme.tertiary}
+											onChangeText={(number) =>
+												setSelectedSets(number)
+											}
+										/>
+										<BodyText>Sets</BodyText>
+									</View>
+									<View style={styles.newExerciseInputValues}>
+										<NumberInput
+											style={{ height: 50 }}
+											placeholder="RPE"
+											keyboardType="numeric"
+											textAlign="center"
+											selectionColor={theme.tertiary}
+											onChangeText={(number) =>
+												setSelectedRPE(number)
+											}
+										/>
+										<BodyText>RPE</BodyText>
+									</View>
+								</View>
+							</View>
+							<View
+								style={{
+									flexDirection: "row",
+									width: "100%",
+									justifyContent: "space-around",
+								}}
+							>
+								<FilledButton onButtonPress={addExercise}>
+									Add Exercise
+								</FilledButton>
+								<OutlineButton
+									onButtonPress={() =>
+										setDatePickerModalVisible(true)
+									}
+								>
+									Set Date
+								</OutlineButton>
+							</View>
 						</View>
-						<View style={styles.newExerciseInputValues}>
-							<NumberInput
-								style={{ height: 50 }}
-								placeholder="Reps"
-								keyboardType="numeric"
-								textAlign="center"
-								selectionColor={theme.tertiary}
-								onChangeText={(number) =>
-									setSelectedReps(number)
-								}
+					)}
+
+					{datePickerModalVisible && (
+						<DateTimePicker
+							testID="datepicker"
+							value={selectedDate}
+							mode={"date"}
+							is24Hour={true}
+							display={"default"}
+							onChange={onChange}
+						/>
+					)}
+					{!isLoading && (
+						<View style={styles.workoutSummary}>
+							<View style={styles.workoutSummaryInfo}>
+								<BodyText large={true}>
+									Workout Summary
+								</BodyText>
+								<BodyText
+									large={true}
+									style={{ marginLeft: 20 }}
+								>
+									Date: {selectedDate.toDateString()}
+								</BodyText>
+							</View>
+							<FlatList
+								style={{ width: "100%" }}
+								keyExtractor={(item, index) => index}
+								data={exerciseDisplay}
+								extraData={exerciseDisplay}
+								renderItem={(itemData) => {
+									return (
+										<ExerciseSummaryView
+											index={itemData.index}
+											exercise={itemData.item}
+											removeExercise={() =>
+												removeExercise(itemData.item)
+											}
+										/>
+									);
+								}}
 							/>
-							<BodyText>Reps</BodyText>
 						</View>
-					</View>
-					<View style={styles.newExerciseValuesRow}>
-						<View style={styles.newExerciseInputValues}>
-							<NumberInput
-								style={{ height: 50 }}
-								placeholder="Sets"
-								keyboardType="numeric"
-								textAlign="center"
-								selectionColor={theme.tertiary}
-								onChangeText={(number) =>
-									setSelectedSets(number)
-								}
-							/>
-							<BodyText>Sets</BodyText>
+					)}
+					{!isLoading && (
+						<View style={styles.saveWorkoutContainer}>
+							<FilledButton
+								onButtonPress={() => saveWorkout()}
+								style={{ width: "100%" }}
+							>
+								Save workout
+							</FilledButton>
 						</View>
-						<View style={styles.newExerciseInputValues}>
-							<NumberInput
-								style={{ height: 50 }}
-								placeholder="RPE"
-								keyboardType="numeric"
-								textAlign="center"
-								selectionColor={theme.tertiary}
-								onChangeText={(number) =>
-									setSelectedRPE(number)
-								}
-							/>
-							<BodyText>RPE</BodyText>
-						</View>
-					</View>
+					)}
 				</View>
-				<View
-					style={{
-						flexDirection: "row",
-						width: "100%",
-						justifyContent: "space-around",
-					}}
-				>
-					<FilledButton onButtonPress={addExercise}>
-						Add Exercise
-					</FilledButton>
-					<OutlineButton
-						onButtonPress={() => setDatePickerModalVisible(true)}
-					>
-						Set Date
-					</OutlineButton>
-				</View>
-			</View>
-			{datePickerModalVisible && (
-				<DateTimePicker
-					testID="datepicker"
-					value={selectedDate}
-					mode={"date"}
-					is24Hour={true}
-					display={"default"}
-					onChange={onChange}
-				/>
-			)}
-			<Divider width="90%" />
-			<View style={styles.workoutSummary}>
-				<View style={styles.workoutSummaryInfo}>
-					<BodyText large={true}>Workout Summary</BodyText>
-					<BodyText large={true} style={{ marginLeft: 20 }}>
-						Date: {selectedDate.toDateString()}
-					</BodyText>
-				</View>
-				<FlatList
-					style={{ width: "100%" }}
-					keyExtractor={(item, index) => index}
-					data={exerciseDisplay}
-					extraData={exerciseDisplay}
-					renderItem={(itemData) => {
-						return (
-							<ExerciseSummaryView
-								index={itemData.index}
-								exercise={itemData.item}
-								removeExercise={() =>
-									removeExercise(itemData.item)
-								}
-							/>
-						);
-					}}
-				/>
-			</View>
-			<View style={styles.saveWorkoutContainer}>
-				<FilledButton
-					onButtonPress={() => saveWorkout()}
-					style={{ width: "100%" }}
-				>
-					Save workout
-				</FilledButton>
-			</View>
-		</KeyboardAvoidingView>
+			</Pressable>
+		</View>
 	);
 };
 
@@ -331,6 +369,8 @@ const styles = StyleSheet.create({
 		// justifyContent: "center",
 		alignItems: "center",
 	},
+	pressable: { flex: 1 },
+	contentView: { flex: 1, alignItems: "center" },
 	saveWorkoutContainer: {
 		marginTop: 10,
 		width: "90%",
@@ -356,7 +396,6 @@ const styles = StyleSheet.create({
 		// borderStyle: "solid",
 		// borderBottomWidth: 1,
 		// borderBottomColor: theme.outline
-	
 	},
 	newExerciseContainer: {
 		// justifyContent: "center",
@@ -377,7 +416,7 @@ const styles = StyleSheet.create({
 	},
 	newExerciseValues: {
 		marginVertical: 10,
-		width: "100%",
+		width: "90%",
 		// flexDirection: "row",
 		// justifyContent: "space-around",
 		// ,backgroundColor: theme.secondary
@@ -402,6 +441,13 @@ const styles = StyleSheet.create({
 		backgroundColor: theme.secondaryContainer,
 		width: 20,
 		height: 40,
+	},
+	loadingSpinner: {
+		flex: 1,
+		height: "100%",
+		width: "100%",
+		justifyContent: "center",
+		alignItems: "center",
 	},
 });
 
