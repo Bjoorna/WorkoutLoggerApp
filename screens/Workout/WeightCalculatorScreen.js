@@ -52,7 +52,7 @@ const initialState = {
 	isValid: false,
 };
 
-const WeightCalculatorScreen = (props) => { 
+const WeightCalculatorScreen = (props) => {
 	const rpeCalc = new RPEMap();
 	const [rpeState, dispatch] = useReducer(rpeReducer, initialState);
 	const [isValid, setIsValid] = useState(false);
@@ -94,16 +94,21 @@ const WeightCalculatorScreen = (props) => {
 	};
 
 	const calculateWeight = () => {
-		if(isValid){
-			const intensity = rpeCalc.getIntensity(rpeState.kRPE, rpeState.kReps);
-			const estimated1RM = Math.round(rpeState.kWeight / (intensity / 100));
-	
+		if (isValid) {
+			const intensity = rpeCalc.getIntensity(
+				rpeState.kRPE,
+				rpeState.kReps
+			);
+			const estimated1RM = Math.round(
+				rpeState.kWeight / (intensity / 100)
+			);
+
 			const wantedIntensity = rpeCalc.getIntensity(
 				rpeState.wRPE,
 				rpeState.wReps
 			);
 			// return Math.round(estimated1RM * (wantedIntensity / 100));
-			setCalcWeight(Math.round(estimated1RM * (wantedIntensity / 100)))
+			setCalcWeight(Math.round(estimated1RM * (wantedIntensity / 100)));
 			return;
 		}
 	};
@@ -111,7 +116,6 @@ const WeightCalculatorScreen = (props) => {
 	return (
 		<View style={styles.container}>
 			<Pressable style={{ flex: 1 }} onPress={() => Keyboard.dismiss()}>
-
 				<View style={styles.knownContainer}>
 					<TitleText
 						large={true}
@@ -207,8 +211,13 @@ const WeightCalculatorScreen = (props) => {
 							<BodyText large={true}>At RPE</BodyText>
 						</View>
 					</View>
-					<FilledButton onButtonPress={() => calculateWeight()} style={{width: 300}}>Calculate</FilledButton>
-
+					<FilledButton
+						disabled={false}
+						onButtonPress={() => calculateWeight()}
+						style={{ width: 300 }}
+					>
+						Calculate
+					</FilledButton>
 				</View>
 
 				{calcWeight > 0 && (
