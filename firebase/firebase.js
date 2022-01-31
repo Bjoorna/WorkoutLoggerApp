@@ -13,6 +13,7 @@ import {
 	where,
 	query,
 	getDocs,
+	orderBy,
 	FieldPath,
 	
 } from "firebase/firestore";
@@ -62,7 +63,7 @@ export const writeExercisesToDatabase = async (exercises, userID, timestamp) => 
 
 export const getUserWorkouts = async(userID) => {
 	try {
-		const q = query(collection(database, "workouts"), where("owner", "==", userID));
+		const q = query(collection(database, "workouts"),  where("owner", "==", userID), orderBy("date", "desc"));
 		const querySnapshot = await getDocs(q);
 		return querySnapshot;
 		

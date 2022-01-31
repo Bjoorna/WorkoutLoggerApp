@@ -26,6 +26,7 @@ const theme = Themes.dark;
 // Expo
 import AppLoading from "expo-app-loading";
 import * as Font from "expo-font";
+import { StatusBar } from "expo-status-bar";
 
 // Reducers
 import authReducer from "./store/reducers/auth";
@@ -64,6 +65,7 @@ export default function App() {
 		<PaperProvider>
 			<Provider store={store}>
 				<View style={styles.baseScreen}>
+					<StatusBar style="light"  />
 					<AppNavigator />
 				</View>
 			</Provider>

@@ -1,36 +1,22 @@
 import { StatusBar } from "expo-status-bar";
-import React, { useCallback, useEffect, useState } from "react";
-import {
-	FlatList,
-	ScrollView,
-	StyleSheet,
-	View,
-	RefreshControl,
-} from "react-native";
-// import { TestTheme as theme } from "..Theme/shared/Theme";
+import React, {
+	useCallback,
+	useEffect,
+	useState,
+	useLayoutEffect,
+} from "react";
+import { FlatList, StyleSheet, View, RefreshControl } from "react-native";
+import { useNavigation } from "@react-navigation/core";
 import { useDimensions } from "@react-native-community/hooks";
-import * as firebase from "../../firebase/firebase";
+import { HeaderButtons, Item } from "react-navigation-header-buttons";
+import CustomHeaderButton from "../../components/Buttons/CustomHeaderButton";
 import FabButton from "../../components/Buttons/Fab";
 import { Themes } from "../../shared/Theme";
-import OutlineButton from "../../components/Buttons/OutlineButton";
-import BodyText from "../../components/Text/Body";
 import { useSelector, useDispatch } from "react-redux";
-
-import { Timestamp } from "firebase/firestore";
-import Workout from "../../models/workout";
 import * as WorkoutActions from "../../store/actions/workout";
 import WorkoutListItem from "../../components/WorkoutListItem";
-const theme = Themes.dark;
 
-const TestWorkoutView = (props) => {
-	return (
-		<View style={{ width: "100%", height: 100 }}>
-			<BodyText style={{ color: theme.primary }}>
-				{props.workout.id}
-			</BodyText>
-		</View>
-	);
-};
+const theme = Themes.dark;
 
 const WorkoutListScreen = (props) => {
 	const { width, height } = useDimensions().window;
@@ -40,42 +26,15 @@ const WorkoutListScreen = (props) => {
 	const reduxWorkoutRef = useSelector((state) => state.workout.workouts);
 	const [workouts, setWorkouts] = useState([]);
 	const [refreshing, setRefreshing] = useState(false);
-
-	// const getUserWorkoutsFromServer = async () => {
-	// 	const serverWorkouts = await firebase.getUserWorkouts(userID);
-	// 	const toWorkout = serverWorkouts.map(
-	// 		(serverWO) =>
-	// 			new Workout(
-	// 				serverWO.exercises,
-	// 				serverWO.date,
-	// 				serverWO.complete,
-	// 				serverWO.note,
-	// 				serverWO.owner
-	// 			)
-	// 	);
-	// 	// console.log(serverWorkouts);
-	// 	setWorkouts(toWorkout);
-	// };
-
-	// const testGetWorkout = async () => {
-	// 	console.log(userID);
-	// 	let now = Date.now();
-	// 	console.log(now);
-	// 	dispatch(WorkoutActions.getUserWorkouts(userID));
-	// 	let then = Date.now();
-	// 	console.log(then);
-	// };
-
-	const printDate = () => {
-		if (workouts.length > 0) {
-			const testwo = workouts[0];
-			console.log(testwo.date);
-			const newDate = new Date(testwo.date.seconds * 1000);
-			console.log(newDate);
-		}
-	};
-
+	const navigation = useNavigation();
 	const onRefresh = useCallback(() => {
+		setRefreshing(true);
+		dispatch(WorkoutActions.getUserWorkouts(userID));
+	}, []);
+
+	// load workouts on page open
+	useEffect(() => {
+		console.log("Page is Loading");
 		setRefreshing(true);
 		dispatch(WorkoutActions.getUserWorkouts(userID));
 	}, []);
@@ -88,11 +47,20 @@ const WorkoutListScreen = (props) => {
 		setRefreshing(false);
 	}, [reduxWorkoutRef]);
 
-	// load workouts on page open
 	useEffect(() => {
-		console.log("Page is Loading");
-		dispatch(WorkoutActions.getUserWorkouts(userID));
-	}, []);
+		props.navigation.setOptions({
+			headerRight: () => (
+				<HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
+					<Item
+						title="add"
+						iconName="filter-list"
+						onPress={() => console.log("Filterbuttonpressed")}
+					/>
+				</HeaderButtons>
+			),
+		});
+	}, [props.navigation]);
+
 	return (
 		<View style={styles.container}>
 			<FabButton

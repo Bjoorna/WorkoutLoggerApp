@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
 		marginVertical: 5,
 		borderRadius: 12,
 		flexDirection: "row",
-		justifyContent: "space-between",
+		justifyContent: "space-around",
 		// borderStyle: "solid",
 		// borderWidth : 1,
 		// borderColor: "red",

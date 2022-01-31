@@ -41,7 +41,7 @@ const ExerciseList = (props) => {
 				// style={isPressed ? {...styles.listItemOnPress, ...modalStyles.}}
 				onPress={() => props.selectExercise(props.item)}
 			>
-				<TitleText style={{ color: theme.onSecondary }} large={true}>
+				<TitleText style={{ color: theme.onSurfaceVariant }} large={true}>
 					{props.item}
 				</TitleText>
 			</Pressable>
@@ -350,6 +350,7 @@ const AddWorkoutScreen = (props) => {
 					{!isLoading && (
 						<View style={styles.saveWorkoutContainer}>
 							<FilledButton
+								disabled={exerciseDisplay.length < 1}
 								onButtonPress={() => saveWorkout()}
 								style={{ width: "100%" }}
 							>
@@ -380,7 +381,7 @@ const styles = StyleSheet.create({
 	workoutSummary: {
 		marginTop: 10,
 		width: "90%",
-		height: 300,
+		maxHeight: 300,
 		backgroundColor: theme.surfaceVariant,
 		// justifyContent: "center",
 		alignItems: "center",
@@ -457,7 +458,7 @@ const modalStyles = StyleSheet.create({
 		height: "60%",
 		width: 400,
 		maxWidth: "90%",
-		backgroundColor: theme.secondary,
+		backgroundColor: theme.surfaceVariant,
 		// justifyContent: "center",
 		alignItems: "center",
 		borderRadius: 20,
