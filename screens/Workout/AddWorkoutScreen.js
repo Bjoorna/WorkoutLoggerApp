@@ -1,14 +1,13 @@
 import React, { cloneElement, useEffect, useReducer, useState } from "react";
 import {
 	View,
-	TextInput,
 	StyleSheet,
 	FlatList,
 	Pressable,
-	KeyboardAvoidingView,
 	Vibration,
 	Keyboard,
 	ActivityIndicator,
+	SectionList
 } from "react-native";
 import { Modal, Portal } from "react-native-paper";
 import FilledButton from "../../components/Buttons/FilledButton";
@@ -25,9 +24,17 @@ import Workout from "../../models/workout";
 import { useSelector } from "react-redux";
 import * as firebase from "../../firebase/firebase";
 import OutlineButton from "../../components/Buttons/OutlineButton";
+import { ExerciseTypes } from "../../shared/utils/ExerciseTypes";
+import LabelText from "../../components/Text/Label";
 const theme = Themes.dark;
 
 const ExerciseArray = ["Squat", "Deadlift", "Bench-Press"];
+
+
+// const TestItem = Type => (
+// 	<View></View>
+// )
+
 
 // TODO make this separate component?
 const ExerciseList = (props) => {
@@ -102,7 +109,6 @@ const AddWorkoutScreen = (props) => {
 		setSelectedExercise(exercise);
 		hideModal();
 	};
-
 	const addExercise = () => {
 		const newExercise = new Exercise(
 			selectedExercise,
@@ -178,7 +184,16 @@ const AddWorkoutScreen = (props) => {
 						visible={modalVisible}
 						onDismiss={hideModal}
 					>
-						<FlatList
+						<SectionList 
+							keyExtractor={(item, index) => item +index}
+							sections={ExerciseTypes}
+							renderItem={({item}) => <ExerciseList item={item} selectExercise={selectExercise} />}
+							renderSectionHeader={({ section: { title } }) => (
+								<LabelText large={true} style={{color: theme.tertiary}}>{title}</LabelText>
+							  )}
+
+						 />
+						{/* <FlatList
 							keyExtractor={(item) => Math.random()}
 							data={ExerciseArray}
 							renderItem={(itemData) => (
@@ -187,8 +202,8 @@ const AddWorkoutScreen = (props) => {
 									item={itemData.item}
 								/>
 							)}
-						/>
-						<FilledButton onButtonPress={hideModal}>
+						/> */}
+						<FilledButton style={{marginTop: 15}} onButtonPress={hideModal}>
 							Dismiss
 						</FilledButton>
 					</Modal>
@@ -462,6 +477,8 @@ const modalStyles = StyleSheet.create({
 		// justifyContent: "center",
 		alignItems: "center",
 		borderRadius: 20,
+		paddingVertical: 15,
+		paddingLeft: 10
 	},
 	exerciseListItem: {
 		flexDirection: "row",
