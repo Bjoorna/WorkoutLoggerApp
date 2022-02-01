@@ -1,4 +1,3 @@
-
 import { initializeApp } from "firebase/app";
 import { getDatabase } from "firebase/database";
 import {
@@ -14,31 +13,34 @@ import {
 	query,
 	getDocs,
 	orderBy,
-	FieldPath,
-	
+	limit,
 } from "firebase/firestore";
 import {
 	getAuth,
 	createUserWithEmailAndPassword,
 	signInWithEmailAndPassword,
-	signOut
+	signOut,
 } from "firebase/auth";
 
 import * as firebaseConfig from "./config";
 import Workout from "../models/workout";
 
-import {nanoid} from 'nanoid';
+import { nanoid } from "nanoid";
 // APPSETUO
 const app = initializeApp(firebaseConfig.firebaseConfig);
 
 // FIRESTORE
 const database = getFirestore(app);
 
-export const writeExercisesToDatabase = async (exercises, userID, timestamp) => {
+export const writeExercisesToDatabase = async (
+	exercises,
+	userID,
+	timestamp
+) => {
 	try {
 		const batch = writeBatch(database);
 		const arrayOfExerciseIDs = [];
-		for(let exercise of exercises) {
+		for (let exercise of exercises) {
 			const exerciseID = nanoid();
 			const exerciseTransform = {
 				exercise: exercise.exercise,
@@ -47,7 +49,7 @@ export const writeExercisesToDatabase = async (exercises, userID, timestamp) => 
 				sets: exercise.sets,
 				rpe: exercise.rpe,
 				date: timestamp,
-				owner: userID
+				owner: userID,
 			};
 			const exerciseRef = doc(database, "exercises", exerciseID);
 			arrayOfExerciseIDs.push(exerciseID);
@@ -59,29 +61,35 @@ export const writeExercisesToDatabase = async (exercises, userID, timestamp) => 
 		console.log(error);
 		throw new Error(error);
 	}
-}
+};
 
-export const getUserWorkouts = async(userID) => {
+export const getUserWorkouts = async (userID) => {
 	try {
-		const q = query(collection(database, "workouts"),  where("owner", "==", userID), orderBy("date", "desc"));
+		const q = query(
+			collection(database, "workouts"),
+			where("owner", "==", userID),
+			orderBy("date", "desc"),
+			limit(1)
+		);
 		const querySnapshot = await getDocs(q);
 		return querySnapshot;
-		
 	} catch (error) {
 		console.log(error);
 		throw new Error(error);
 	}
-}
+};
 
-export const getExercisesInWorkout = async(exercises, userID) => {
-	try{
+export const getExercisesInWorkout = async (exercises, userID) => {
+	try {
 		// const q = query(collection(database, "exercises"), where(FieldPath.))
 		// const q = query(collection(database, "exercises"), where("uid", "in", workouts));
 		// const querySnapshot = await getDocs(q);
 		// querySnapshot.forEach(doc => {
 		// 	console.log("An Exercise: " + doc.data());
 		// })
-		const docRefs = exercises.map(exercise => getDoc(doc(database, "exercises", exercise)));
+		const docRefs = exercises.map((exercise) =>
+			getDoc(doc(database, "exercises", exercise))
+		);
 		const docSnaps = await Promise.all(docRefs);
 		return docSnaps;
 		// docSnaps.forEach(doc => {
@@ -89,18 +97,19 @@ export const getExercisesInWorkout = async(exercises, userID) => {
 		// 		console.log(doc.data());
 		// 	}
 		// });
-		
-
-
-	}catch(error){
+	} catch (error) {
 		throw new Error(error);
 	}
-}
+};
 
 export const writeWorkoutToCollection = async (workout) => {
 	try {
 		const timestamp = Timestamp.fromMillis(workout.date);
-		const exerciseIDs = await writeExercisesToDatabase(workout.exercises, workout.owner, timestamp);
+		const exerciseIDs = await writeExercisesToDatabase(
+			workout.exercises,
+			workout.owner,
+			timestamp
+		);
 		const newWorkout = {
 			exercises: exerciseIDs,
 			date: timestamp,
@@ -117,11 +126,10 @@ export const writeWorkoutToCollection = async (workout) => {
 	} catch (e) {
 		console.log("From WriteWrokoutToCOllection");
 		console.log(e);
-
 	}
 };
 
-export const saveUserToCollection = async(user, userID) => {
+export const saveUserToCollection = async (user, userID) => {
 	try {
 		const docRef = doc(database, "users", userID);
 		const userTransform = {
@@ -130,18 +138,18 @@ export const saveUserToCollection = async(user, userID) => {
 			weight: user.weight,
 			height: user.height,
 			profileImageURI: user.profileImageURI,
-		}
-		return await setDoc(docRef, userTransform, {merge: true});
+		};
+		return await setDoc(docRef, userTransform, { merge: true });
 	} catch (error) {
 		throw new Error(error);
 	}
-}
+};
 
 export const writeDocumentToCollection = async (
 	document,
 	dbCollection,
 	optionalID = "",
-	shouldMerge = true,
+	shouldMerge = true
 ) => {
 	console.log("doc: " + document);
 	if (optionalID !== "") {
@@ -154,9 +162,7 @@ export const writeDocumentToCollection = async (
 		}
 	} else {
 		try {
-			return (
-				await addDoc(collection(database, dbCollection), document)
-			);
+			return await addDoc(collection(database, dbCollection), document);
 		} catch (e) {
 			console.log("From WriteDocumentToCOllection, with no specified ID");
 			console.log(e);
@@ -214,4 +220,3 @@ export const loginWithEmailAndPassword = async (email, password) => {
 		throw new Error(error);
 	}
 };
-

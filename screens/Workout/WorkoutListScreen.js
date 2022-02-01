@@ -5,7 +5,15 @@ import React, {
 	useState,
 	useLayoutEffect,
 } from "react";
-import { FlatList, StyleSheet, View, RefreshControl } from "react-native";
+import {
+	FlatList,
+	StyleSheet,
+	View,
+	RefreshControl,
+	LayoutAnimation,
+	UIManager,
+	Platform,
+} from "react-native";
 import { useNavigation } from "@react-navigation/core";
 import { useDimensions } from "@react-native-community/hooks";
 import { HeaderButtons, Item } from "react-navigation-header-buttons";
@@ -18,15 +26,26 @@ import WorkoutListItem from "../../components/WorkoutListItem";
 
 const theme = Themes.dark;
 
+if (
+	Platform.OS === "android" &&
+	UIManager.setLayoutAnimationEnabledExperimental
+) {
+	UIManager.setLayoutAnimationEnabledExperimental(true);
+}
+
 const WorkoutListScreen = (props) => {
 	const { width, height } = useDimensions().window;
 	const dispatch = useDispatch();
 
 	const userID = useSelector((state) => state.auth.userID);
 	const reduxWorkoutRef = useSelector((state) => state.workout.workouts);
+
 	const [workouts, setWorkouts] = useState([]);
 	const [refreshing, setRefreshing] = useState(false);
-	const navigation = useNavigation();
+	const [showFilter, setShowFilter] = useState(false);
+	const [filterToggle, setFilterToggle] = useState(false);
+	const [testCounter, incrementCounter] = useState(0);
+
 	const onRefresh = useCallback(() => {
 		setRefreshing(true);
 		dispatch(WorkoutActions.getUserWorkouts(userID));
@@ -48,18 +67,33 @@ const WorkoutListScreen = (props) => {
 	}, [reduxWorkoutRef]);
 
 	useEffect(() => {
+		setShowFilter(filterToggle);
+		LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+	}, [filterToggle]);
+
+	const toggle = () => {
+		if (filterToggle) {
+			setFilterToggle(false);
+		} else {
+			setFilterToggle(true);
+		}
+	};
+
+	useLayoutEffect(() => {
 		props.navigation.setOptions({
 			headerRight: () => (
-				<HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
-					<Item
-						title="add"
-						iconName="filter-list"
-						onPress={() => console.log("Filterbuttonpressed")}
-					/>
-				</HeaderButtons>
+				<View style={{ flexDirection: "row" }}>
+					<HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
+						<Item
+							title="add"
+							iconName="filter-list"
+							onPress={toggle}
+						/>
+					</HeaderButtons>
+				</View>
 			),
 		});
-	}, [props.navigation]);
+	}, [props.navigation, filterToggle]);
 
 	return (
 		<View style={styles.container}>
@@ -74,6 +108,19 @@ const WorkoutListScreen = (props) => {
 			>
 				New Workout
 			</FabButton>
+			{showFilter && (
+				<View
+					style={{ width: "100%", height: 200, alignItems: "center" }}
+				>
+					<View
+						style={{
+							width: "90%",
+							height: "90%",
+							backgroundColor: theme.primaryContainer,
+						}}
+					></View>
+				</View>
+			)}
 
 			<View style={styles.contentView}>
 				<FlatList
