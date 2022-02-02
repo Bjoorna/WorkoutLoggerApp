@@ -21,7 +21,7 @@ import CustomHeaderButton from "../../components/Buttons/CustomHeaderButton";
 import FabButton from "../../components/Buttons/Fab";
 import { Themes } from "../../shared/Theme";
 import { useSelector, useDispatch } from "react-redux";
-import DisplayText from '../../components/Text/Display';
+import DisplayText from "../../components/Text/Display";
 import * as WorkoutActions from "../../store/actions/workout";
 import WorkoutListItem from "../../components/WorkoutListItem";
 
@@ -60,7 +60,6 @@ const WorkoutListScreen = (props) => {
 	}, []);
 
 	useEffect(() => {
-		// console.log(reduxWorkoutRef);
 		console.log("Page Loaded");
 		const newArray = [...reduxWorkoutRef];
 		setWorkouts(newArray);
@@ -118,10 +117,15 @@ const WorkoutListScreen = (props) => {
 							width: "90%",
 							height: "90%",
 							backgroundColor: theme.secondaryContainer,
-							padding: 20
+							padding: 20,
 						}}
 					>
-						<DisplayText large={true} style={{color: theme.onSecondaryContainer}}>Hello</DisplayText>
+						<DisplayText
+							large={true}
+							style={{ color: theme.onSecondaryContainer }}
+						>
+							Hello
+						</DisplayText>
 					</View>
 				</View>
 			)}

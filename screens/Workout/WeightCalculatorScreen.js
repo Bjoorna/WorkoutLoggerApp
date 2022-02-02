@@ -16,6 +16,7 @@ import DisplayText from "../../components/Text/Display";
 
 import Divider from "../../components/UI/Divider";
 import FilledButton from "../../components/Buttons/FilledButton";
+import OutlineButton from "../../components/Buttons/OutlineButton";
 const theme = Themes.dark;
 
 const SET_KWEIGHT = "SET_KWEIGHT";
@@ -23,6 +24,7 @@ const SET_KREPS = "SET_KREPS";
 const SET_KRPE = "SET_KRPE";
 const SET_WREPS = "SET_WREPS";
 const SET_WRPE = "SET_WRPE";
+const RESET = "RESET";
 const SET_ISVALID = "SET_ISVALID";
 const CHECK_ISVALID = "CHECK_ISVALID";
 
@@ -38,6 +40,8 @@ const rpeReducer = (state, action) => {
 			return { ...state, wReps: action.value };
 		case SET_WRPE:
 			return { ...state, wRPE: action.value };
+		case RESET: 
+			return initialState;
 		default:
 			return state;
 	}
@@ -109,7 +113,8 @@ const WeightCalculatorScreen = (props) => {
 			);
 			// return Math.round(estimated1RM * (wantedIntensity / 100));
 			setCalcWeight(Math.round(estimated1RM * (wantedIntensity / 100)));
-			return;
+			Keyboard.dismiss();
+			// return;
 		}
 	};
 

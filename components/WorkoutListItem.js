@@ -117,7 +117,7 @@ const WorkoutListItem = (props) => {
 						)}
 						{!isLoading && (
 							<FlatList
-								keyExtractor={(item) => item.id}
+								keyExtractor={(item) => Math.random()} // TODO other method of generating id
 								horizontal={true}
 								data={exercises}
 								renderItem={(itemData) => (

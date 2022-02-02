@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
 	View,
 	StyleSheet,
@@ -15,68 +15,86 @@ import { useDispatch, useSelector } from "react-redux";
 
 import DisplayText from "../../components/Text/Display";
 import BodyText from "../../components/Text/Body";
+import LabelText from "../../components/Text/Label";
+import HeadlineText from "../../components/Text/Headline";
 import OutlineButton from "../../components/Buttons/OutlineButton";
 import TextButton from "../../components/Buttons/TextButton";
 import { Themes } from "../../shared/Theme";
 const theme = Themes.dark;
 
 import Workout from "../../models/workout";
+import TitleText from "../../components/Text/Title";
+
+function calculateAge(user) {
+	const now = new Date();
+	const bd = new Date(user.dob.seconds * 1000);
+	let age = now.getFullYear() - bd.getFullYear();
+
+	const month = now.getMonth() - bd.getMonth();
+	if (month < 0 || (month === 0 && now.getDate() < bd.getDate())) {
+		age--;
+	}
+	return age;	
+
+}
 
 const UserOverviewScreen = (props) => {
 	// const user = USERS.find((user) => user.name === "Dennis");
 	const user = useSelector((state) => state.user.user);
 	const userID = useSelector((state) => state.auth.userID);
-	console.log("USER from UserOverview: ");
-	console.log(user);
 
-	const authDetails = useSelector((state) => state.auth);
 	const dispatch = useDispatch();
 
 	const logoutUser = () => {
 		dispatch(AuthActions.logout());
 	};
 
-	const saveUser = () => {
-		dispatch(AuthActions.saveUser(user));
-	};
+	const memoAgeValue = useMemo(() => calculateAge(user), [user]); // useMemo is probably unnecessary
 
-	const testWorkout = new Workout(
-		Date.now(),
-		false,
-		"This is a workout",
-		userID
-	);
+	// const calculateAge = (user) => {
+	// 	const now = new Date();
+	// 	const bd = new Date(user.dob.seconds * 1000);
+	// 	let age = now.getFullYear() - bd.getFullYear();
+
+	// 	const month = now.getMonth() - bd.getMonth();
+	// 	if (month < 0 || (month === 0 && now.getDate() < bd.getDate())) {
+	// 		age--;
+	// 	}
+	// 	return age;	
+	// }
+
 
 	return (
 		<SafeAreaView style={styles.safeView}>
-			<ScrollView style={styles.screen}>
-				<View style={styles.userHeaderContainer}>
-					<DisplayText style={styles.headerText}>
-						{user.name}
-					</DisplayText>
-					<Image
-						style={styles.image}
-						resizeMode="contain"
-						source={{ uri: user.profileImageURI }}
-					/>
+			<View style={styles.userHeaderContainer}>
+				<DisplayText style={styles.headerText}>{user.name}</DisplayText>
+				<Image
+					style={styles.image}
+					resizeMode="contain"
+					source={{ uri: user.profileImageURI }}
+				/>
+			</View>
+			<View style={styles.currentInfoView}>
+				<View style={styles.infoItem}>
+					<LabelText style={styles.infoText}  large={true}>Height</LabelText>
+					<HeadlineText style={styles.infoText}  large={true}>{user.height ? user.height : "N/A"}</HeadlineText>
 				</View>
-				<View style={styles.currentInfoView}>
-					<BodyText large={true}>{user.weight}</BodyText>
-					<OutlineButton onButtonPress={() => logoutUser()}>
-						Logout
-					</OutlineButton>
-					<OutlineButton
-						disabled={false}
-						// style={{width: 300}}
-						onButtonPress={() => console.log(authDetails)}
-					>
-						authDetails
-					</OutlineButton>
-					<TextButton disabled={false}>
-						TestButton
-					</TextButton>
+				<View style={styles.infoItem}>
+					<LabelText style={styles.infoText}  large={true}>Weight</LabelText>
+					<HeadlineText style={styles.infoText}  large={true}>{user.weight ? user.weight : "N/A"}</HeadlineText>
 				</View>
-			</ScrollView>
+				<View style={styles.infoItem}>
+					<LabelText style={styles.infoText} large={true}>Age</LabelText>
+					<HeadlineText style={styles.infoText}  large={true}>{user.dob ? memoAgeValue : "N/A"}</HeadlineText>
+				</View>
+
+			</View>
+			<OutlineButton onButtonPress={() => console.log(user)}>
+				UserDetaail
+			</OutlineButton>
+			<OutlineButton style={{marginTop: 20}} onButtonPress={() => logoutUser()}>
+				Logout
+			</OutlineButton>
 		</SafeAreaView>
 	);
 };
@@ -85,11 +103,9 @@ const styles = StyleSheet.create({
 	safeView: {
 		flex: 1,
 		backgroundColor: theme.surface,
+		alignItems: "center",
 	},
-	screen: {
-		// flex: 1,
-		backgroundColor: theme.surface,
-	},
+
 	userHeaderContainer: {
 		height: 300,
 		justifyContent: "center",
@@ -97,12 +113,24 @@ const styles = StyleSheet.create({
 		width: "100%",
 	},
 	currentInfoView: {
+		marginTop: 10,
 		width: "90%",
-		alignItems: "center"
+		height: 100,
+		flexDirection: "row",
+		justifyContent: "space-around",
+		alignItems: "center",
+		borderRadius: 12,
+		paddingHorizontal: 16,
+		paddingVertical: 6,
+		backgroundColor: theme.surfaceVariant,
 	},
+	infoItem: {},
 	headerText: {
 		color: theme.onSurface,
 	},
+	infoText: {
+		color: theme.onSurfaceVariant
+	},	
 	image: {
 		height: "80%",
 		width: "80%",
