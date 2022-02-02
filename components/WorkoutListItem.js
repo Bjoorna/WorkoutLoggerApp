@@ -14,7 +14,7 @@ const ExerciseItem = (props) => {
 		<View style={exerciseStyles.exerciseItem}>
 			
 			<View style={exerciseStyles.exerciseValues}>
-			<BodyText style={{ color: theme.onSecondaryContainer }}>
+			<BodyText style={{ color: theme.onSecondaryContainer ,height: 20, overflow: "hidden" }}>
 				{exercise.exercise}
 			</BodyText>
 				<LabelText style={{ color: theme.onSecondaryContainer }}>

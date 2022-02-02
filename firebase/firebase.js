@@ -35,6 +35,7 @@ const database = getFirestore(app);
 export const writeExercisesToDatabase = async (
 	exercises,
 	userID,
+	workoutID,
 	timestamp
 ) => {
 	try {
@@ -50,6 +51,7 @@ export const writeExercisesToDatabase = async (
 				rpe: exercise.rpe,
 				date: timestamp,
 				owner: userID,
+				workoutID: workoutID
 			};
 			const exerciseRef = doc(database, "exercises", exerciseID);
 			arrayOfExerciseIDs.push(exerciseID);
@@ -69,7 +71,7 @@ export const getUserWorkouts = async (userID) => {
 			collection(database, "workouts"),
 			where("owner", "==", userID),
 			orderBy("date", "desc"),
-			limit(1)
+			limit(5)
 		);
 		const querySnapshot = await getDocs(q);
 		return querySnapshot;
@@ -81,22 +83,11 @@ export const getUserWorkouts = async (userID) => {
 
 export const getExercisesInWorkout = async (exercises, userID) => {
 	try {
-		// const q = query(collection(database, "exercises"), where(FieldPath.))
-		// const q = query(collection(database, "exercises"), where("uid", "in", workouts));
-		// const querySnapshot = await getDocs(q);
-		// querySnapshot.forEach(doc => {
-		// 	console.log("An Exercise: " + doc.data());
-		// })
 		const docRefs = exercises.map((exercise) =>
 			getDoc(doc(database, "exercises", exercise))
 		);
 		const docSnaps = await Promise.all(docRefs);
 		return docSnaps;
-		// docSnaps.forEach(doc => {
-		// 	if(doc.exists){
-		// 		console.log(doc.data());
-		// 	}
-		// });
 	} catch (error) {
 		throw new Error(error);
 	}
@@ -105,9 +96,11 @@ export const getExercisesInWorkout = async (exercises, userID) => {
 export const writeWorkoutToCollection = async (workout) => {
 	try {
 		const timestamp = Timestamp.fromMillis(workout.date);
+		const newUUID = nanoid();
 		const exerciseIDs = await writeExercisesToDatabase(
 			workout.exercises,
 			workout.owner,
+			newUUID,
 			timestamp
 		);
 		const newWorkout = {
@@ -117,9 +110,6 @@ export const writeWorkoutToCollection = async (workout) => {
 			note: workout.note,
 			owner: workout.owner,
 		};
-
-		const newUUID = nanoid();
-		console.log(newUUID);
 
 		const docRef = doc(database, "workouts", newUUID);
 		return await setDoc(docRef, newWorkout);

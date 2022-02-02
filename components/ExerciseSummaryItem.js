@@ -10,7 +10,7 @@ const theme = Themes.dark;
 const ExerciseSummaryView = (props) => {
 	return (
 		<View style={styles.exerciseSummaryView}>
-			<TitleText style={styles.text} large={true}>
+			<TitleText style={{...styles.text, }} large={true}>
 				{props.exercise.exercise}
 			</TitleText>
 			<LabelText style={styles.text} large={true}>
