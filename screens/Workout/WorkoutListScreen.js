@@ -21,6 +21,7 @@ import CustomHeaderButton from "../../components/Buttons/CustomHeaderButton";
 import FabButton from "../../components/Buttons/Fab";
 import { Themes } from "../../shared/Theme";
 import { useSelector, useDispatch } from "react-redux";
+import DisplayText from '../../components/Text/Display';
 import * as WorkoutActions from "../../store/actions/workout";
 import WorkoutListItem from "../../components/WorkoutListItem";
 
@@ -116,9 +117,12 @@ const WorkoutListScreen = (props) => {
 						style={{
 							width: "90%",
 							height: "90%",
-							backgroundColor: theme.primaryContainer,
+							backgroundColor: theme.secondaryContainer,
+							padding: 20
 						}}
-					></View>
+					>
+						<DisplayText large={true} style={{color: theme.onSecondaryContainer}}>Hello</DisplayText>
+					</View>
 				</View>
 			)}
 
