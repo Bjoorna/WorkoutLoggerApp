@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, StyleSheet, Switch, Alert } from "react-native";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import BodyText from "../../components/Text/Body";
 
 import * as UserActions from "../../store/actions/user";
@@ -11,9 +11,12 @@ const theme = Themes.dark;
 const UserSettingsScreen = (props) => {
 	const user = useSelector((state) => state.user.user);
 	const userID = useSelector((state) => state.auth.userID);
+	const dispatch = useDispatch();
 
 	const [isSwitchDisabled, setIsSwitchDisabled] = useState(false);
 	const [useMetricValue, setUseMetricValue] = useState(false);
+	const [updateUser, setUpdateUser] = useState(false);
+	const [isUpdating, setIsUpdating] = useState(false);
 	const [error, setError] = useState();
 
 	// initialize userSettingsValues
@@ -23,20 +26,31 @@ const UserSettingsScreen = (props) => {
 	}, [user]);
 
 	useEffect(() => {
+		if(!isUpdating){
+			return;
+		}
 		const updateUserSettings = async () => {
-			console.log("Hello");
 			const newUserData = { ...user };
 			newUserData.useMetric = useMetricValue;
 			setError(null);
+			setIsSwitchDisabled(true);
 			try {
-				await UserActions.updateUser(userID, newUserData);
+				console.log("UseEffect in userSettings");
+				await dispatch(UserActions.updateUser(userID, newUserData));
+				setIsUpdating(false);
 			} catch (error) {
 				setError(error.message);
 				setIsSwitchDisabled(false);
+				setIsUpdating(false);
 			}
 		};
 		updateUserSettings();
-	}, [useMetricValue]);
+	}, [isUpdating]);
+
+	const setUpdateUserFlag = (event) => {
+		console.log("ONCHANGE");
+		setIsUpdating(true);
+	};
 
 	useEffect(() => {
 		if (error) {
@@ -56,6 +70,7 @@ const UserSettingsScreen = (props) => {
 					</BodyText>
 					<Switch
 						onValueChange={toggleUseMetric}
+						onChange={(event) => setUpdateUserFlag(event)}
 						value={useMetricValue}
 						disabled={isSwitchDisabled}
 						trackColor={{

@@ -19,34 +19,6 @@ export const auth = (userID, token) => {
 	};
 };
 
-// export const signup = (email, password) => {
-// 	return async (dispatch) => {
-// 		const tempTestData = {
-// 			name: "Marcus",
-// 			weight: 100,
-// 			height: 190,
-// 			profileImageURL:
-// 				"https://images.unsplash.com/photo-1506207803951-1ee93d7256ad?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1160&q=80",
-// 		};
-
-// 		try {
-			
-// 			const newUser = await firebase.signUpNewUserWithEmailAndPassword(
-// 				email,
-// 				password
-// 			);
-// 			const userID = newUser.uid;
-// 			const userToken = newUser.stsTokenManager.accessToken;
-// 			await firebase.writeDocumentToCollection(tempTestData, "users", userID);
-// 			dispatch(auth(userID, userToken));
-// 			await saveAuthDataToStorage(userToken, userID);
-
-// 		} catch (e) {
-// 			throw new Error(e);
-// 		}
-// 	};
-// };
-
 export const initSaveUser = (userID, user) => {
 	return async(dispatch) => {
 		try {
@@ -109,57 +81,6 @@ export const logout = () => {
 	return { type: LOGOUT };
 };
 
-// export const saveUser = (user) => {
-// 	return async (dispatch) => {
-// 		let localSavedUserCreds = await AsyncStorage.getItem("userData");
-// 		console.log(localSavedUserCreds);
-// 		localSavedUserCreds = JSON.parse(localSavedUserCreds);
-
-
-// 		const databaseURLWithAuth =
-// 			firebaseConfig.databaseURL +
-// 			"users/" +
-// 			localSavedUserCreds.userID +
-// 			`.json?auth=${localSavedUserCreds.token}`;
-// 		console.log(localSavedUserCreds);
-// 		const userID = localSavedUserCreds.userID;
-// 		console.log("USERID: " + userID);
-// 		const userPackage = JSON.stringify({
-// 			userID: {
-// 				name: user.name,
-// 				age: user.age + 30,
-// 				weight: user.weight,
-// 				height: user.weight,
-// 				profileImageURI: user.profileImageURI,
-// 			},
-// 		});
-
-// 		console.log(userPackage);
-
-// 		console.log(databaseURLWithAuth);
-// 		const response = await fetch(databaseURLWithAuth, {
-// 			method: "PUT",
-// 			headers: { "Content-Type": "application/json" },
-// 			body: JSON.stringify({
-// 				name: user.name,
-// 				age: user.age,
-// 				weight: user.weight,
-// 				height: user.weight,
-// 				profileImageURI: user.profileImageURI,
-// 			}),
-// 		});
-
-// 		if (!response.ok) {
-// 			const errorData = await response.json();
-// 			console.log(errorData);
-// 			throw new Error("Error");
-// 		}
-// 		const resData = await response.json();
-// 		console.log(resData);
-// 		// // dispatch(savedUser())
-// 		return { type: SAVE_USER };
-// 	};
-// };
 
 const saveAuthDataToStorage = async (token, userID) => {
 	try {

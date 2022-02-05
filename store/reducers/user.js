@@ -15,7 +15,7 @@ export default (state = initialState, action) => {
 				userdata.weight,
 				userdata.height,
 				userdata.useMetric,
-				userdata.profileImageURL
+				userdata.profileImageURI
 			);
 			return {...state, user: newUser };
 		default:

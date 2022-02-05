@@ -55,12 +55,13 @@ export const saveUserToCollection = async (user, userID) => {
 export const updateUser = async (userID, newUserState) => {
 	const userRef = doc(database, "users", userID);
 	try {
-		return await updateDoc(userRef, {useMetric: newUserState.useMetric});
+		console.log("userState from firebase function");
+		console.log(newUserState);
+		return await updateDoc(userRef, { ...newUserState });
 	} catch (error) {
 		throw new Error(error);
 	}
-}
-
+};
 
 export const writeExercisesToDatabase = async (
 	exercises,
@@ -81,7 +82,7 @@ export const writeExercisesToDatabase = async (
 				rpe: exercise.rpe,
 				date: timestamp,
 				owner: userID,
-				workoutID: workoutID
+				workoutID: workoutID,
 			};
 			const exerciseRef = doc(database, "exercises", exerciseID);
 			arrayOfExerciseIDs.push(exerciseID);
@@ -148,7 +149,6 @@ export const writeWorkoutToCollection = async (workout) => {
 		console.log(e);
 	}
 };
-
 
 export const writeDocumentToCollection = async (
 	document,

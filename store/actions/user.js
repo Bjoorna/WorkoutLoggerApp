@@ -16,8 +16,8 @@ export const saveUser = (user) => {
 export const updateUser = (userID, user) => {
     return async (dispatch) => {
         try {
+            console.log("updateing user from UserActions");
             await firebase.updateUser(userID, user);
-            console.log("Retrieving new UserData");
             const updatedUser = await firebase.getDocumentFromCollection(userID, "users");
             console.log("new User: ");
             console.log(updatedUser);
