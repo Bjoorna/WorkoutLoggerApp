@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useLayoutEffect, useMemo, useState } from "react";
 import {
 	View,
 	StyleSheet,
@@ -10,20 +10,16 @@ import {
 } from "react-native";
 
 import * as AuthActions from "../../store/actions/auth";
-import * as WorkoutActions from "../../store/actions/workout";
 import { useDispatch, useSelector } from "react-redux";
+import { HeaderButtons, Item } from "react-navigation-header-buttons";
+import CustomHeaderButton from "../../components/Buttons/CustomHeaderButton";
 
 import DisplayText from "../../components/Text/Display";
-import BodyText from "../../components/Text/Body";
 import LabelText from "../../components/Text/Label";
 import HeadlineText from "../../components/Text/Headline";
 import OutlineButton from "../../components/Buttons/OutlineButton";
-import TextButton from "../../components/Buttons/TextButton";
 import { Themes } from "../../shared/Theme";
 const theme = Themes.dark;
-
-import Workout from "../../models/workout";
-import TitleText from "../../components/Text/Title";
 
 function calculateAge(user) {
 	const now = new Date();
@@ -34,8 +30,7 @@ function calculateAge(user) {
 	if (month < 0 || (month === 0 && now.getDate() < bd.getDate())) {
 		age--;
 	}
-	return age;	
-
+	return age;
 }
 
 const UserOverviewScreen = (props) => {
@@ -49,20 +44,31 @@ const UserOverviewScreen = (props) => {
 		dispatch(AuthActions.logout());
 	};
 
+	useLayoutEffect(() => {
+		props.navigation.setOptions({
+			headerRight: () => (
+				<View style={{ flexDirection: "row" }}>
+					<HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
+						<Item
+							title="edit"
+							iconName="edit"
+							onPress={() => console.log("eddit")}
+						/>
+					</HeaderButtons>
+
+					<HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
+						<Item
+							title="usersettings"
+							iconName="settings"
+							onPress={() => props.navigation.navigate("UserSettings")}
+						/>
+					</HeaderButtons>
+				</View>
+			),
+		});
+	}, [props.navigation]);
+
 	const memoAgeValue = useMemo(() => calculateAge(user), [user]); // useMemo is probably unnecessary
-
-	// const calculateAge = (user) => {
-	// 	const now = new Date();
-	// 	const bd = new Date(user.dob.seconds * 1000);
-	// 	let age = now.getFullYear() - bd.getFullYear();
-
-	// 	const month = now.getMonth() - bd.getMonth();
-	// 	if (month < 0 || (month === 0 && now.getDate() < bd.getDate())) {
-	// 		age--;
-	// 	}
-	// 	return age;	
-	// }
-
 
 	return (
 		<SafeAreaView style={styles.safeView}>
@@ -76,23 +82,37 @@ const UserOverviewScreen = (props) => {
 			</View>
 			<View style={styles.currentInfoView}>
 				<View style={styles.infoItem}>
-					<LabelText style={styles.infoText}  large={true}>Height</LabelText>
-					<HeadlineText style={styles.infoText}  large={true}>{user.height ? user.height : "N/A"}</HeadlineText>
+					<LabelText style={styles.infoText} large={true}>
+						Height
+					</LabelText>
+					<HeadlineText style={styles.infoText} large={true}>
+						{user.height ? user.height : "N/A"}
+					</HeadlineText>
 				</View>
 				<View style={styles.infoItem}>
-					<LabelText style={styles.infoText}  large={true}>Weight</LabelText>
-					<HeadlineText style={styles.infoText}  large={true}>{user.weight ? user.weight : "N/A"}</HeadlineText>
+					<LabelText style={styles.infoText} large={true}>
+						Weight
+					</LabelText>
+					<HeadlineText style={styles.infoText} large={true}>
+						{user.weight ? user.weight : "N/A"}
+					</HeadlineText>
 				</View>
 				<View style={styles.infoItem}>
-					<LabelText style={styles.infoText} large={true}>Age</LabelText>
-					<HeadlineText style={styles.infoText}  large={true}>{user.dob ? memoAgeValue : "N/A"}</HeadlineText>
+					<LabelText style={styles.infoText} large={true}>
+						Age
+					</LabelText>
+					<HeadlineText style={styles.infoText} large={true}>
+						{user.dob ? memoAgeValue : "N/A"}
+					</HeadlineText>
 				</View>
-
 			</View>
 			<OutlineButton onButtonPress={() => console.log(user)}>
 				UserDetaail
 			</OutlineButton>
-			<OutlineButton style={{marginTop: 20}} onButtonPress={() => logoutUser()}>
+			<OutlineButton
+				style={{ marginTop: 20 }}
+				onButtonPress={() => logoutUser()}
+			>
 				Logout
 			</OutlineButton>
 		</SafeAreaView>
@@ -129,8 +149,8 @@ const styles = StyleSheet.create({
 		color: theme.onSurface,
 	},
 	infoText: {
-		color: theme.onSurfaceVariant
-	},	
+		color: theme.onSurfaceVariant,
+	},
 	image: {
 		height: "80%",
 		width: "80%",

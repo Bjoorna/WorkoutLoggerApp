@@ -14,6 +14,7 @@ import {
 	getDocs,
 	orderBy,
 	limit,
+	updateDoc,
 } from "firebase/firestore";
 import {
 	getAuth,
@@ -31,6 +32,35 @@ const app = initializeApp(firebaseConfig.firebaseConfig);
 
 // FIRESTORE
 const database = getFirestore(app);
+
+// userFunctions
+
+export const saveUserToCollection = async (user, userID) => {
+	try {
+		const docRef = doc(database, "users", userID);
+		const userTransform = {
+			name: user.name,
+			dob: user.dob,
+			weight: user.weight,
+			height: user.height,
+			useMetric: user.useMetric,
+			profileImageURI: user.profileImageURI,
+		};
+		return await setDoc(docRef, userTransform, { merge: true });
+	} catch (error) {
+		throw new Error(error);
+	}
+};
+
+export const updateUser = async (userID, newUserState) => {
+	const userRef = doc(database, "users", userID);
+	try {
+		return await updateDoc(userRef, {useMetric: newUserState.useMetric});
+	} catch (error) {
+		throw new Error(error);
+	}
+}
+
 
 export const writeExercisesToDatabase = async (
 	exercises,
@@ -119,21 +149,6 @@ export const writeWorkoutToCollection = async (workout) => {
 	}
 };
 
-export const saveUserToCollection = async (user, userID) => {
-	try {
-		const docRef = doc(database, "users", userID);
-		const userTransform = {
-			name: user.name,
-			dob: user.dob,
-			weight: user.weight,
-			height: user.height,
-			profileImageURI: user.profileImageURI,
-		};
-		return await setDoc(docRef, userTransform, { merge: true });
-	} catch (error) {
-		throw new Error(error);
-	}
-};
 
 export const writeDocumentToCollection = async (
 	document,

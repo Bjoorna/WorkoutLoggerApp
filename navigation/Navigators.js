@@ -8,7 +8,7 @@ import TestScreen from "../screens/TestScreen";
 import TestScreen1 from "../screens/TestScreen2";
 
 import UserOverviewScreen from "../screens/User/UserOverview";
-import UserDetailScreen from "../screens/User/UserDetail";
+import UserSettingsScreen from "../screens/User/UserSettings";
 
 import AddWorkoutScreen from "../screens/Workout/AddWorkoutScreen";
 
@@ -158,8 +158,8 @@ export const UserStackScreen = () => {
 					}}
 				/>
 				<UserStackNavigator.Screen
-					name="UserDetail"
-					component={UserDetailScreen}
+					name="UserSettings"
+					component={UserSettingsScreen}
 					options={{ ...defaultStyleOptions, presentation: "card" }}
 				/>
 			</UserStackNavigator.Group>
