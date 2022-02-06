@@ -4,6 +4,7 @@ import React, {
 	useEffect,
 	useState,
 	useLayoutEffect,
+	useRef,
 } from "react";
 import {
 	FlatList,
@@ -13,6 +14,7 @@ import {
 	LayoutAnimation,
 	UIManager,
 	Platform,
+	Animated,
 } from "react-native";
 import { useNavigation } from "@react-navigation/core";
 import { useDimensions } from "@react-native-community/hooks";
@@ -22,8 +24,12 @@ import FabButton from "../../components/Buttons/Fab";
 import { Themes } from "../../shared/Theme";
 import { useSelector, useDispatch } from "react-redux";
 import DisplayText from "../../components/Text/Display";
+import TitleText from "../../components/Text/Title";
+
 import * as WorkoutActions from "../../store/actions/workout";
 import WorkoutListItem from "../../components/WorkoutListItem";
+
+import FilterChip from "../../components/UI/Chips/FilterChip";
 
 const theme = Themes.dark;
 
@@ -33,6 +39,66 @@ if (
 ) {
 	UIManager.setLayoutAnimationEnabledExperimental(true);
 }
+
+const FilterBox = (props) => {
+	const exerciseList = [
+		"Squat",
+		"Deadlift",
+		"RDL",
+		"Bench-Press",
+		"Sumo-DL",
+		"Press",
+	];
+	const fadeAnim = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
+	useEffect(() => {
+		Animated.timing(fadeAnim, {
+			toValue: 1,
+			duration: 1000,
+			useNativeDriver: true,
+		}).start();
+	}, [fadeAnim]);
+	return (
+		<Animated.View style={filterBoxStyles.filterBoxContainer}>
+			<View style={filterBoxStyles.filterBoxContent}>
+				<View style={filterBoxStyles.header}>
+					<TitleText style={{ color: theme.onSurfaceVariant }}>
+						Filter
+					</TitleText>
+				</View>
+				<View style={{ width: "100%" }}>
+					<FlatList
+						horizontal={true}
+						keyExtractor={item => Math.random()}
+						data={exerciseList}
+						renderItem={(itemData) => (
+							<FilterChip selected={false}>
+								{itemData.item}
+							</FilterChip>
+						)}
+					/>
+				</View>
+			</View>
+		</Animated.View>
+	);
+};
+
+const filterBoxStyles = StyleSheet.create({
+	filterBoxContainer: {
+		width: "100%",
+		height: 200,
+		alignItems: "center",
+	},
+	filterBoxContent: {
+		width: "90%",
+		height: "90%",
+		padding: 20,
+		borderRadius: 12,
+		// borderColor: theme.outline,
+		// borderWidth: 1,
+		// borderStyle: "solid"
+	},
+	header: {},
+});
 
 const WorkoutListScreen = (props) => {
 	const { width, height } = useDimensions().window;
@@ -68,7 +134,7 @@ const WorkoutListScreen = (props) => {
 
 	useEffect(() => {
 		setShowFilter(filterToggle);
-		LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+		// LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
 	}, [filterToggle]);
 
 	const toggle = () => {
@@ -109,25 +175,26 @@ const WorkoutListScreen = (props) => {
 				New Workout
 			</FabButton>
 			{showFilter && (
-				<View
-					style={{ width: "100%", height: 200, alignItems: "center" }}
-				>
-					<View
-						style={{
-							width: "90%",
-							height: "90%",
-							backgroundColor: theme.secondaryContainer,
-							padding: 20,
-						}}
-					>
-						<DisplayText
-							large={true}
-							style={{ color: theme.onSecondaryContainer }}
-						>
-							Hello
-						</DisplayText>
-					</View>
-				</View>
+				// <View
+				// 	style={{ width: "100%", height: 200, alignItems: "center" }}
+				// >
+				// 	<View
+				// 		style={{
+				// 			width: "90%",
+				// 			height: "90%",
+				// 			backgroundColor: theme.secondaryContainer,
+				// 			padding: 20,
+				// 		}}
+				// 	>
+				// 		<DisplayText
+				// 			large={true}
+				// 			style={{ color: theme.onSecondaryContainer }}
+				// 		>
+				// 			Hello
+				// 		</DisplayText>
+				// 	</View>
+				// </View>
+				<FilterBox />
 			)}
 
 			<View style={styles.contentView}>
