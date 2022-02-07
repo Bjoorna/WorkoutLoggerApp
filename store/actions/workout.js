@@ -17,10 +17,8 @@ export const addWorkout = (workout) => {
 				workout,
 				"workouts",
 				"",
-				false,
+				false
 			);
-
-			console.log(saveNewWorkout.id);
 			dispatch({ type: ADD_WORKOUT, workout: workout });
 		} catch (e) {
 			throw new Error(e);
@@ -28,39 +26,50 @@ export const addWorkout = (workout) => {
 	};
 };
 
-// export const getUserWorkouts = (userID, dataBaseRef) => {
-// 	return async (dispatch) => {
-// 		try{
-// 			console.log("Getting Workouts...");
-// 			const serverWorkouts = await firebase.getUserWorkouts(userID);
-// 			console.log("Workouts collected");
-
-// 			const transformWorkouts = serverWorkouts.map(
-// 				(serverWO) =>
-// 					new Workout(
-// 						serverWO.exercises,
-// 						serverWO.date,
-// 						serverWO.complete,
-// 						serverWO.note,
-// 						serverWO.owner
-// 					)
-// 			);
-// 			dispatch({type: GET_WORKOUTS, workouts: transformWorkouts});
-// 		}catch(e){
-
-// 		}
-// 	}
-
-// }
-
-export const getUserWorkouts = (userID, dataBaseRef) => {
+export const getWorkoutFilteredByExerciseType = (userID, exerciseArray) => {
 	return async (dispatch) => {
-		try{
+		try {
+			const workoutIDArray = [];
+			const filteredExercises =
+				await firebase.getExercisesFilteredByExerciseType(
+					userID,
+					exerciseArray
+				);
+			console.log("Exercises!?: ");
+			filteredExercises.forEach((doc) => {
+				workoutIDArray.push(doc.data().workoutID);
+			});
+			const workoutDocs = await firebase.getWorkoutsBasedOnWorkoutIDs(
+				workoutIDArray
+			);
+			const transformedWorkouts = []
+			workoutDocs.forEach((query) => {
+				const workoutData = query.data();
+				const newWorkout = new Workout(
+					workoutData.exercises,
+					workoutData.date,
+					workoutData.complete,
+					workoutData.note,
+					workoutData.owner,
+					query.id
+				);
+				transformedWorkouts.push(newWorkout);
+			});
+			dispatch({type: GET_WORKOUTS, workouts: transformedWorkouts});
+		} catch (error) {
+			throw new Error(error);
+		}
+	};
+};
+
+export const getUserWorkouts = (userID) => {
+	return async (dispatch) => {
+		try {
 			console.log("Getting Workouts...");
 			const queryResult = await firebase.getUserWorkouts(userID);
 			console.log("Workouts collected");
 			const arrayOfWorkouts = [];
-			queryResult.forEach(doc => {
+			queryResult.forEach((doc) => {
 				const dataObject = doc.data();
 				const newWorkout = new Workout(
 					dataObject.exercises,
@@ -73,10 +82,9 @@ export const getUserWorkouts = (userID, dataBaseRef) => {
 				arrayOfWorkouts.push(newWorkout);
 			});
 
-			dispatch({type: GET_WORKOUTS, workouts: arrayOfWorkouts});
-		}catch(e){
-
+			dispatch({ type: GET_WORKOUTS, workouts: arrayOfWorkouts });
+		} catch (error) {
+			throw new Error(error);
 		}
-	}
-
-}
+	};
+};

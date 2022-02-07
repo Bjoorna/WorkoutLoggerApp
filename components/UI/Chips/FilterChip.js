@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, StyleSheet, Pressable } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Themes } from "../../../shared/Theme";
@@ -6,12 +6,19 @@ import LabelText from "../../Text/Label";
 
 const theme = Themes.dark;
 
+
+// TODO the state of each chip is now set separately from the state that is being managed in the component the chip is being used in
+// Change that
 const FilterChip = (props) => {
 	const [isSelected, setIsSelected] = useState(props.selected);
 
     const onPress =() => {
+        props.onChipPress();
         setIsSelected(state => !state);
     }
+	// useEffect(()=> {
+	// 	setIsSelected(props.selected);
+	// },[props.selected])
 
 	if (isSelected) {
 		return (

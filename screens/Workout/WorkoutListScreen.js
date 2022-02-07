@@ -30,6 +30,7 @@ import * as WorkoutActions from "../../store/actions/workout";
 import WorkoutListItem from "../../components/WorkoutListItem";
 
 import FilterChip from "../../components/UI/Chips/FilterChip";
+import OutlineButton from "../../components/Buttons/OutlineButton";
 
 const theme = Themes.dark;
 
@@ -40,15 +41,38 @@ if (
 	UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
+const exerciseList = [
+	{ exercise: "Squat", selected: false },
+	{ exercise: "Deadlift", selected: false },
+	{ exercise: "Bench-Press", selected: false },
+	{ exercise: "RDL", selected: false },
+	{ exercise: "Sumo-DL", selected: false },
+	{ exercise: "Press", selected: false },
+];
+
 const FilterBox = (props) => {
-	const exerciseList = [
-		"Squat",
-		"Deadlift",
-		"RDL",
-		"Bench-Press",
-		"Sumo-DL",
-		"Press",
-	];
+	const dispatch = useDispatch();
+	const userID = useSelector((state) => state.auth.userID);
+	const [exerciseFilterState, setExerciseFilterState] =
+		useState(exerciseList);
+
+	useEffect(() => {
+		console.log("State is changed");
+		console.log(exerciseFilterState);
+	}, [exerciseFilterState]);
+
+	const updateFilterState = (exercise, selected) => {
+		const newState = [...exerciseFilterState];
+		const findEx = newState.find(
+			(arrayItem) => arrayItem.exercise == exercise
+		);
+		if (!findEx) {
+			return;
+		}
+		findEx.selected = !findEx.selected;
+		setExerciseFilterState(newState);
+	};
+
 	const fadeAnim = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
 	useEffect(() => {
 		Animated.timing(fadeAnim, {
@@ -57,25 +81,60 @@ const FilterBox = (props) => {
 			useNativeDriver: true,
 		}).start();
 	}, [fadeAnim]);
+
+	const queryForFilter = async () => {
+		const exerciseFilter = exerciseFilterState
+			.filter((ex) => ex.selected == true)
+			.map((ex) => ex.exercise);
+		console.log("Filter is called");
+		console.log(exerciseFilter);
+		try {
+			if (exerciseFilter.length < 1) {
+				dispatch(WorkoutActions.getUserWorkouts(userID));
+			} else {
+				dispatch(
+					WorkoutActions.getWorkoutFilteredByExerciseType(
+						userID,
+						exerciseFilter
+					)
+				);
+			}
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
 	return (
 		<Animated.View style={filterBoxStyles.filterBoxContainer}>
 			<View style={filterBoxStyles.filterBoxContent}>
 				<View style={filterBoxStyles.header}>
 					<TitleText style={{ color: theme.onSurfaceVariant }}>
-						Filter
+						Filter by exercise
 					</TitleText>
 				</View>
 				<View style={{ width: "100%" }}>
 					<FlatList
+						style={{ marginVertical: 5 }}
 						horizontal={true}
-						keyExtractor={item => Math.random()}
-						data={exerciseList}
+						keyExtractor={(item) => Math.random()}
+						data={exerciseFilterState}
 						renderItem={(itemData) => (
-							<FilterChip selected={false}>
-								{itemData.item}
+							<FilterChip
+								onChipPress={() =>
+									updateFilterState(
+										itemData.item.exercise,
+										itemData.item.selected
+									)
+								}
+								selected={itemData.item.selected}
+							>
+								{itemData.item.exercise}
 							</FilterChip>
 						)}
 					/>
+					<OutlineButton onButtonPress={queryForFilter}>
+						Filter
+					</OutlineButton>
 				</View>
 			</View>
 		</Animated.View>
@@ -113,6 +172,22 @@ const WorkoutListScreen = (props) => {
 	const [filterToggle, setFilterToggle] = useState(false);
 	const [testCounter, incrementCounter] = useState(0);
 
+	useLayoutEffect(() => {
+		props.navigation.setOptions({
+			headerRight: () => (
+				<View style={{ flexDirection: "row" }}>
+					<HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
+						<Item
+							title="add"
+							iconName="filter-list"
+							onPress={toggle}
+						/>
+					</HeaderButtons>
+				</View>
+			),
+		});
+	}, [props.navigation, filterToggle]);
+
 	const onRefresh = useCallback(() => {
 		setRefreshing(true);
 		dispatch(WorkoutActions.getUserWorkouts(userID));
@@ -145,22 +220,6 @@ const WorkoutListScreen = (props) => {
 		}
 	};
 
-	useLayoutEffect(() => {
-		props.navigation.setOptions({
-			headerRight: () => (
-				<View style={{ flexDirection: "row" }}>
-					<HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
-						<Item
-							title="add"
-							iconName="filter-list"
-							onPress={toggle}
-						/>
-					</HeaderButtons>
-				</View>
-			),
-		});
-	}, [props.navigation, filterToggle]);
-
 	return (
 		<View style={styles.container}>
 			<FabButton
@@ -174,28 +233,7 @@ const WorkoutListScreen = (props) => {
 			>
 				New Workout
 			</FabButton>
-			{showFilter && (
-				// <View
-				// 	style={{ width: "100%", height: 200, alignItems: "center" }}
-				// >
-				// 	<View
-				// 		style={{
-				// 			width: "90%",
-				// 			height: "90%",
-				// 			backgroundColor: theme.secondaryContainer,
-				// 			padding: 20,
-				// 		}}
-				// 	>
-				// 		<DisplayText
-				// 			large={true}
-				// 			style={{ color: theme.onSecondaryContainer }}
-				// 		>
-				// 			Hello
-				// 		</DisplayText>
-				// 	</View>
-				// </View>
-				<FilterBox />
-			)}
+			{showFilter && <FilterBox />}
 
 			<View style={styles.contentView}>
 				<FlatList

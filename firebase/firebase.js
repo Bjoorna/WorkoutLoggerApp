@@ -112,6 +112,38 @@ export const getUserWorkouts = async (userID) => {
 	}
 };
 
+export const getWorkoutsBasedOnWorkoutIDs = async (workoutIDs) => {
+	try {
+		const workoutRefs = workoutIDs.map((id) => 
+			getDoc(doc(database, "workouts", id))
+		);
+		const docSnaps = await Promise.all(workoutRefs);
+		return docSnaps;
+	} catch (error) {
+		throw new Error(error);
+	}
+}
+
+export const getExercisesFilteredByExerciseType = async (
+	userID,
+	exerciseArray
+) => {
+	try {
+		const exerciseRef = collection(database, "exercises");
+		const q = query(
+			exerciseRef,
+			where("owner", "==", userID),
+			where("exercise", "in", exerciseArray)
+		);
+		const querySnapshot = await getDocs(q);
+		return querySnapshot;
+	} catch (error) {
+		throw new Error(error);
+	}
+};
+
+
+
 export const getExercisesInWorkout = async (exercises, userID) => {
 	try {
 		const docRefs = exercises.map((exercise) =>
