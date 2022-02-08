@@ -31,6 +31,7 @@ import WorkoutListItem from "../../components/WorkoutListItem";
 
 import FilterChip from "../../components/UI/Chips/FilterChip";
 import OutlineButton from "../../components/Buttons/OutlineButton";
+import TextButton from "../../components/Buttons/TextButton";
 
 const theme = Themes.dark;
 
@@ -53,8 +54,8 @@ const exerciseList = [
 const FilterBox = (props) => {
 	const dispatch = useDispatch();
 	const userID = useSelector((state) => state.auth.userID);
-	const [exerciseFilterState, setExerciseFilterState] =
-		useState(exerciseList);
+	const [exerciseFilterState, setExerciseFilterState] = useState(exerciseList,
+	);
 
 	useEffect(() => {
 		console.log("State is changed");
@@ -86,8 +87,6 @@ const FilterBox = (props) => {
 		const exerciseFilter = exerciseFilterState
 			.filter((ex) => ex.selected == true)
 			.map((ex) => ex.exercise);
-		console.log("Filter is called");
-		console.log(exerciseFilter);
 		try {
 			if (exerciseFilter.length < 1) {
 				dispatch(WorkoutActions.getUserWorkouts(userID));
@@ -104,6 +103,14 @@ const FilterBox = (props) => {
 		}
 	};
 
+	const clearFilter = () => {
+		const newValues = [...exerciseFilterState];
+		newValues.forEach(element => {
+			element.selected = false;
+		});
+		setExerciseFilterState(newValues);
+	};
+
 	return (
 		<Animated.View style={filterBoxStyles.filterBoxContainer}>
 			<View style={filterBoxStyles.filterBoxContent}>
@@ -118,6 +125,7 @@ const FilterBox = (props) => {
 						horizontal={true}
 						keyExtractor={(item) => Math.random()}
 						data={exerciseFilterState}
+						showsHorizontalScrollIndicator={false}
 						renderItem={(itemData) => (
 							<FilterChip
 								onChipPress={() =>
@@ -132,9 +140,23 @@ const FilterBox = (props) => {
 							</FilterChip>
 						)}
 					/>
-					<OutlineButton onButtonPress={queryForFilter}>
+				</View>
+				<View
+					style={{
+						flexDirection: "row",
+						width: "90%",
+						justifyContent: "center",
+					}}
+				>
+					<OutlineButton
+						style={{ width: "40%", marginRight: 10 }}
+						onButtonPress={queryForFilter}
+					>
 						Filter
 					</OutlineButton>
+					<TextButton onButtonPress={() => clearFilter()}>
+						Clear
+					</TextButton>
 				</View>
 			</View>
 		</Animated.View>
@@ -148,7 +170,7 @@ const filterBoxStyles = StyleSheet.create({
 		alignItems: "center",
 	},
 	filterBoxContent: {
-		width: "90%",
+		// width: "90%",
 		height: "90%",
 		padding: 20,
 		borderRadius: 12,

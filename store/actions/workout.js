@@ -36,13 +36,19 @@ export const getWorkoutFilteredByExerciseType = (userID, exerciseArray) => {
 					exerciseArray
 				);
 			console.log("Exercises!?: ");
+			// Not very elegant solution
 			filteredExercises.forEach((doc) => {
-				workoutIDArray.push(doc.data().workoutID);
+				const id = doc.data().workoutID;
+				if (workoutIDArray.includes(id)) {
+					console.log("DUPLICATE ID");
+				} else {
+					workoutIDArray.push(id);
+				}
 			});
 			const workoutDocs = await firebase.getWorkoutsBasedOnWorkoutIDs(
 				workoutIDArray
 			);
-			const transformedWorkouts = []
+			const transformedWorkouts = [];
 			workoutDocs.forEach((query) => {
 				const workoutData = query.data();
 				const newWorkout = new Workout(
@@ -55,7 +61,7 @@ export const getWorkoutFilteredByExerciseType = (userID, exerciseArray) => {
 				);
 				transformedWorkouts.push(newWorkout);
 			});
-			dispatch({type: GET_WORKOUTS, workouts: transformedWorkouts});
+			dispatch({ type: GET_WORKOUTS, workouts: transformedWorkouts });
 		} catch (error) {
 			throw new Error(error);
 		}

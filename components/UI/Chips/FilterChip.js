@@ -14,11 +14,11 @@ const FilterChip = (props) => {
 
     const onPress =() => {
         props.onChipPress();
-        setIsSelected(state => !state);
+        // setIsSelected(state => !state);
     }
-	// useEffect(()=> {
-	// 	setIsSelected(props.selected);
-	// },[props.selected])
+	useEffect(()=> {
+		setIsSelected(props.selected);
+	},[props.selected])
 
 	if (isSelected) {
 		return (
