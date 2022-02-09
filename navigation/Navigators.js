@@ -16,6 +16,7 @@ import { Themes } from "../shared/Theme";
 import AuthScreen from "../screens/User/AuthScreen";
 import WeightCalculatorScreen from "../screens/Workout/WeightCalculatorScreen";
 import WorkoutListScreen from "../screens/Workout/WorkoutListScreen";
+import WorkoutAnalysisScreen from "../screens/Workout/WorkoutAnalysisScreen";
 import NewUserScreen from "../screens/User/NewUserScreen";
 import NewUserDetailScreen from "../screens/User/NewUserDetailScreen";
 const theme = Themes.dark;
@@ -85,8 +86,8 @@ export const AppTabNavigator = () => {
 				}}
 			/>
 			<TabNavigator.Screen
-				name="Test1"
-				component={TestScreen1}
+				name="Analysis"
+				component={WorkoutAnalysisScreen}
 				options={{
 					tabBarIcon: (props) => (
 						<MaterialIcons

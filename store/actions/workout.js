@@ -1,8 +1,9 @@
 export const ADD_WORKOUT = "ADD_WORKOUT";
 export const GET_WORKOUTS = "GET_WORKOUTS";
-
+export const GET_EXERCISES = "GET_EXERCISES";
 import Workout from "../../models/workout";
 import * as firebase from "../../firebase/firebase";
+import Exercise from "../../models/Exercise";
 
 export const addWorkout = (workout) => {
 	return async (dispatch) => {
@@ -35,7 +36,6 @@ export const getWorkoutFilteredByExerciseType = (userID, exerciseArray) => {
 					userID,
 					exerciseArray
 				);
-			console.log("Exercises!?: ");
 			// Not very elegant solution
 			filteredExercises.forEach((doc) => {
 				const id = doc.data().workoutID;
@@ -63,6 +63,37 @@ export const getWorkoutFilteredByExerciseType = (userID, exerciseArray) => {
 			});
 			dispatch({ type: GET_WORKOUTS, workouts: transformedWorkouts });
 		} catch (error) {
+			throw new Error(error);
+		}
+	};
+};
+
+export const getExerciseByType = (userID, exercise) => {
+	return async (dispatch) => {
+		try {
+			const exercisesQuery =
+				await firebase.getExercisesFilteredByExerciseType(userID, [
+					exercise,
+				]);
+			const exerciseArray = [];
+			exercisesQuery.forEach((ex) => {
+				const exerciseData = ex.data();
+				const newExercise = new Exercise(
+					exerciseData.exercise,
+					exerciseData.weight,
+					exerciseData.reps,
+					exerciseData.sets,
+					exerciseData.rpe,
+					exerciseData.date,
+					exerciseData.owner,
+					exerciseData.workoutID,
+					ex.id
+				);
+				exerciseArray.push(newExercise);
+			});
+			dispatch({type: GET_EXERCISES, exercises: exerciseArray});
+		} catch (error) {
+			console.log(error);
 			throw new Error(error);
 		}
 	};

@@ -16,11 +16,6 @@ const AppNavigator = (props) => {
 	);
 
 	useEffect(() => {
-		console.log("From NAVIGATOR");
-		console.log(isUserAuthenticated);
-		console.log("Is NEw user creation: ");
-
-		console.log(isNewUserCreation);
 	}, [isUserAuthenticated, isNewUserCreation]);
 
 	return (
