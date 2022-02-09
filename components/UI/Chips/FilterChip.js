@@ -6,25 +6,27 @@ import LabelText from "../../Text/Label";
 
 const theme = Themes.dark;
 
+/**
+ * 
+ * @param {boolean} selected - Set the selected state of the chip
+ * @param {function} onChipPress - Pass a reference to the function being called when user presses the chip
+ * @param {string} children - The text between tags
+ */
 
-// TODO the state of each chip is now set separately from the state that is being managed in the component the chip is being used in
-// Change that
-const FilterChip = (props) => {
-	const [isSelected, setIsSelected] = useState(props.selected);
+const FilterChip = ({selected, onChipPress, children}) => {
+	const [isSelected, setIsSelected] = useState(selected);
 
     const onPress =() => {
-        props.onChipPress();
-        // setIsSelected(state => !state);
+        onChipPress();
     }
 	useEffect(()=> {
-		setIsSelected(props.selected);
-	},[props.selected])
+		setIsSelected(selected);
+	},[selected])
 
 	if (isSelected) {
 		return (
 			<Pressable
 				style={filterChipStyles.selectedChipStyle}
-				// android_ripple={{ color: theme.onSecondaryContainer }}
                 onPress={onPress}
 			>
 				<MaterialIcons
@@ -37,7 +39,7 @@ const FilterChip = (props) => {
 					large={true}
 					style={{ color: theme.onSurfaceVariant }}
 				>
-					{props.children}
+					{children}
 				</LabelText>
 			</Pressable>
 		);
@@ -52,7 +54,7 @@ const FilterChip = (props) => {
 					large={true}
 					style={{ color: theme.onSurfaceVariant }}
 				>
-					{props.children}
+					{children}
 				</LabelText>
 			</Pressable>
 		);
