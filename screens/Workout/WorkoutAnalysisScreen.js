@@ -51,12 +51,14 @@ const WorkoutAnalysisScreen = (props) => {
 		const exerciseWeightArray = [];
 		data.forEach((exercise) => {
 			const date = new Date(exercise.date.seconds * 1000);
+			const monthString = date.toDateString().split(" ")[1];
+			// const dateString = date.toDateString();
 			const dateString =
 				date.getDate() +
-				" " +
-				date.getMonth() +
-				" " +
-				date.getFullYear().toString().slice(2);
+				"" +
+				monthString 
+				// "" +
+				// date.getFullYear().toString().slice(2);
 			labelArray.push(dateString);
 			exerciseWeightArray.push(exercise.weight);
 		});
@@ -115,7 +117,7 @@ const WorkoutAnalysisScreen = (props) => {
 								chartConfig={{
 									backgroundColor: theme.surface,
 									backgroundGradientFrom: theme.surface,
-									backgroundGradientTo: theme.surfaceE5,
+									backgroundGradientTo: theme.surface,
 									decimalPlaces: 2, // optional, defaults to 2dp
 									color: (opacity = 1) =>
 										`rgba(${hexToRGB(theme.tertiary)[0]}, ${
@@ -126,11 +128,11 @@ const WorkoutAnalysisScreen = (props) => {
 									labelColor: (opacity = 1) =>
 										`rgba(255, 255, 255, ${opacity})`,
 									style: {
-										borderRadius: 16,
+										borderRadius: 12,
 									},
 									propsForDots: {
-										r: "6",
-										strokeWidth: "2",
+										r: "1",
+										strokeWidth: "1",
 										stroke: "#ffa726",
 									},
 								}}
