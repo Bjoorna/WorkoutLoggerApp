@@ -5,6 +5,7 @@ import React, {
 	useState,
 	useLayoutEffect,
 	useRef,
+	useMemo,
 } from "react";
 import {
 	FlatList,
@@ -16,15 +17,17 @@ import {
 	Platform,
 	Animated,
 } from "react-native";
-import { useNavigation } from "@react-navigation/core";
 import { useDimensions } from "@react-native-community/hooks";
 import { HeaderButtons, Item } from "react-navigation-header-buttons";
 import CustomHeaderButton from "../../components/Buttons/CustomHeaderButton";
 import FabButton from "../../components/Buttons/Fab";
 import { Themes } from "../../shared/Theme";
 import { useSelector, useDispatch } from "react-redux";
-import DisplayText from "../../components/Text/Display";
 import TitleText from "../../components/Text/Title";
+
+import { FlatList as GestureFlatList } from "react-native-gesture-handler";
+
+import BottomSheet, {BottomSheetFlatList} from "@gorhom/bottom-sheet";
 
 import * as WorkoutActions from "../../store/actions/workout";
 import WorkoutListItem from "../../components/WorkoutListItem";
@@ -54,8 +57,8 @@ const exerciseList = [
 const FilterBox = (props) => {
 	const dispatch = useDispatch();
 	const userID = useSelector((state) => state.auth.userID);
-	const [exerciseFilterState, setExerciseFilterState] = useState(exerciseList,
-	);
+	const [exerciseFilterState, setExerciseFilterState] =
+		useState(exerciseList);
 
 	useEffect(() => {
 		console.log("State is changed");
@@ -105,7 +108,7 @@ const FilterBox = (props) => {
 
 	const clearFilter = () => {
 		const newValues = [...exerciseFilterState];
-		newValues.forEach(element => {
+		newValues.forEach((element) => {
 			element.selected = false;
 		});
 		setExerciseFilterState(newValues);
@@ -185,6 +188,19 @@ const WorkoutListScreen = (props) => {
 	const { width, height } = useDimensions().window;
 	const dispatch = useDispatch();
 
+	const bottomSheetRef = useRef(null);
+	const handleSheetChanges = useCallback((index) => {
+		console.log("Handlesheetchanges: ", index);
+		if (index === -1) {
+			if(!filterToggle){
+				return;
+			}
+			setFilterToggle((state) => !state);
+		}
+	});
+
+	const snapPoints = useMemo(() => ["50%"], []);
+
 	const userID = useSelector((state) => state.auth.userID);
 	const reduxWorkoutRef = useSelector((state) => state.workout.workouts);
 
@@ -192,7 +208,67 @@ const WorkoutListScreen = (props) => {
 	const [refreshing, setRefreshing] = useState(false);
 	const [showFilter, setShowFilter] = useState(false);
 	const [filterToggle, setFilterToggle] = useState(false);
-	const [testCounter, incrementCounter] = useState(0);
+
+
+	// temp, extract
+	const [exerciseFilterState, setExerciseFilterState] =
+		useState(exerciseList);
+
+	useEffect(() => {
+		console.log("State is changed");
+		console.log(exerciseFilterState);
+	}, [exerciseFilterState]);
+
+	const updateFilterState = (exercise, selected) => {
+		const newState = [...exerciseFilterState];
+		const findEx = newState.find(
+			(arrayItem) => arrayItem.exercise == exercise
+		);
+		if (!findEx) {
+			return;
+		}
+		findEx.selected = !findEx.selected;
+		setExerciseFilterState(newState);
+	};
+
+	const fadeAnim = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
+	useEffect(() => {
+		Animated.timing(fadeAnim, {
+			toValue: 1,
+			duration: 1000,
+			useNativeDriver: true,
+		}).start();
+	}, [fadeAnim]);
+
+	const queryForFilter = async () => {
+		const exerciseFilter = exerciseFilterState
+			.filter((ex) => ex.selected == true)
+			.map((ex) => ex.exercise);
+		try {
+			if (exerciseFilter.length < 1) {
+				dispatch(WorkoutActions.getUserWorkouts(userID));
+			} else {
+				dispatch(
+					WorkoutActions.getWorkoutFilteredByExerciseType(
+						userID,
+						exerciseFilter
+					)
+				);
+			}
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
+	const clearFilter = () => {
+		const newValues = [...exerciseFilterState];
+		newValues.forEach((element) => {
+			element.selected = false;
+		});
+		setExerciseFilterState(newValues);
+	};
+
+	// end of them
 
 	useLayoutEffect(() => {
 		props.navigation.setOptions({
@@ -231,6 +307,11 @@ const WorkoutListScreen = (props) => {
 
 	useEffect(() => {
 		setShowFilter(filterToggle);
+		if (filterToggle) {
+			bottomSheetRef.current.expand();
+		} else {
+			bottomSheetRef.current.close();
+		}
 		// LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
 	}, [filterToggle]);
 
@@ -244,18 +325,22 @@ const WorkoutListScreen = (props) => {
 
 	return (
 		<View style={styles.container}>
-			<FabButton
-				onButtonPress={() => props.navigation.navigate("AddWorkout")}
-				iconName="add"
-				style={{
-					...styles.fabButtonPlacement,
-					left: width - 160,
-					top: height - 200,
-				}}
-			>
-				New Workout
-			</FabButton>
-			{showFilter && <FilterBox />}
+			{!showFilter && (
+				<FabButton
+					onButtonPress={() =>
+						props.navigation.navigate("AddWorkout")
+					}
+					iconName="add"
+					style={{
+						...styles.fabButtonPlacement,
+						left: width - 160,
+						top: height - 200,
+					}}
+				>
+					New Workout
+				</FabButton>
+			)}
+			{/* {showFilter && <FilterBox />} */}
 
 			<View style={styles.contentView}>
 				<FlatList
@@ -280,6 +365,71 @@ const WorkoutListScreen = (props) => {
 					)}
 				/>
 			</View>
+			<BottomSheet
+				ref={bottomSheetRef}
+				index={-1}
+				snapPoints={snapPoints}
+				onChange={handleSheetChanges}
+				enablePanDownToClose={true}
+				enableOverDrag={false}
+				handleStyle={{
+					backgroundColor: theme.tertiary,
+					borderTopLeftRadius: 10,
+					borderTopRightRadius: 10,
+				}}
+			>
+				<View style={styles.bottomSheetContainer}>
+					<View style={filterBoxStyles.filterBoxContent}>
+						<View style={filterBoxStyles.header}>
+							<TitleText
+								style={{ color: theme.onSurfaceVariant }}
+							>
+								Filter by exercise
+							</TitleText>
+						</View>
+						<View style={{ width: "100%" }}>
+							
+							<GestureFlatList // need to use the flatlist from react-native-gesture-handler in order to scroll inside the BottomSheet
+								style={{ marginVertical: 5 }}
+								horizontal={true}
+								keyExtractor={(item) => Math.random()}
+								data={exerciseFilterState}
+								showsHorizontalScrollIndicator={false}
+								renderItem={(itemData) => (
+									<FilterChip
+										onChipPress={() =>
+											updateFilterState(
+												itemData.item.exercise,
+												itemData.item.selected
+											)
+										}
+										selected={itemData.item.selected}
+									>
+										{itemData.item.exercise}
+									</FilterChip>
+								)}
+							/>
+						</View>
+						<View
+							style={{
+								flexDirection: "row",
+								width: "90%",
+								justifyContent: "center",
+							}}
+						>
+							<OutlineButton
+								style={{ width: "40%", marginRight: 10 }}
+								onButtonPress={queryForFilter}
+							>
+								Filter
+							</OutlineButton>
+							<TextButton onButtonPress={() => clearFilter()}>
+								Clear
+							</TextButton>
+						</View>
+					</View>
+				</View>
+			</BottomSheet>
 		</View>
 	);
 };
@@ -288,6 +438,11 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		backgroundColor: theme.surface,
+	},
+	bottomSheetContainer: {
+		flex: 1,
+		alignItems: "center",
+		backgroundColor: theme.surfaceE2,
 	},
 	contentView: {
 		width: "100%",
