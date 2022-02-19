@@ -35,6 +35,7 @@ import WorkoutListItem from "../../components/WorkoutListItem";
 import FilterChip from "../../components/UI/Chips/FilterChip";
 import OutlineButton from "../../components/Buttons/OutlineButton";
 import TextButton from "../../components/Buttons/TextButton";
+import FilterSelect from "../../components/FilterSelect";
 
 const theme = Themes.dark;
 
@@ -45,149 +46,22 @@ if (
 	UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-const exerciseList = [
-	{ exercise: "Squat", selected: false },
-	{ exercise: "Deadlift", selected: false },
-	{ exercise: "Bench-Press", selected: false },
-	{ exercise: "RDL", selected: false },
-	{ exercise: "Sumo-DL", selected: false },
-	{ exercise: "Press", selected: false },
-];
-
-const FilterBox = (props) => {
-	const dispatch = useDispatch();
-	const userID = useSelector((state) => state.auth.userID);
-	const [exerciseFilterState, setExerciseFilterState] =
-		useState(exerciseList);
-
-	useEffect(() => {
-		console.log("State is changed");
-		console.log(exerciseFilterState);
-	}, [exerciseFilterState]);
-
-	const updateFilterState = (exercise, selected) => {
-		const newState = [...exerciseFilterState];
-		const findEx = newState.find(
-			(arrayItem) => arrayItem.exercise == exercise
-		);
-		if (!findEx) {
-			return;
-		}
-		findEx.selected = !findEx.selected;
-		setExerciseFilterState(newState);
-	};
-
-	const fadeAnim = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
-	useEffect(() => {
-		Animated.timing(fadeAnim, {
-			toValue: 1,
-			duration: 1000,
-			useNativeDriver: true,
-		}).start();
-	}, [fadeAnim]);
-
-	const queryForFilter = async () => {
-		const exerciseFilter = exerciseFilterState
-			.filter((ex) => ex.selected == true)
-			.map((ex) => ex.exercise);
-		try {
-			if (exerciseFilter.length < 1) {
-				dispatch(WorkoutActions.getUserWorkouts(userID));
-			} else {
-				dispatch(
-					WorkoutActions.getWorkoutFilteredByExerciseType(
-						userID,
-						exerciseFilter
-					)
-				);
-			}
-		} catch (error) {
-			console.log(error);
-		}
-	};
-
-	const clearFilter = () => {
-		const newValues = [...exerciseFilterState];
-		newValues.forEach((element) => {
-			element.selected = false;
-		});
-		setExerciseFilterState(newValues);
-	};
-
-	return (
-		<Animated.View style={filterBoxStyles.filterBoxContainer}>
-			<View style={filterBoxStyles.filterBoxContent}>
-				<View style={filterBoxStyles.header}>
-					<TitleText style={{ color: theme.onSurfaceVariant }}>
-						Filter by exercise
-					</TitleText>
-				</View>
-				<View style={{ width: "100%" }}>
-					<FlatList
-						style={{ marginVertical: 5 }}
-						horizontal={true}
-						keyExtractor={(item) => Math.random()}
-						data={exerciseFilterState}
-						showsHorizontalScrollIndicator={false}
-						renderItem={(itemData) => (
-							<FilterChip
-								onChipPress={() =>
-									updateFilterState(
-										itemData.item.exercise,
-										itemData.item.selected
-									)
-								}
-								selected={itemData.item.selected}
-							>
-								{itemData.item.exercise}
-							</FilterChip>
-						)}
-					/>
-				</View>
-				<View
-					style={{
-						flexDirection: "row",
-						width: "90%",
-						justifyContent: "center",
-					}}
-				>
-					<OutlineButton
-						style={{ width: "40%", marginRight: 10 }}
-						onButtonPress={queryForFilter}
-					>
-						Filter
-					</OutlineButton>
-					<TextButton onButtonPress={() => clearFilter()}>
-						Clear
-					</TextButton>
-				</View>
-			</View>
-		</Animated.View>
-	);
-};
-
-const filterBoxStyles = StyleSheet.create({
-	filterBoxContainer: {
-		width: "100%",
-		height: 200,
-		alignItems: "center",
-	},
-	filterBoxContent: {
-		// width: "90%",
-		height: "90%",
-		padding: 20,
-		borderRadius: 12,
-		// borderColor: theme.outline,
-		// borderWidth: 1,
-		// borderStyle: "solid"
-	},
-	header: {},
-});
 
 const WorkoutListScreen = (props) => {
 	const { width, height } = useDimensions().window;
 	const dispatch = useDispatch();
+	const userID = useSelector((state) => state.auth.userID);
+	const reduxWorkoutRef = useSelector((state) => state.workout.workouts);
 
+
+	const [workouts, setWorkouts] = useState([]);
+	const [refreshing, setRefreshing] = useState(false);
+	const [showFilter, setShowFilter] = useState(false);
+	const [filterToggle, setFilterToggle] = useState(false);
+
+
+
+	// BottomSheet stuff
 	const bottomSheetRef = useRef(null);
 	const handleSheetChanges = useCallback((index) => {
 		console.log("Handlesheetchanges: ", index);
@@ -198,77 +72,8 @@ const WorkoutListScreen = (props) => {
 			setFilterToggle((state) => !state);
 		}
 	});
+	const snapPoints = useMemo(() => ["25%","50%"], []);
 
-	const snapPoints = useMemo(() => ["50%"], []);
-
-	const userID = useSelector((state) => state.auth.userID);
-	const reduxWorkoutRef = useSelector((state) => state.workout.workouts);
-
-	const [workouts, setWorkouts] = useState([]);
-	const [refreshing, setRefreshing] = useState(false);
-	const [showFilter, setShowFilter] = useState(false);
-	const [filterToggle, setFilterToggle] = useState(false);
-
-
-	// temp, extract
-	const [exerciseFilterState, setExerciseFilterState] =
-		useState(exerciseList);
-
-	useEffect(() => {
-		console.log("State is changed");
-		console.log(exerciseFilterState);
-	}, [exerciseFilterState]);
-
-	const updateFilterState = (exercise, selected) => {
-		const newState = [...exerciseFilterState];
-		const findEx = newState.find(
-			(arrayItem) => arrayItem.exercise == exercise
-		);
-		if (!findEx) {
-			return;
-		}
-		findEx.selected = !findEx.selected;
-		setExerciseFilterState(newState);
-	};
-
-	const fadeAnim = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
-	useEffect(() => {
-		Animated.timing(fadeAnim, {
-			toValue: 1,
-			duration: 1000,
-			useNativeDriver: true,
-		}).start();
-	}, [fadeAnim]);
-
-	const queryForFilter = async () => {
-		const exerciseFilter = exerciseFilterState
-			.filter((ex) => ex.selected == true)
-			.map((ex) => ex.exercise);
-		try {
-			if (exerciseFilter.length < 1) {
-				dispatch(WorkoutActions.getUserWorkouts(userID));
-			} else {
-				dispatch(
-					WorkoutActions.getWorkoutFilteredByExerciseType(
-						userID,
-						exerciseFilter
-					)
-				);
-			}
-		} catch (error) {
-			console.log(error);
-		}
-	};
-
-	const clearFilter = () => {
-		const newValues = [...exerciseFilterState];
-		newValues.forEach((element) => {
-			element.selected = false;
-		});
-		setExerciseFilterState(newValues);
-	};
-
-	// end of them
 
 	useLayoutEffect(() => {
 		props.navigation.setOptions({
@@ -308,7 +113,7 @@ const WorkoutListScreen = (props) => {
 	useEffect(() => {
 		setShowFilter(filterToggle);
 		if (filterToggle) {
-			bottomSheetRef.current.expand();
+			bottomSheetRef.current.snapToIndex(0);
 		} else {
 			bottomSheetRef.current.close();
 		}
@@ -347,8 +152,6 @@ const WorkoutListScreen = (props) => {
 					style={styles.flatListStyle}
 					data={workouts}
 					keyExtractor={(item) => item.id}
-					// refreshing={refreshing}
-					// onRefresh={onRefresh}
 					refreshControl={
 						<RefreshControl
 							refreshing={refreshing}
@@ -379,55 +182,7 @@ const WorkoutListScreen = (props) => {
 				}}
 			>
 				<View style={styles.bottomSheetContainer}>
-					<View style={filterBoxStyles.filterBoxContent}>
-						<View style={filterBoxStyles.header}>
-							<TitleText
-								style={{ color: theme.onSurfaceVariant }}
-							>
-								Filter by exercise
-							</TitleText>
-						</View>
-						<View style={{ width: "100%" }}>
-							
-							<GestureFlatList // need to use the flatlist from react-native-gesture-handler in order to scroll inside the BottomSheet
-								style={{ marginVertical: 5 }}
-								horizontal={true}
-								keyExtractor={(item) => Math.random()}
-								data={exerciseFilterState}
-								showsHorizontalScrollIndicator={false}
-								renderItem={(itemData) => (
-									<FilterChip
-										onChipPress={() =>
-											updateFilterState(
-												itemData.item.exercise,
-												itemData.item.selected
-											)
-										}
-										selected={itemData.item.selected}
-									>
-										{itemData.item.exercise}
-									</FilterChip>
-								)}
-							/>
-						</View>
-						<View
-							style={{
-								flexDirection: "row",
-								width: "90%",
-								justifyContent: "center",
-							}}
-						>
-							<OutlineButton
-								style={{ width: "40%", marginRight: 10 }}
-								onButtonPress={queryForFilter}
-							>
-								Filter
-							</OutlineButton>
-							<TextButton onButtonPress={() => clearFilter()}>
-								Clear
-							</TextButton>
-						</View>
-					</View>
+					<FilterSelect /> 
 				</View>
 			</BottomSheet>
 		</View>
