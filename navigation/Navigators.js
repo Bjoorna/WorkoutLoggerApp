@@ -24,11 +24,11 @@ const theme = Themes.dark;
 
 const defaultStyleOptions = {
 	headerStyle: {
-		backgroundColor: theme.surface,
+		backgroundColor: theme.surfaceE2,
 	},
 	headerTintColor: theme.onSurface,
 	cardStyle: {
-		backgroundColor: theme.surface,
+		backgroundColor: theme.background,
 	},
 };
 
