@@ -32,6 +32,7 @@ import { StatusBar } from "expo-status-bar";
 import authReducer from "./store/reducers/auth";
 import userReducer from "./store/reducers/user";
 import workoutReducer  from "./store/reducers/workout";
+import appsettingsReducer from "./store/reducers/appsettings";
 
 // react native paper
 import { Provider as PaperProvider } from "react-native-paper";
@@ -39,7 +40,8 @@ import { Provider as PaperProvider } from "react-native-paper";
 const rootReducer = combineReducers({
 	auth: authReducer,
 	user: userReducer,
-	workout: workoutReducer
+	workout: workoutReducer,
+	appSettings: appsettingsReducer
 });
 const store = createStore(rootReducer, applyMiddleware(ReduxThunk));
 

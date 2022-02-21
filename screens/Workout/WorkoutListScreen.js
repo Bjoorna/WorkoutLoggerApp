@@ -27,15 +27,18 @@ import TitleText from "../../components/Text/Title";
 
 import { FlatList as GestureFlatList } from "react-native-gesture-handler";
 
-import BottomSheet, {BottomSheetFlatList} from "@gorhom/bottom-sheet";
+import BottomSheet, { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 
 import * as WorkoutActions from "../../store/actions/workout";
+import * as AppSettingsActions from "../../store/actions/appsettings";
 import WorkoutListItem from "../../components/WorkoutListItem";
 
 import FilterChip from "../../components/UI/Chips/FilterChip";
 import OutlineButton from "../../components/Buttons/OutlineButton";
 import TextButton from "../../components/Buttons/TextButton";
 import FilterSelect from "../../components/FilterSelect";
+
+import { SET_HIDE_TABBAR } from "../../store/actions/appsettings";
 
 const theme = Themes.dark;
 
@@ -46,34 +49,37 @@ if (
 	UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-
 const WorkoutListScreen = (props) => {
 	const { width, height } = useDimensions().window;
 	const dispatch = useDispatch();
 	const userID = useSelector((state) => state.auth.userID);
 	const reduxWorkoutRef = useSelector((state) => state.workout.workouts);
-
+	const hideTabBar = useSelector((state) => state.appSettings.hideTabBar);
 
 	const [workouts, setWorkouts] = useState([]);
 	const [refreshing, setRefreshing] = useState(false);
 	const [showFilter, setShowFilter] = useState(false);
 	const [filterToggle, setFilterToggle] = useState(false);
 
-
-
 	// BottomSheet stuff
 	const bottomSheetRef = useRef(null);
 	const handleSheetChanges = useCallback((index) => {
 		console.log("Handlesheetchanges: ", index);
 		if (index === -1) {
-			if(!filterToggle){
+			if (!filterToggle) {
 				return;
 			}
 			setFilterToggle((state) => !state);
 		}
 	});
-	const snapPoints = useMemo(() => ["25%","50%"], []);
+	const snapPoints = useMemo(() => ["25%", "50%"], []);
 
+	// load workouts on page open
+	useEffect(() => {
+		console.log("Page is Loading");
+		setRefreshing(true);
+		dispatch(WorkoutActions.getUserWorkouts(userID));
+	}, []);
 
 	useLayoutEffect(() => {
 		props.navigation.setOptions({
@@ -82,7 +88,7 @@ const WorkoutListScreen = (props) => {
 					<HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
 						<Item
 							title="add"
-							iconName="filter-list"
+							iconName={filterToggle ? "close" : "filter-list"}
 							onPress={toggle}
 						/>
 					</HeaderButtons>
@@ -91,14 +97,8 @@ const WorkoutListScreen = (props) => {
 		});
 	}, [props.navigation, filterToggle]);
 
-	const onRefresh = useCallback(() => {
-		setRefreshing(true);
-		dispatch(WorkoutActions.getUserWorkouts(userID));
-	}, []);
 
-	// load workouts on page open
-	useEffect(() => {
-		console.log("Page is Loading");
+	const onRefresh = useCallback(() => {
 		setRefreshing(true);
 		dispatch(WorkoutActions.getUserWorkouts(userID));
 	}, []);
@@ -117,7 +117,6 @@ const WorkoutListScreen = (props) => {
 		} else {
 			bottomSheetRef.current.close();
 		}
-		// LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
 	}, [filterToggle]);
 
 	const toggle = () => {
@@ -182,7 +181,7 @@ const WorkoutListScreen = (props) => {
 				}}
 			>
 				<View style={styles.bottomSheetContainer}>
-					<FilterSelect /> 
+					<FilterSelect />
 				</View>
 			</BottomSheet>
 		</View>

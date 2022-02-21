@@ -1,6 +1,7 @@
-import React from "react";
-import { StyleSheet, View } from "react-native";
+import React, { useEffect } from "react";
+import { Animated, StyleSheet, View } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
+import { useDispatch, useSelector } from "react-redux";
 
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -34,6 +35,13 @@ const defaultStyleOptions = {
 const TabNavigator = createBottomTabNavigator();
 
 export const AppTabNavigator = () => {
+	// const shouldHideTabBar = useSelector(
+	// 	(state) => state.appSettings.hideTabBar
+	// );
+	// useEffect(() => {
+	// 	console.log("Should hide tabbar from NAvigator");
+	// }, [shouldHideTabBar]);
+
 	return (
 		<TabNavigator.Navigator
 			screenOptions={{
@@ -64,10 +72,33 @@ export const AppTabNavigator = () => {
 							}
 						/>
 					),
+
 				}}
 				name="Workout"
 				component={WorkoutStackScreen}
 			/>
+
+			{/* incase i want to hide the tabbar*/}
+			{/* {!shouldHideTabBar && (
+				<TabNavigator.Screen
+					options={{
+						tabBarIcon: (props) => (
+							<MaterialIcons
+								name="fitness-center"
+								size={24}
+								color={
+									props.focused
+										? theme.onSecondaryContainer
+										: theme.onSurfaceVariant
+								}
+							/>
+						),
+					}}
+					name="Workout"
+					component={WorkoutStackScreen}
+				/>
+			)} */}
+
 			<TabNavigator.Screen
 				name="Calculator"
 				component={WeightCalculatorScreen}
@@ -188,7 +219,6 @@ export const AuthStackScreen = () => {
 					...defaultStyleOptions,
 					headerTitle: "Create New User",
 				}}
-
 			/>
 		</AuthStackNavigator.Navigator>
 	);
@@ -200,17 +230,16 @@ export const CreateUserStackScreen = () => {
 	return (
 		<CreateUserStackNavigator.Navigator>
 			<CreateUserStackNavigator.Screen
-			name="CreateNewUser"
-			component={NewUserDetailScreen}
-			options={{
-				...defaultStyleOptions,
-				headerTitle: "Enter Personal Details"
-			}}
+				name="CreateNewUser"
+				component={NewUserDetailScreen}
+				options={{
+					...defaultStyleOptions,
+					headerTitle: "Enter Personal Details",
+				}}
 			/>
-
-			</CreateUserStackNavigator.Navigator>
-	)
-}
+		</CreateUserStackNavigator.Navigator>
+	);
+};
 
 // const customTab = (state, descriptor, navigation) => {
 // 	<View></View>;

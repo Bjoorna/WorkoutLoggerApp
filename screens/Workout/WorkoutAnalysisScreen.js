@@ -5,7 +5,7 @@ import {
 	StatusBar,
 	Dimensions,
 	ActivityIndicator,
-	FlatList
+	FlatList,
 } from "react-native";
 import DisplayText from "../../components/Text/Display";
 import { LineChart } from "react-native-chart-kit";
@@ -20,8 +20,6 @@ import { ExerciseTypes } from "../../shared/utils/ExerciseTypes";
 
 const theme = Themes.dark;
 
-
-
 const WorkoutAnalysisScreen = (props) => {
 	const userID = useSelector((state) => state.auth.userID);
 	const exerciseStoreRef = useSelector((state) => state.workout.exercises);
@@ -31,23 +29,24 @@ const WorkoutAnalysisScreen = (props) => {
 	const [filterState, setFilterState] = useState([]);
 	const [chartDataObject, setChartDataObject] = useState(null);
 	const [isLoading, setIsLoading] = useState(false);
-
+	const [currentChartExercise, setCurrentChartExercise] = useState();
 
 	useEffect(() => {
 		// componentdidmount
 		setIsLoading(true);
 		createExerciseTypeArray();
-		updateFilterState();
-		// loadExercise("Squat");
-		// dispatch(WorkoutActions.getExerciseByType(userID, "Squat"));
 	}, []);
+
+	useEffect(() => {
+		updateFilterState();
+	}, [exerciseTypes]);
 
 	useEffect(() => {
 		setExercises(exerciseStoreRef);
 		console.log(exercises);
 		if (exerciseStoreRef.length > 0) {
-            createChartData(exerciseStoreRef);
-		}else{
+			createChartData(exerciseStoreRef);
+		} else {
 			setChartDataObject(null);
 		}
 		setIsLoading(false);
@@ -55,54 +54,59 @@ const WorkoutAnalysisScreen = (props) => {
 
 	useEffect(() => {
 		console.log("FilterStateIS updated");
-		const selectedExercise = filterState.find(exercise => exercise.selected == true);
-		if(selectedExercise){
+		const selectedExercise = filterState.find(
+			(exercise) => exercise.selected == true
+		);
+		if (selectedExercise) {
 			loadExercise(selectedExercise.exercise);
 		}
-	}, [filterState])
+	}, [filterState]);
 
 	const loadExercise = (type) => {
-        setIsLoading(true);
+		setIsLoading(true);
+		setCurrentChartExercise(type);
 		dispatch(WorkoutActions.getExerciseByType(userID, type));
 	};
 
 	// TODO make it so that when pressing a selected exercise, it is unselected
 	const updateFilterState = (exercise, selectedState) => {
 		// if the filterstate is not initiated
-		if(filterState.length < 1){
+		if (filterState.length < 1) {
 			const newFilterState = [];
-			for(const ex of exerciseTypes){
-				const exerciseState = {exercise: ex, selected: false};
+			for (const ex of exerciseTypes) {
+				const exerciseState = { exercise: ex, selected: false };
 				newFilterState.push(exerciseState);
 			}
 			setFilterState(newFilterState);
-		}else{
-			const newFilterState = [...filterState]
-			const isSelected = newFilterState.find(arrayItem => arrayItem.selected == true);
-			if(isSelected){
+		} else {
+			const newFilterState = [...filterState];
+			const isSelected = newFilterState.find(
+				(arrayItem) => arrayItem.selected == true
+			);
+			if (isSelected) {
 				isSelected.selected = !isSelected.selected;
-				if(isSelected.exercise == exercise){
+				if (isSelected.exercise == exercise) {
 					console.log("Cancel the same exercise");
-				}				
+				}
 			}
-			const updateStateOfExercise = newFilterState.find(arrayItem => arrayItem.exercise == exercise);
-			if(updateStateOfExercise){
+			const updateStateOfExercise = newFilterState.find(
+				(arrayItem) => arrayItem.exercise == exercise
+			);
+			if (updateStateOfExercise) {
 				updateStateOfExercise.selected = true;
 			}
 			setFilterState(newFilterState);
 		}
-	}
-	
+	};
+
 	const createExerciseTypeArray = () => {
 		let finalArray = [];
-		for(let eData of ExerciseTypes){
+		for (let eData of ExerciseTypes) {
 			finalArray = finalArray.concat(eData.data);
-			
 		}
 		console.log(finalArray);
 		setExerciseTypes(finalArray);
-	}
-
+	};
 
 	const createChartData = (data) => {
 		// Sort exercises before transformation
@@ -113,12 +117,9 @@ const WorkoutAnalysisScreen = (props) => {
 			const date = new Date(exercise.date.seconds * 1000);
 			const monthString = date.toDateString().split(" ")[1];
 			// const dateString = date.toDateString();
-			const dateString =
-				date.getDate() +
-				"" +
-				monthString 
-				// "" +
-				// date.getFullYear().toString().slice(2);
+			const dateString = date.getDate() + "" + monthString;
+			// "" +
+			// date.getFullYear().toString().slice(2);
 			labelArray.push(dateString);
 			exerciseWeightArray.push(exercise.weight);
 		});
@@ -168,8 +169,28 @@ const WorkoutAnalysisScreen = (props) => {
 				{!isLoading && (
 					<View style={styles.chartContainer}>
 						{!chartDataObject && (
-							<View>
-								<DisplayText style={{color: theme.onSurface}}>No DATA</DisplayText>
+							<View
+								style={{
+									width: "100%",
+									height: "100%",
+									alignItems: "center",
+								}}
+							>
+								{currentChartExercise && (
+									<DisplayText
+										style={{ color: theme.onSurface }}
+									>
+										No DATA Avaliable for{" "}
+										{currentChartExercise}
+									</DisplayText>
+								)}
+								{!currentChartExercise && (
+									<DisplayText
+										style={{ color: theme.onSurface }}
+									>
+										Select an exercise to display trends
+									</DisplayText>
+								)}
 							</View>
 						)}
 						{chartDataObject && (
@@ -212,32 +233,26 @@ const WorkoutAnalysisScreen = (props) => {
 			</View>
 			<View style={styles.filterBox}>
 				<FlatList
-							style={{ marginVertical: 5 }}
-							horizontal={true}
-							keyExtractor={(item) => Math.random()}
-							data={filterState}
-							showsHorizontalScrollIndicator={false}
-							renderItem={(itemData) => (
-								<FilterChip
-									onChipPress={() =>
-										updateFilterState(
-											itemData.item.exercise,
-											itemData.item.selected
-										)
-									}
-									selected={itemData.item.selected}
-								>
-									{itemData.item.exercise}
-								</FilterChip>
-							)}
-						/>
+					style={{ marginVertical: 5 }}
+					horizontal={true}
+					keyExtractor={(item) => Math.random()}
+					data={filterState}
+					showsHorizontalScrollIndicator={false}
+					renderItem={(itemData) => (
+						<FilterChip
+							onChipPress={() =>
+								updateFilterState(
+									itemData.item.exercise,
+									itemData.item.selected
+								)
+							}
+							selected={itemData.item.selected}
+						>
+							{itemData.item.exercise}
+						</FilterChip>
+					)}
+				/>
 			</View>
-			{/* <OutlineButton onButtonPress={() => loadExercise("Squat")}>
-				Squat
-			</OutlineButton>
-			<OutlineButton onButtonPress={() => loadExercise("Deadlift")}>
-				Deadlift
-			</OutlineButton> */}
 		</View>
 	);
 };
@@ -247,18 +262,21 @@ const styles = StyleSheet.create({
 		marginTop: StatusBar.currentHeight,
 		flex: 1,
 		backgroundColor: theme.surface,
+		alignItems: "center",
 	},
 	contentView: {
 		alignItems: "center",
 	},
 	filterBox: {
 		height: 50,
+		width: "90%",
+		backgroundColor: theme.surface,
+		// alignItems: "center"
+	},
+	chartContainer: {
+		height: 300,
 		width: "100%",
-		backgroundColor: theme.surface
-	}
-	,chartContainer: {
-		height: 300
-	}
+	},
 });
 
 export default WorkoutAnalysisScreen;
