@@ -175,7 +175,7 @@ const WorkoutListScreen = (props) => {
 				enablePanDownToClose={true}
 				enableOverDrag={false}
 				handleStyle={{
-					backgroundColor: theme.tertiary,
+					backgroundColor: theme.primaryContainer,
 					borderTopLeftRadius: 10,
 					borderTopRightRadius: 10,
 				}}

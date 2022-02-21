@@ -192,7 +192,7 @@ export const UserStackScreen = () => {
 				<UserStackNavigator.Screen
 					name="UserSettings"
 					component={UserSettingsScreen}
-					options={{ ...defaultStyleOptions, presentation: "card" }}
+					options={{ ...defaultStyleOptions, presentation: "card", headerTitle: "Settings" }}
 				/>
 			</UserStackNavigator.Group>
 		</UserStackNavigator.Navigator>
