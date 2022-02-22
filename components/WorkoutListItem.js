@@ -206,33 +206,5 @@ const getStyles = theme => {
 	});
 }
 
-// const styles = StyleSheet.create({
-// 	workoutItemContainer: {
-// 		width: "100%",
-// 		minHeight: 130,
-// 		borderRadius: 12,
-// 		overflow: "hidden",
-// 		borderColor: theme.outline,
-// 		borderStyle: "solid",
-// 		borderWidth: 1,
-// 		marginVertical: 5,
-// 	},
-// 	pressableView: {
-// 		flex: 1,
-// 		// width: "100%",
-// 		// minHeight: 100,
-// 		// height: "100%"
-// 	},
-// 	workoutItemLayout: {
-// 		flex: 1,
-// 		paddingHorizontal: 10,
-// 	},
-// 	workoutItemHeader: {
-// 		width: "100%",
-// 		height: 20,
-// 		alignItems: "flex-end",
-// 	},
-// 	workoutItemExerciseContainer: {},
-// });
 
 export default WorkoutListItem;

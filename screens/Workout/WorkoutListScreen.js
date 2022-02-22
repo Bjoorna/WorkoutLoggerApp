@@ -254,48 +254,5 @@ const getStyles = (theme) => {
 	});
 };
 
-// const styles = StyleSheet.create({
-// 	container: {
-// 		flex: 1,
-// 		backgroundColor: theme.surface,
-// 	},
-// 	bottomSheetContainer: {
-// 		flex: 1,
-// 		alignItems: "center",
-// 		backgroundColor: theme.surfaceE2,
-// 	},
-// 	contentView: {
-// 		width: "100%",
-// 		// height: 300,
-// 		alignItems: "center",
-// 		// justifyContent: "center",
-// 		marginTop: 40,
-// 	},
-// 	flatListStyle: {
-// 		width: "90%",
-// 	},
-// 	cardView: {
-// 		flex: 1,
-// 		alignItems: "center",
-// 	},
-// 	cardStyle: {
-// 		backgroundColor: theme.primary,
-// 	},
-// 	testText: {
-// 		color: theme.onPrimary,
-// 	},
-// 	cardWithBorder: {
-// 		borderStyle: "solid",
-// 		borderWidth: 1,
-// 		borderColor: theme.outline,
-// 	},
-
-// 	fabButtonPlacement: {
-// 		position: "absolute",
-// 		// top: "90%"
-// 		// , right: 100,
-// 		zIndex: 1000,
-// 	},
-// });
 
 export default WorkoutListScreen;

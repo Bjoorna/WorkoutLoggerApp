@@ -91,35 +91,5 @@ const getStyles = (theme) => {
 		},
 	});
 };
-// const styles = StyleSheet.create({
-// 	baseButtonStyle: {
-// 		minWidth: 48,
-// 		height: 40,
-// 		borderRadius: 20,
-// 		overflow: "hidden",
-// 		backgroundColor: theme.primary,
-// 		paddingHorizontal: 24,
-// 		alignItems: "center",
-// 		justifyContent: "center",
-// 	},
-// 	disabledButtonStyle: {
-// 		minWidth: 48,
-// 		height: 40,
-// 		borderRadius: 20,
-// 		overflow: "hidden",
-// 		backgroundColor: theme.onSurface,
-// 		paddingHorizontal: 24,
-// 		alignItems: "center",
-// 		justifyContent: "center",
-// 		opacity: 0.12,
-// 	},
-// 	text: {
-// 		color: theme.onPrimary,
-// 	},
-// 	disabledText: {
-// 		color: theme.onSurface,
-// 		opacity: 0.38,
-// 	},
-// });
 
 export default FilledButton;

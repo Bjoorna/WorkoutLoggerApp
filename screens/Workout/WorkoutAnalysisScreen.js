@@ -294,26 +294,4 @@ const getStyles = theme => {
 	});
 }
 
-// const styles = StyleSheet.create({
-// 	container: {
-// 		marginTop: StatusBar.currentHeight,
-// 		flex: 1,
-// 		backgroundColor: theme.surface,
-// 		alignItems: "center",
-// 	},
-// 	contentView: {
-// 		alignItems: "center",
-// 	},
-// 	filterBox: {
-// 		height: 50,
-// 		width: "90%",
-// 		backgroundColor: theme.surface,
-// 		// alignItems: "center"
-// 	},
-// 	chartContainer: {
-// 		height: 300,
-// 		width: "100%",
-// 	},
-// });
-
 export default WorkoutAnalysisScreen;

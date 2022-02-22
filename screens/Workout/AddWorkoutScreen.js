@@ -520,93 +520,6 @@ const getStyles = theme => {
 	
 }
 
-// const styles = StyleSheet.create({
-// 	container: {
-// 		flex: 1,
-// 		// justifyContent: "center",
-// 		alignItems: "center",
-// 	},
-// 	pressable: { flex: 1 },
-// 	contentView: { flex: 1, alignItems: "center" },
-// 	saveWorkoutContainer: {
-// 		marginTop: 10,
-// 		width: "90%",
-// 		justifyContent: "center",
-// 		alignItems: "center",
-// 	},
-// 	workoutSummary: {
-// 		marginTop: 10,
-// 		width: "90%",
-// 		maxHeight: 300,
-// 		backgroundColor: theme.surfaceVariant,
-// 		// justifyContent: "center",
-// 		alignItems: "center",
-// 		borderRadius: 12,
-// 	},
-// 	workoutSummaryInfo: {
-// 		flexDirection: "row",
-// 		height: 40,
-// 		padding: 10,
-// 		width: "100%",
-// 		borderRadius: 12,
-// 		alignItems: "baseline",
-// 		// borderStyle: "solid",
-// 		// borderBottomWidth: 1,
-// 		// borderBottomColor: theme.outline
-// 	},
-// 	newExerciseContainer: {
-// 		// justifyContent: "center",
-// 		alignItems: "center",
-// 		// height: 300,
-// 		width: "95%",
-// 		marginVertical: 10,
-// 	},
-// 	selectNewExercise: {
-// 		// width: "90%",
-// 		height: 60,
-// 		borderRadius: 16,
-// 		backgroundColor: theme.secondaryContainer,
-
-// 		flexDirection: "row",
-// 		justifyContent: "center",
-// 		alignItems: "center",
-// 	},
-// 	newExerciseValues: {
-// 		marginVertical: 10,
-// 		width: "90%",
-// 		// flexDirection: "row",
-// 		// justifyContent: "space-around",
-// 		// ,backgroundColor: theme.secondary
-// 		borderStyle: "solid",
-// 		borderColor: theme.outline,
-// 		borderWidth: 1,
-// 		borderRadius: 16,
-// 	},
-// 	newExerciseValuesRow: {
-// 		marginVertical: 5,
-// 		flexDirection: "row",
-// 		justifyContent: "space-around",
-// 	},
-// 	newExerciseInputValues: {
-// 		height: 80,
-// 		width: 100,
-// 		// backgroundColor: theme.secondaryContainer,
-// 		alignItems: "center",
-// 		justifyContent: "space-around",
-// 	},
-// 	newExerciseNumberInput: {
-// 		backgroundColor: theme.secondaryContainer,
-// 		width: 20,
-// 		height: 40,
-// 	},
-// 	loadingSpinner: {
-// 		flex: 1,
-// 		height: "100%",
-// 		width: "100%",
-// 		justifyContent: "center",
-// 		alignItems: "center",
-// 	},
-// });
 
 const getModalStyles = theme => {
 	return StyleSheet.create({
@@ -639,35 +552,5 @@ const getModalStyles = theme => {
 		},
 	});
 }
-
-// const modalStyles = StyleSheet.create({
-// 	modalStyle: {
-// 		left: "5%",
-// 		height: "60%",
-// 		width: 400,
-// 		maxWidth: "90%",
-// 		backgroundColor: theme.surfaceVariant,
-// 		// justifyContent: "center",
-// 		alignItems: "center",
-// 		borderRadius: 20,
-// 		paddingVertical: 15,
-// 		paddingLeft: 10,
-// 	},
-// 	exerciseListItem: {
-// 		flexDirection: "row",
-// 		// justifyContent: "center",
-// 		// textAlign: "right",
-// 		// alignItems: "center",
-// 		width: 400,
-// 		height: 60,
-// 		marginVertical: 5,
-// 		padding: 10,
-// 		// backgroundColor: theme.secondaryContainer
-// 	},
-// 	pressable: {
-// 		width: "100%",
-// 		height: "100%",
-// 	},
-// });
 
 export default AddWorkoutScreen;

@@ -81,18 +81,4 @@ const getStyles = theme => {
 		text: { color: theme.onPrimaryContainer },
 	});
 }
-// const styles = StyleSheet.create({
-// 	fabButtonStyle: {
-// 		height: 56,
-// 		minWidth: 80,
-// 		borderRadius: 16,
-// 		overflow: "hidden",
-// 		backgroundColor: theme.primaryContainer,
-// 		alignItems: "center",
-// 		justifyContent: "center",
-// 		elevation: 3,
-// 		padding: 16,
-// 	},
-// 	text: { color: theme.onPrimaryContainer },
-// });
 export default FabButton;

@@ -199,49 +199,5 @@ const getStyles = (theme) => {
 	});
 };
 
-// const styles = StyleSheet.create({
-// 	screen: {
-// 		flex: 1,
-// 		backgroundColor: theme.surface,
-// 	},
-// 	pressable: {
-// 		flex: 1,
-// 		// height: "100%",
-// 		// width: "100%",
-// 		// alignItems: "",
-// 	},
-// 	contentView: {
-// 		flex: 1,
-// 		// height: "100%",
-// 		// width: "100%",
-
-// 		alignItems: "center",
-// 	},
-
-// 	textInput: {
-// 		backgroundColor: theme.surfaceVariant,
-// 	},
-// 	card: {
-// 		marginTop: 10,
-// 		width: "90%",
-// 		// height: 400,
-// 		backgroundColor: theme.surfaceVariant,
-// 		borderRadius: 12,
-// 		padding: 10,
-// 	},
-// 	cardContent: {},
-// 	personalInfoHeader: { marginBottom: 15 },
-// 	personalInfoInput: {},
-// 	personalInfoDetailInput: {
-// 		marginVertical: 20,
-// 	},
-// 	loadingSpinner: {
-// 		flex: 1,
-// 		height: "100%",
-// 		width: "100%",
-// 		justifyContent: "center",
-// 		alignItems: "center",
-// 	},
-// });
 
 export default NewUserDetailScreen;

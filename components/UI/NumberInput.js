@@ -34,14 +34,4 @@ const getStyles = (theme) => {
 		},
 	});
 };
-// const styles = StyleSheet.create({
-//     input: {
-// 		height: 80,
-// 		backgroundColor: theme.onSecondaryContainer,
-// 		borderRadius: 20,
-// 		width: "90%",
-// 	},
-
-// })
-
 export default NumberInput;

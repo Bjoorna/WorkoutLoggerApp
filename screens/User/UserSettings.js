@@ -137,7 +137,7 @@ const UserSettingsScreen = (props) => {
 };
 
 const getStyles = theme => {
-	const styles = StyleSheet.create({
+	return StyleSheet.create({
 		screen: {
 			flex: 1,
 			backgroundColor: theme.surface,
@@ -163,29 +163,5 @@ const getStyles = theme => {
 	});
 	return styles;
 }
-// const styles = StyleSheet.create({
-// 	screen: {
-// 		flex: 1,
-// 		backgroundColor: theme.surface,
-// 		// justifyContent: "center",
-// 		alignItems: "center",
-// 	},
-// 	text: {
-// 		color: theme.onSurface,
-// 	},
-// 	userSettingsList: {
-// 		width: "100%",
-// 		marginTop: 10,
-// 	},
-// 	userSettingsItem: {
-// 		width: "100%",
-// 		height: 60,
-// 		paddingVertical: 5,
-// 		paddingHorizontal: 20,
-// 		flexDirection: "row",
-// 		alignItems: "center",
-// 		justifyContent: "space-between",
-// 	},
-// });
 
 export default UserSettingsScreen;

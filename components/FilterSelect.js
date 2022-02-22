@@ -167,17 +167,4 @@ const getStyles = theme => {
 	});
 }
 
-// const styles = StyleSheet.create({
-// 	filterBoxContainer: {
-// 		width: "100%",
-// 		height: 200,
-// 		alignItems: "center",
-// 	},
-// 	filterBoxContent: {
-// 		height: "90%",
-// 		padding: 20,
-// 		borderRadius: 12,
-// 	},
-// });
-
 export default FilterSelect;

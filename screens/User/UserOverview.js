@@ -174,43 +174,5 @@ const getStyles = (theme) => {
 	});
 };
 
-// const styles = StyleSheet.create({
-// 	safeView: {
-// 		flex: 1,
-// 		backgroundColor: theme.surface,
-// 		alignItems: "center",
-// 	},
-
-// 	userHeaderContainer: {
-// 		height: 300,
-// 		justifyContent: "center",
-// 		alignItems: "center",
-// 		width: "100%",
-// 	},
-// 	currentInfoView: {
-// 		marginTop: 10,
-// 		width: "90%",
-// 		height: 100,
-// 		flexDirection: "row",
-// 		justifyContent: "space-around",
-// 		alignItems: "center",
-// 		borderRadius: 12,
-// 		paddingHorizontal: 16,
-// 		paddingVertical: 6,
-// 		backgroundColor: theme.surfaceVariant,
-// 	},
-// 	infoItem: {},
-// 	headerText: {
-// 		color: theme.onSurface,
-// 	},
-// 	infoText: {
-// 		color: theme.onSurfaceVariant,
-// 	},
-// 	image: {
-// 		height: "80%",
-// 		width: "80%",
-// 		borderRadius: 2000,
-// 	},
-// });
 
 export default UserOverviewScreen;
