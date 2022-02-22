@@ -1,8 +1,8 @@
 import "react-native-gesture-handler";
-import 'react-native-get-random-values';
+import "react-native-get-random-values";
 
 // React
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 // react native
 import { StyleSheet, View, Dimensions } from "react-native";
@@ -21,17 +21,17 @@ import AppNavigator from "./navigation/AppNavigator";
 
 // themeing
 import { Themes } from "./shared/Theme";
+import StatusBarWrapper from "./components/UI/StatusBarWrapper";
 const theme = Themes.dark;
 
 // Expo
 import AppLoading from "expo-app-loading";
 import * as Font from "expo-font";
-import { StatusBar } from "expo-status-bar";
 
 // Reducers
 import authReducer from "./store/reducers/auth";
 import userReducer from "./store/reducers/user";
-import workoutReducer  from "./store/reducers/workout";
+import workoutReducer from "./store/reducers/workout";
 import appsettingsReducer from "./store/reducers/appsettings";
 
 // react native paper
@@ -41,7 +41,7 @@ const rootReducer = combineReducers({
 	auth: authReducer,
 	user: userReducer,
 	workout: workoutReducer,
-	appSettings: appsettingsReducer
+	appSettings: appsettingsReducer,
 });
 const store = createStore(rootReducer, applyMiddleware(ReduxThunk));
 
@@ -54,6 +54,19 @@ const loadFonts = () => {
 
 export default function App() {
 	const [fontLoaded, setFontLoaded] = useState(false);
+	// const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
+	// const [styles, setStyles] = useState(
+	// 	getStyles(useDarkMode ? Themes.dark : Themes.light)
+	// );
+	// // const [currentTheme, setCurrentTheme] = useState(
+	// // 	useDarkMode ? Themes.dark : Themes.light
+	// // );
+
+	// useEffect(() => {
+	// 	setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
+	// 	// setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
+	// }, [useDarkMode]);
+
 	if (!fontLoaded) {
 		return (
 			<AppLoading
@@ -67,7 +80,7 @@ export default function App() {
 		<PaperProvider>
 			<Provider store={store}>
 				<View style={styles.baseScreen}>
-					<StatusBar style="light"  />
+					<StatusBarWrapper />
 					<AppNavigator />
 				</View>
 			</Provider>
