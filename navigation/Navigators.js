@@ -1,12 +1,10 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Animated, StyleSheet, View } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
 
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import TestScreen from "../screens/TestScreen";
-import TestScreen1 from "../screens/TestScreen2";
 
 import UserOverviewScreen from "../screens/User/UserOverview";
 import UserSettingsScreen from "../screens/User/UserSettings";
@@ -32,29 +30,42 @@ const defaultStyleOptions = {
 	},
 };
 
+const getDefaultStyleOptions = (theme) => {
+	return {
+		headerStyle: {
+			backgroundColor: theme.surfaceE2,
+		},
+		headerTintColor: theme.onSurface,
+		cardStyle: {
+			backgroundColor: theme.background,
+		},
+	};
+};
+
 const TabNavigator = createBottomTabNavigator();
 
 export const AppTabNavigator = () => {
-	// const shouldHideTabBar = useSelector(
-	// 	(state) => state.appSettings.hideTabBar
-	// );
-	// useEffect(() => {
-	// 	console.log("Should hide tabbar from NAvigator");
-	// }, [shouldHideTabBar]);
+	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
+	const [currentTheme, setCurrentTheme] = useState(Themes.dark);
+	useEffect(() => {
+		console.log("setDarkMode NAvigator");
+		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
+	}, [useDarkMode]);
+
 
 	return (
 		<TabNavigator.Navigator
 			screenOptions={{
-				...defaultStyleOptions,
+				...getDefaultStyleOptions(currentTheme),
 				tabBarStyle: {
-					backgroundColor: theme.surface,
+					backgroundColor: currentTheme.surface,
 					height: 80,
 					paddingBottom: 16,
 					paddingTop: 12,
 				},
 
-				tabBarActiveTintColor: theme.onSurface,
-				tabBarInactiveTintColor: theme.onSurfaceVariant,
+				tabBarActiveTintColor: currentTheme.onSurface,
+				tabBarInactiveTintColor: currentTheme.onSurfaceVariant,
 				headerShown: false,
 				tabBarHideOnKeyboard: true,
 			}}
@@ -67,12 +78,11 @@ export const AppTabNavigator = () => {
 							size={24}
 							color={
 								props.focused
-									? theme.onSecondaryContainer
-									: theme.onSurfaceVariant
+									? currentTheme.onSecondaryContainer
+									: currentTheme.onSurfaceVariant
 							}
 						/>
 					),
-
 				}}
 				name="Workout"
 				component={WorkoutStackScreen}
@@ -109,8 +119,8 @@ export const AppTabNavigator = () => {
 							size={24}
 							color={
 								props.focused
-									? theme.onSecondaryContainer
-									: theme.onSurfaceVariant
+									? currentTheme.onSecondaryContainer
+									: currentTheme.onSurfaceVariant
 							}
 						/>
 					),
@@ -126,8 +136,8 @@ export const AppTabNavigator = () => {
 							size={24}
 							color={
 								props.focused
-									? theme.onSecondaryContainer
-									: theme.onSurfaceVariant
+									? currentTheme.onSecondaryContainer
+									: currentTheme.onSurfaceVariant
 							}
 						/>
 					),
@@ -144,8 +154,8 @@ export const AppTabNavigator = () => {
 							size={24}
 							color={
 								props.focused
-									? theme.onSecondaryContainer
-									: theme.onSurfaceVariant
+									? currentTheme.onSecondaryContainer
+									: currentTheme.onSurfaceVariant
 							}
 						/>
 					),
@@ -158,17 +168,25 @@ export const AppTabNavigator = () => {
 const WorkoutStackNavigator = createStackNavigator();
 
 export const WorkoutStackScreen = () => {
+
+	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
+	const [currentTheme, setCurrentTheme] = useState(Themes.dark);
+	useEffect(() => {
+		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
+	}, [useDarkMode]);
+
+
 	return (
 		<WorkoutStackNavigator.Navigator>
 			<WorkoutStackNavigator.Screen
 				name="Workouts"
 				component={WorkoutListScreen}
-				options={{ ...defaultStyleOptions }}
+				options={{ ...getDefaultStyleOptions(currentTheme) }}
 			/>
 			<WorkoutStackNavigator.Screen
 				name="AddWorkout"
 				component={AddWorkoutScreen}
-				options={{ ...defaultStyleOptions, headerTitle: "Add Workout" }}
+				options={{ ...getDefaultStyleOptions(currentTheme) , headerTitle: "Add Workout" }}
 			/>
 		</WorkoutStackNavigator.Navigator>
 	);
@@ -177,6 +195,12 @@ export const WorkoutStackScreen = () => {
 const UserStackNavigator = createStackNavigator();
 
 export const UserStackScreen = () => {
+	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
+	const [currentTheme, setCurrentTheme] = useState(Themes.dark);
+	useEffect(() => {
+		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
+	}, [useDarkMode]);
+
 	return (
 		<UserStackNavigator.Navigator>
 			<UserStackNavigator.Group>
@@ -184,7 +208,7 @@ export const UserStackScreen = () => {
 					name="UserOverview"
 					component={UserOverviewScreen}
 					options={{
-						...defaultStyleOptions,
+						...getDefaultStyleOptions(currentTheme),
 						headerTitle: "User",
 						presentation: "card",
 					}}
@@ -192,7 +216,11 @@ export const UserStackScreen = () => {
 				<UserStackNavigator.Screen
 					name="UserSettings"
 					component={UserSettingsScreen}
-					options={{ ...defaultStyleOptions, presentation: "card", headerTitle: "Settings" }}
+					options={{
+						...getDefaultStyleOptions(currentTheme),
+						presentation: "card",
+						headerTitle: "Settings",
+					}}
 				/>
 			</UserStackNavigator.Group>
 		</UserStackNavigator.Navigator>
@@ -202,13 +230,19 @@ export const UserStackScreen = () => {
 const AuthStackNavigator = createStackNavigator();
 
 export const AuthStackScreen = () => {
+	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
+	const [currentTheme, setCurrentTheme] = useState(Themes.dark);
+	useEffect(() => {
+		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
+	}, [useDarkMode]);
+
 	return (
 		<AuthStackNavigator.Navigator>
 			<AuthStackNavigator.Screen
 				name="AuthScreen"
 				component={AuthScreen}
 				options={{
-					...defaultStyleOptions,
+					...getDefaultStyleOptions(currentTheme),
 					headerTitle: "Authentication",
 				}}
 			/>
@@ -216,7 +250,7 @@ export const AuthStackScreen = () => {
 				name="NewUserScreen"
 				component={NewUserScreen}
 				options={{
-					...defaultStyleOptions,
+					...getDefaultStyleOptions(currentTheme),
 					headerTitle: "Create New User",
 				}}
 			/>
@@ -227,26 +261,22 @@ export const AuthStackScreen = () => {
 const CreateUserStackNavigator = createStackNavigator();
 
 export const CreateUserStackScreen = () => {
+	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
+	const [currentTheme, setCurrentTheme] = useState(Themes.dark);
+	useEffect(() => {
+		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
+	}, [useDarkMode]);
+
 	return (
 		<CreateUserStackNavigator.Navigator>
 			<CreateUserStackNavigator.Screen
 				name="CreateNewUser"
 				component={NewUserDetailScreen}
 				options={{
-					...defaultStyleOptions,
+					...getDefaultStyleOptions(currentTheme),
 					headerTitle: "Enter Personal Details",
 				}}
 			/>
 		</CreateUserStackNavigator.Navigator>
 	);
 };
-
-// const customTab = (state, descriptor, navigation) => {
-// 	<View></View>;
-// };
-
-const tabBarStyles = StyleSheet.create({
-	container: {
-		flexDirection: "row",
-	},
-});
