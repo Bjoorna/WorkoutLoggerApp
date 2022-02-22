@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, StyleSheet, Pressable } from "react-native";
+import { useSelector, useDispatch } from "react-redux";
+
 import { MaterialIcons } from "@expo/vector-icons";
 import { Themes } from "../../../shared/Theme";
 import LabelText from "../../Text/Label";
@@ -14,6 +16,19 @@ const theme = Themes.dark;
  */
 
 const FilterChip = ({selected, onChipPress, children}) => {
+	// Themes
+	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
+	const [styles, setStyles] = useState(
+		getStyles(useDarkMode ? Themes.dark : Themes.light)
+	);
+	const [currentTheme, setCurrentTheme] = useState(
+		useDarkMode ? Themes.dark : Themes.light
+	);
+
+	useEffect(() => {
+		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
+		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
+	}, [useDarkMode]);
 	const [isSelected, setIsSelected] = useState(selected);
 
     const onPress =() => {
@@ -23,21 +38,22 @@ const FilterChip = ({selected, onChipPress, children}) => {
 		setIsSelected(selected);
 	},[selected])
 
+
 	if (isSelected) {
 		return (
 			<Pressable
-				style={filterChipStyles.selectedChipStyle}
+				style={styles.selectedChipStyle}
                 onPress={onPress}
 			>
 				<MaterialIcons
 					style={{ marginHorizontal: 8 }}
-					color={theme.onSecondaryContainer}
+					color={currentTheme.onSecondaryContainer}
 					name="check"
 					size={18}
 				/>
 				<LabelText
 					large={true}
-					style={{ color: theme.onSurfaceVariant }}
+					style={{ color: currentTheme.onSurfaceVariant }}
 				>
 					{children}
 				</LabelText>
@@ -46,13 +62,13 @@ const FilterChip = ({selected, onChipPress, children}) => {
 	} else {
 		return (
 			<Pressable
-				style={filterChipStyles.unselectedChipStyle}
+				style={styles.unselectedChipStyle}
 				// android_ripple={{ color: theme.onSecondaryContainer }}
                 onPress={onPress}
 			>
 				<LabelText
 					large={true}
-					style={{ color: theme.onSurfaceVariant }}
+					style={{ color: currentTheme.onSurfaceVariant }}
 				>
 					{children}
 				</LabelText>
@@ -61,31 +77,33 @@ const FilterChip = ({selected, onChipPress, children}) => {
 	}
 };
 
-const filterChipStyles = StyleSheet.create({
-	unselectedChipStyle: {
-		overflow: "hidden",
-		marginVertical: 4,
-		marginRight: 8,
-		height: 32,
-		borderRadius: 8,
-		paddingHorizontal: 16,
-		borderStyle: "solid",
-		borderWidth: 1,
-		borderColor: theme.outline,
-		justifyContent: "center",
-	},
-	selectedChipStyle: {
-		overflow: "hidden",
-		marginVertical: 4,
-		marginRight: 8,
-		height: 32,
-		borderRadius: 8,
-		paddingRight: 16,
-		backgroundColor: theme.secondaryContainer,
-		flexDirection: "row",
-		alignItems: "center",
-	},
-	selectedIcon: {},
-});
+const getStyles = theme => {
+	return StyleSheet.create({
+		unselectedChipStyle: {
+			overflow: "hidden",
+			marginVertical: 4,
+			marginRight: 8,
+			height: 32,
+			borderRadius: 8,
+			paddingHorizontal: 16,
+			borderStyle: "solid",
+			borderWidth: 1,
+			borderColor: theme.outline,
+			justifyContent: "center",
+		},
+		selectedChipStyle: {
+			overflow: "hidden",
+			marginVertical: 4,
+			marginRight: 8,
+			height: 32,
+			borderRadius: 8,
+			paddingRight: 16,
+			backgroundColor: theme.secondaryContainer,
+			flexDirection: "row",
+			alignItems: "center",
+		},
+		selectedIcon: {},
+	});
+}
 
 export default FilterChip;

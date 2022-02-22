@@ -1,32 +1,45 @@
 import React, { useEffect, useState } from "react";
 import { Pressable, StyleSheet, View, ActivityIndicator } from "react-native";
+import { useSelector } from "react-redux";
+
 import BodyText from "./Text/Body";
 import { Themes } from "../shared/Theme";
 import * as firebase from "../firebase/firebase";
 import Exercise from "../models/Exercise";
 import LabelText from "./Text/Label";
 import { FlatList } from "react-native-gesture-handler";
-const theme = Themes.dark;
+// const theme = Themes.dark;
 
 const ExerciseItem = (props) => {
 	const exercise = props.exercise;
+	const [currentTheme, setCurrentTheme] = useState(props.currentTheme);
+	const [exerciseStyles, setExerciseStyles] = useState(getExerciseStyles(currentTheme)); 
+	// const currentTheme = props.ocurrentTheme;
+
+	useEffect(() => {
+		setCurrentTheme(props.currentTheme);
+	}, [props])
+	
+	useEffect(() => {
+		setExerciseStyles(getExerciseStyles(currentTheme));
+	},[currentTheme])
 	return (
 		<View style={exerciseStyles.exerciseItem}>
 			
 			<View style={exerciseStyles.exerciseValues}>
-			<BodyText style={{ color: theme.onSecondaryContainer ,height: 20, overflow: "hidden" }}>
+			<BodyText style={{ color: currentTheme.onSecondaryContainer ,height: 20, overflow: "hidden" }}>
 				{exercise.exercise}
 			</BodyText>
-				<LabelText style={{ color: theme.onSecondaryContainer }}>
+				<LabelText style={{ color: currentTheme.onSecondaryContainer }}>
 					{exercise.weight} kg
 				</LabelText>
-				<LabelText style={{ color: theme.onSecondaryContainer }}>
+				<LabelText style={{ color: currentTheme.onSecondaryContainer }}>
 					{exercise.reps} reps
 				</LabelText>
-				<LabelText style={{ color: theme.onSecondaryContainer }}>
+				<LabelText style={{ color: currentTheme.onSecondaryContainer }}>
 					{exercise.sets} sets
 				</LabelText>
-				<LabelText style={{ color: theme.onSecondaryContainer }}>
+				<LabelText style={{ color: currentTheme.onSecondaryContainer }}>
 					{exercise.rpe} RPE
 				</LabelText>
 			</View>
@@ -34,24 +47,54 @@ const ExerciseItem = (props) => {
 	);
 };
 
-const exerciseStyles = StyleSheet.create({
-	exerciseItem: {
-		width: 100,
-		height: 100,
-		borderRadius: 5,
-		padding: 5,
-		backgroundColor: theme.secondaryContainer,
-		marginHorizontal: 3,
-	},
-	exerciseValues: {
-		alignItems: "center",
-		paddingHorizontal: 4
-	}
-});
+const getExerciseStyles = theme => {
+	return StyleSheet.create({
+		exerciseItem: {
+			width: 100,
+			height: 100,
+			borderRadius: 5,
+			padding: 5,
+			backgroundColor: theme.secondaryContainer,
+			marginHorizontal: 3,
+		},
+		exerciseValues: {
+			alignItems: "center",
+			paddingHorizontal: 4
+		}
+	});
+}
+
+// const exerciseStyles = StyleSheet.create({
+// 	exerciseItem: {
+// 		width: 100,
+// 		height: 100,
+// 		borderRadius: 5,
+// 		padding: 5,
+// 		backgroundColor: theme.secondaryContainer,
+// 		marginHorizontal: 3,
+// 	},
+// 	exerciseValues: {
+// 		alignItems: "center",
+// 		paddingHorizontal: 4
+// 	}
+// });
 
 const WorkoutListItem = (props) => {
 	const [exercises, setExercises] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
+
+	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
+	const [styles, setStyles] = useState(
+		getStyles(useDarkMode ? Themes.dark : Themes.light)
+	);
+	const [currentTheme, setCurrentTheme] = useState(
+		useDarkMode ? Themes.dark : Themes.light
+	);
+
+	useEffect(() => {
+		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
+		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
+	}, [useDarkMode]);
 
 	const date = new Date(props.workout.date.seconds * 1000);
 
@@ -101,7 +144,7 @@ const WorkoutListItem = (props) => {
 			>
 				<View style={styles.workoutItemLayout}>
 					<View style={styles.workoutItemHeader}>
-						<LabelText style={{ color: theme.secondary }}>
+						<LabelText style={{ color: currentTheme.secondary }}>
 							{date.toDateString()}
 							{/* {date.toISOString()} */}
 						</LabelText>
@@ -111,7 +154,7 @@ const WorkoutListItem = (props) => {
 							<View>
 								<ActivityIndicator
 									size="small"
-									color={theme.primary}
+									color={currentTheme.primary}
 								/>
 							</View>
 						)}
@@ -121,7 +164,7 @@ const WorkoutListItem = (props) => {
 								horizontal={true}
 								data={exercises}
 								renderItem={(itemData) => (
-									<ExerciseItem exercise={itemData.item} />
+									<ExerciseItem currentTheme={currentTheme} exercise={itemData.item} />
 								)}
 							/>
 						)}
@@ -132,33 +175,64 @@ const WorkoutListItem = (props) => {
 	);
 };
 
-const styles = StyleSheet.create({
-	workoutItemContainer: {
-		width: "100%",
-		minHeight: 130,
-		borderRadius: 12,
-		overflow: "hidden",
-		borderColor: theme.outline,
-		borderStyle: "solid",
-		borderWidth: 1,
-		marginVertical: 5,
-	},
-	pressableView: {
-		flex: 1,
-		// width: "100%",
-		// minHeight: 100,
-		// height: "100%"
-	},
-	workoutItemLayout: {
-		flex: 1,
-		paddingHorizontal: 10,
-	},
-	workoutItemHeader: {
-		width: "100%",
-		height: 20,
-		alignItems: "flex-end",
-	},
-	workoutItemExerciseContainer: {},
-});
+const getStyles = theme => {
+	return StyleSheet.create({
+		workoutItemContainer: {
+			width: "100%",
+			minHeight: 130,
+			borderRadius: 12,
+			overflow: "hidden",
+			borderColor: theme.outline,
+			borderStyle: "solid",
+			borderWidth: 1,
+			marginVertical: 5,
+		},
+		pressableView: {
+			flex: 1,
+			// width: "100%",
+			// minHeight: 100,
+			// height: "100%"
+		},
+		workoutItemLayout: {
+			flex: 1,
+			paddingHorizontal: 10,
+		},
+		workoutItemHeader: {
+			width: "100%",
+			height: 20,
+			alignItems: "flex-end",
+		},
+		workoutItemExerciseContainer: {},
+	});
+}
+
+// const styles = StyleSheet.create({
+// 	workoutItemContainer: {
+// 		width: "100%",
+// 		minHeight: 130,
+// 		borderRadius: 12,
+// 		overflow: "hidden",
+// 		borderColor: theme.outline,
+// 		borderStyle: "solid",
+// 		borderWidth: 1,
+// 		marginVertical: 5,
+// 	},
+// 	pressableView: {
+// 		flex: 1,
+// 		// width: "100%",
+// 		// minHeight: 100,
+// 		// height: "100%"
+// 	},
+// 	workoutItemLayout: {
+// 		flex: 1,
+// 		paddingHorizontal: 10,
+// 	},
+// 	workoutItemHeader: {
+// 		width: "100%",
+// 		height: 20,
+// 		alignItems: "flex-end",
+// 	},
+// 	workoutItemExerciseContainer: {},
+// });
 
 export default WorkoutListItem;

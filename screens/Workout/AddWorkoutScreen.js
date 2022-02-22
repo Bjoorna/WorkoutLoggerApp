@@ -400,6 +400,7 @@ const AddWorkoutScreen = (props) => {
 								renderItem={(itemData) => {
 									return (
 										<ExerciseSummaryView
+											currentTheme={currentTheme}
 											index={itemData.index}
 											exercise={itemData.item}
 											removeExercise={() =>

@@ -10,11 +10,24 @@ import OutlineButton from "./Buttons/OutlineButton";
 import TextButton from "./Buttons/TextButton";
 import FilterChip from "./UI/Chips/FilterChip";
 import { Themes } from "../shared/Theme";
-const theme = Themes.dark;
+// const theme = Themes.dark;
 
 import { ExerciseTypes } from "../shared/utils/ExerciseTypes";
 
 const FilterSelect = (props) => {
+	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
+	const [styles, setStyles] = useState(
+		getStyles(useDarkMode ? Themes.dark : Themes.light)
+	);
+	const [currentTheme, setCurrentTheme] = useState(
+		useDarkMode ? Themes.dark : Themes.light
+	);
+
+	useEffect(() => {
+		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
+		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
+	}, [useDarkMode]);
+
 	const userID = useSelector((state) => state.auth.userID);
 	const dispatch = useDispatch();
 	const [exerciseTypes, setExerciseTypes] = useState([]);
@@ -94,7 +107,7 @@ const FilterSelect = (props) => {
 		<View style={styles.container}>
 			<View style={styles.filterBoxContent}>
 				<View style={styles.header}>
-					<TitleText style={{ color: theme.onSurfaceVariant }}>
+					<TitleText style={{ color: currentTheme.onSurfaceVariant }}>
 						Filter by exercise
 					</TitleText>
 				</View>
@@ -139,17 +152,32 @@ const FilterSelect = (props) => {
 	);
 };
 
-const styles = StyleSheet.create({
-	filterBoxContainer: {
-		width: "100%",
-		height: 200,
-		alignItems: "center",
-	},
-	filterBoxContent: {
-		height: "90%",
-		padding: 20,
-		borderRadius: 12,
-	},
-});
+const getStyles = theme => {
+	return StyleSheet.create({
+		filterBoxContainer: {
+			width: "100%",
+			height: 200,
+			alignItems: "center",
+		},
+		filterBoxContent: {
+			height: "90%",
+			padding: 20,
+			borderRadius: 12,
+		},
+	});
+}
+
+// const styles = StyleSheet.create({
+// 	filterBoxContainer: {
+// 		width: "100%",
+// 		height: 200,
+// 		alignItems: "center",
+// 	},
+// 	filterBoxContent: {
+// 		height: "90%",
+// 		padding: 20,
+// 		borderRadius: 12,
+// 	},
+// });
 
 export default FilterSelect;

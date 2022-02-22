@@ -6,6 +6,7 @@ import LabelText from "../Text/Label";
 const theme = Themes.dark;
 
 const TextButton = (props) => {
+	console.log(props.textStyle);
 	const [isPressed, setIsPressed] = useState(false);
 	const isDisabled = props.disabled;
 
@@ -23,7 +24,7 @@ const TextButton = (props) => {
 					...props.style,
 				}}
 			>
-				<LabelText large={true} style={styles.disabledText}>
+				<LabelText large={true} style={{...styles.text, ...props.textStyle}}>
 					{props.children}
 				</LabelText>
 			</Pressable>
@@ -40,7 +41,7 @@ const TextButton = (props) => {
 				onPressOut={() => setIsPressed(false)}
 				onPress={props.onButtonPress}
 			>
-				<LabelText style={styles.text} large={true}>
+				<LabelText style={{...styles.text, ...props.textStyle}} large={true}>
 					{props.children}
 				</LabelText>
 			</Pressable>

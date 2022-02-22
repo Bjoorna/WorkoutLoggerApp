@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from "react-native";
 import { Themes } from "../shared/Theme";
 const theme = Themes.dark
 
+// unused
 const Card = (props) => {
   return (
     <View style={{ ...styles.cardBase, ...props.style }}>
