@@ -54,12 +54,16 @@ const WorkoutListScreen = (props) => {
 	const dispatch = useDispatch();
 	const userID = useSelector((state) => state.auth.userID);
 	const reduxWorkoutRef = useSelector((state) => state.workout.workouts);
-	const hideTabBar = useSelector((state) => state.appSettings.hideTabBar);
+	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
 
 	const [workouts, setWorkouts] = useState([]);
 	const [refreshing, setRefreshing] = useState(false);
 	const [showFilter, setShowFilter] = useState(false);
 	const [filterToggle, setFilterToggle] = useState(false);
+	const [styles, setStyles] = useState(getStyles(useDarkMode ? Themes.dark : Themes.light));
+	const [currentTheme, setCurrentTheme] = useState(
+		useDarkMode ? Themes.dark : Themes.light
+	);
 
 	// BottomSheet stuff
 	const bottomSheetRef = useRef(null);
@@ -87,16 +91,27 @@ const WorkoutListScreen = (props) => {
 				<View style={{ flexDirection: "row" }}>
 					<HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
 						<Item
-							title="add"
+							title="filter"
 							iconName={filterToggle ? "close" : "filter-list"}
 							onPress={toggle}
+						/>
+					</HeaderButtons>
+					<HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
+						<Item
+							title="add"
+							iconName="add"
+							onPress={() =>
+								dispatch({
+									type: AppSettingsActions.SET_USE_DARKMODE,
+									value: !useDarkMode,
+								})
+							}
 						/>
 					</HeaderButtons>
 				</View>
 			),
 		});
 	}, [props.navigation, filterToggle]);
-
 
 	const onRefresh = useCallback(() => {
 		setRefreshing(true);
@@ -118,6 +133,11 @@ const WorkoutListScreen = (props) => {
 			bottomSheetRef.current.close();
 		}
 	}, [filterToggle]);
+
+	useEffect(() => {
+		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
+		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
+	}, [useDarkMode]);
 
 	const toggle = () => {
 		if (filterToggle) {
@@ -155,8 +175,8 @@ const WorkoutListScreen = (props) => {
 						<RefreshControl
 							refreshing={refreshing}
 							onRefresh={onRefresh}
-							colors={[theme.onPrimary]}
-							progressBackgroundColor={theme.primary}
+							colors={[currentTheme.onPrimary]}
+							progressBackgroundColor={currentTheme.primary}
 						/>
 					}
 					renderItem={(itemData) => (
@@ -175,7 +195,7 @@ const WorkoutListScreen = (props) => {
 				enablePanDownToClose={true}
 				enableOverDrag={false}
 				handleStyle={{
-					backgroundColor: theme.primaryContainer,
+					backgroundColor: currentTheme.primaryContainer,
 					borderTopLeftRadius: 10,
 					borderTopRightRadius: 10,
 				}}
@@ -188,48 +208,94 @@ const WorkoutListScreen = (props) => {
 	);
 };
 
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: theme.surface,
-	},
-	bottomSheetContainer: {
-		flex: 1,
-		alignItems: "center",
-		backgroundColor: theme.surfaceE2,
-	},
-	contentView: {
-		width: "100%",
-		// height: 300,
-		alignItems: "center",
-		// justifyContent: "center",
-		marginTop: 40,
-	},
-	flatListStyle: {
-		width: "90%",
-	},
-	cardView: {
-		flex: 1,
-		alignItems: "center",
-	},
-	cardStyle: {
-		backgroundColor: theme.primary,
-	},
-	testText: {
-		color: theme.onPrimary,
-	},
-	cardWithBorder: {
-		borderStyle: "solid",
-		borderWidth: 1,
-		borderColor: theme.outline,
-	},
+const getStyles = (theme) => {
+	return StyleSheet.create({
+		container: {
+			flex: 1,
+			backgroundColor: theme.surface,
+		},
+		bottomSheetContainer: {
+			flex: 1,
+			alignItems: "center",
+			backgroundColor: theme.surfaceE2,
+		},
+		contentView: {
+			width: "100%",
+			// height: 300,
+			alignItems: "center",
+			// justifyContent: "center",
+			marginTop: 40,
+		},
+		flatListStyle: {
+			width: "90%",
+		},
+		cardView: {
+			flex: 1,
+			alignItems: "center",
+		},
+		cardStyle: {
+			backgroundColor: theme.primary,
+		},
+		testText: {
+			color: theme.onPrimary,
+		},
+		cardWithBorder: {
+			borderStyle: "solid",
+			borderWidth: 1,
+			borderColor: theme.outline,
+		},
 
-	fabButtonPlacement: {
-		position: "absolute",
-		// top: "90%"
-		// , right: 100,
-		zIndex: 1000,
-	},
-});
+		fabButtonPlacement: {
+			position: "absolute",
+			// top: "90%"
+			// , right: 100,
+			zIndex: 1000,
+		},
+	});
+};
+
+// const styles = StyleSheet.create({
+// 	container: {
+// 		flex: 1,
+// 		backgroundColor: theme.surface,
+// 	},
+// 	bottomSheetContainer: {
+// 		flex: 1,
+// 		alignItems: "center",
+// 		backgroundColor: theme.surfaceE2,
+// 	},
+// 	contentView: {
+// 		width: "100%",
+// 		// height: 300,
+// 		alignItems: "center",
+// 		// justifyContent: "center",
+// 		marginTop: 40,
+// 	},
+// 	flatListStyle: {
+// 		width: "90%",
+// 	},
+// 	cardView: {
+// 		flex: 1,
+// 		alignItems: "center",
+// 	},
+// 	cardStyle: {
+// 		backgroundColor: theme.primary,
+// 	},
+// 	testText: {
+// 		color: theme.onPrimary,
+// 	},
+// 	cardWithBorder: {
+// 		borderStyle: "solid",
+// 		borderWidth: 1,
+// 		borderColor: theme.outline,
+// 	},
+
+// 	fabButtonPlacement: {
+// 		position: "absolute",
+// 		// top: "90%"
+// 		// , right: 100,
+// 		zIndex: 1000,
+// 	},
+// });
 
 export default WorkoutListScreen;

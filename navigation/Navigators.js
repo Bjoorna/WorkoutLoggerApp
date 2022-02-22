@@ -20,15 +20,15 @@ import NewUserScreen from "../screens/User/NewUserScreen";
 import NewUserDetailScreen from "../screens/User/NewUserDetailScreen";
 const theme = Themes.dark;
 
-const defaultStyleOptions = {
-	headerStyle: {
-		backgroundColor: theme.surfaceE2,
-	},
-	headerTintColor: theme.onSurface,
-	cardStyle: {
-		backgroundColor: theme.background,
-	},
-};
+// const defaultStyleOptions = {
+// 	headerStyle: {
+// 		backgroundColor: theme.surfaceE2,
+// 	},
+// 	headerTintColor: theme.onSurface,
+// 	cardStyle: {
+// 		backgroundColor: theme.background,
+// 	},
+// };
 
 const getDefaultStyleOptions = (theme) => {
 	return {

@@ -18,18 +18,24 @@ import { useDispatch, useSelector } from "react-redux";
 import OutlineButton from "../../components/Buttons/OutlineButton";
 import { ExerciseTypes } from "../../shared/utils/ExerciseTypes";
 
-const theme = Themes.dark;
 
 const WorkoutAnalysisScreen = (props) => {
 	const userID = useSelector((state) => state.auth.userID);
 	const exerciseStoreRef = useSelector((state) => state.workout.exercises);
+	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
+
 	const dispatch = useDispatch();
+
 	const [exercises, setExercises] = useState();
 	const [exerciseTypes, setExerciseTypes] = useState([]);
 	const [filterState, setFilterState] = useState([]);
 	const [chartDataObject, setChartDataObject] = useState(null);
 	const [isLoading, setIsLoading] = useState(false);
 	const [currentChartExercise, setCurrentChartExercise] = useState();
+
+	const [styles, setStyles] = useState(getStyles(useDarkMode ? Themes.dark : Themes.light));
+	const [currentTheme, setCurrentTheme] = useState(useDarkMode ? Themes.dark : Themes.light);
+
 
 	useEffect(() => {
 		// componentdidmount
@@ -61,6 +67,12 @@ const WorkoutAnalysisScreen = (props) => {
 			loadExercise(selectedExercise.exercise);
 		}
 	}, [filterState]);
+
+	useEffect(() => {
+		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
+		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
+	}, [useDarkMode]);
+
 
 	const loadExercise = (type) => {
 		setIsLoading(true);
@@ -129,9 +141,9 @@ const WorkoutAnalysisScreen = (props) => {
 				{
 					data: exerciseWeightArray,
 					color: (opacity = 1) =>
-						`rgba(${hexToRGB(theme.tertiary)[0]}, ${
-							hexToRGB(theme.tertiary)[1]
-						}, ${hexToRGB(theme.tertiary)[2]}, ${opacity})`,
+						`rgba(${hexToRGB(currentTheme.tertiary)[0]}, ${
+							hexToRGB(currentTheme.tertiary)[1]
+						}, ${hexToRGB(currentTheme.tertiary)[2]}, ${opacity})`,
 					strokeWidth: 2,
 				},
 			],
@@ -164,7 +176,7 @@ const WorkoutAnalysisScreen = (props) => {
 		<View style={styles.container}>
 			<View style={styles.contentView}>
 				{isLoading && (
-					<ActivityIndicator color={theme.primary} size="large" />
+					<ActivityIndicator color={currentTheme.primary} size="large" />
 				)}
 				{!isLoading && (
 					<View style={styles.chartContainer}>
@@ -178,7 +190,7 @@ const WorkoutAnalysisScreen = (props) => {
 							>
 								{currentChartExercise && (
 									<DisplayText
-										style={{ color: theme.onSurface }}
+										style={{ color: currentTheme.onSurface }}
 									>
 										No DATA Avaliable for{" "}
 										{currentChartExercise}
@@ -186,7 +198,7 @@ const WorkoutAnalysisScreen = (props) => {
 								)}
 								{!currentChartExercise && (
 									<DisplayText
-										style={{ color: theme.onSurface }}
+										style={{ color: currentTheme.onSurface }}
 									>
 										Select an exercise to display trends
 									</DisplayText>
@@ -201,15 +213,15 @@ const WorkoutAnalysisScreen = (props) => {
 								yAxisSuffix="kg"
 								yAxisInterval={1} // optional, defaults to 1
 								chartConfig={{
-									backgroundColor: theme.surface,
-									backgroundGradientFrom: theme.surface,
-									backgroundGradientTo: theme.surface,
+									backgroundColor: currentTheme.surface,
+									backgroundGradientFrom: currentTheme.surface,
+									backgroundGradientTo: currentTheme.surface,
 									decimalPlaces: 2, // optional, defaults to 2dp
 									color: (opacity = 1) =>
-										`rgba(${hexToRGB(theme.tertiary)[0]}, ${
-											hexToRGB(theme.tertiary)[1]
+										`rgba(${hexToRGB(currentTheme.tertiary)[0]}, ${
+											hexToRGB(currentTheme.tertiary)[1]
 										}, ${
-											hexToRGB(theme.tertiary)[2]
+											hexToRGB(currentTheme.tertiary)[2]
 										}, ${opacity})`,
 									labelColor: (opacity = 1) =>
 										`rgba(255, 255, 255, ${opacity})`,
@@ -257,26 +269,50 @@ const WorkoutAnalysisScreen = (props) => {
 	);
 };
 
-const styles = StyleSheet.create({
-	container: {
-		marginTop: StatusBar.currentHeight,
-		flex: 1,
-		backgroundColor: theme.surface,
-		alignItems: "center",
-	},
-	contentView: {
-		alignItems: "center",
-	},
-	filterBox: {
-		height: 50,
-		width: "90%",
-		backgroundColor: theme.surface,
-		// alignItems: "center"
-	},
-	chartContainer: {
-		height: 300,
-		width: "100%",
-	},
-});
+const getStyles = theme => {
+	return StyleSheet.create({
+		container: {
+			marginTop: StatusBar.currentHeight,
+			flex: 1,
+			backgroundColor: theme.surface,
+			alignItems: "center",
+		},
+		contentView: {
+			alignItems: "center",
+		},
+		filterBox: {
+			height: 50,
+			width: "90%",
+			backgroundColor: theme.surface,
+			// alignItems: "center"
+		},
+		chartContainer: {
+			height: 300,
+			width: "100%",
+		},
+	});
+}
+
+// const styles = StyleSheet.create({
+// 	container: {
+// 		marginTop: StatusBar.currentHeight,
+// 		flex: 1,
+// 		backgroundColor: theme.surface,
+// 		alignItems: "center",
+// 	},
+// 	contentView: {
+// 		alignItems: "center",
+// 	},
+// 	filterBox: {
+// 		height: 50,
+// 		width: "90%",
+// 		backgroundColor: theme.surface,
+// 		// alignItems: "center"
+// 	},
+// 	chartContainer: {
+// 		height: 300,
+// 		width: "100%",
+// 	},
+// });
 
 export default WorkoutAnalysisScreen;

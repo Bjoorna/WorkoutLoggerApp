@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useMemo, useState } from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import {
 	View,
 	StyleSheet,
@@ -19,7 +19,7 @@ import LabelText from "../../components/Text/Label";
 import HeadlineText from "../../components/Text/Headline";
 import OutlineButton from "../../components/Buttons/OutlineButton";
 import { Themes } from "../../shared/Theme";
-const theme = Themes.dark;
+// const theme = Themes.dark;
 
 function calculateAge(user) {
 	const now = new Date();
@@ -37,6 +37,23 @@ const UserOverviewScreen = (props) => {
 	// const user = USERS.find((user) => user.name === "Dennis");
 	const user = useSelector((state) => state.user.user);
 	const userID = useSelector((state) => state.auth.userID);
+	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
+
+	const [styles, setStyles] = useState(getStyles(useDarkMode ? Themes.dark : Themes.light));
+	const [currentTheme, setCurrentTheme] = useState(
+		useDarkMode ? Themes.dark : Themes.light
+	);
+
+	useEffect(() => {
+		console.log("DARKMODE IS NOW: ");
+		console.log(useDarkMode);
+		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
+		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
+	}, [useDarkMode]);
+
+	// useEffect(() => {
+	// 	setCurrentTheme()
+	// }, [styles])
 
 	const dispatch = useDispatch();
 
@@ -60,7 +77,9 @@ const UserOverviewScreen = (props) => {
 						<Item
 							title="usersettings"
 							iconName="settings"
-							onPress={() => props.navigation.navigate("UserSettings")}
+							onPress={() =>
+								props.navigation.navigate("UserSettings")
+							}
 						/>
 					</HeaderButtons>
 				</View>
@@ -119,43 +138,84 @@ const UserOverviewScreen = (props) => {
 	);
 };
 
-const styles = StyleSheet.create({
-	safeView: {
-		flex: 1,
-		backgroundColor: theme.surface,
-		alignItems: "center",
-	},
+const getStyles = (theme) => {
+	return StyleSheet.create({
+		safeView: {
+			flex: 1,
+			backgroundColor: theme.surface,
+			alignItems: "center",
+		},
 
-	userHeaderContainer: {
-		height: 300,
-		justifyContent: "center",
-		alignItems: "center",
-		width: "100%",
-	},
-	currentInfoView: {
-		marginTop: 10,
-		width: "90%",
-		height: 100,
-		flexDirection: "row",
-		justifyContent: "space-around",
-		alignItems: "center",
-		borderRadius: 12,
-		paddingHorizontal: 16,
-		paddingVertical: 6,
-		backgroundColor: theme.surfaceVariant,
-	},
-	infoItem: {},
-	headerText: {
-		color: theme.onSurface,
-	},
-	infoText: {
-		color: theme.onSurfaceVariant,
-	},
-	image: {
-		height: "80%",
-		width: "80%",
-		borderRadius: 2000,
-	},
-});
+		userHeaderContainer: {
+			height: 300,
+			justifyContent: "center",
+			alignItems: "center",
+			width: "100%",
+		},
+		currentInfoView: {
+			marginTop: 10,
+			width: "90%",
+			height: 100,
+			flexDirection: "row",
+			justifyContent: "space-around",
+			alignItems: "center",
+			borderRadius: 12,
+			paddingHorizontal: 16,
+			paddingVertical: 6,
+			backgroundColor: theme.surfaceVariant,
+		},
+		infoItem: {},
+		headerText: {
+			color: theme.onSurface,
+		},
+		infoText: {
+			color: theme.onSurfaceVariant,
+		},
+		image: {
+			height: "80%",
+			width: "80%",
+			borderRadius: 2000,
+		},
+	});
+};
+
+// const styles = StyleSheet.create({
+// 	safeView: {
+// 		flex: 1,
+// 		backgroundColor: theme.surface,
+// 		alignItems: "center",
+// 	},
+
+// 	userHeaderContainer: {
+// 		height: 300,
+// 		justifyContent: "center",
+// 		alignItems: "center",
+// 		width: "100%",
+// 	},
+// 	currentInfoView: {
+// 		marginTop: 10,
+// 		width: "90%",
+// 		height: 100,
+// 		flexDirection: "row",
+// 		justifyContent: "space-around",
+// 		alignItems: "center",
+// 		borderRadius: 12,
+// 		paddingHorizontal: 16,
+// 		paddingVertical: 6,
+// 		backgroundColor: theme.surfaceVariant,
+// 	},
+// 	infoItem: {},
+// 	headerText: {
+// 		color: theme.onSurface,
+// 	},
+// 	infoText: {
+// 		color: theme.onSurfaceVariant,
+// 	},
+// 	image: {
+// 		height: "80%",
+// 		width: "80%",
+// 		borderRadius: 2000,
+// 	},
+// });
 
 export default UserOverviewScreen;
