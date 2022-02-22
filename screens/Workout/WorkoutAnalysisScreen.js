@@ -22,7 +22,6 @@ import { ExerciseTypes } from "../../shared/utils/ExerciseTypes";
 const WorkoutAnalysisScreen = (props) => {
 	const userID = useSelector((state) => state.auth.userID);
 	const exerciseStoreRef = useSelector((state) => state.workout.exercises);
-	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
 
 	const dispatch = useDispatch();
 
@@ -33,6 +32,8 @@ const WorkoutAnalysisScreen = (props) => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [currentChartExercise, setCurrentChartExercise] = useState();
 
+	// Themes
+	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
 	const [styles, setStyles] = useState(getStyles(useDarkMode ? Themes.dark : Themes.light));
 	const [currentTheme, setCurrentTheme] = useState(useDarkMode ? Themes.dark : Themes.light);
 

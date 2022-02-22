@@ -1,7 +1,7 @@
 import {SET_HIDE_TABBAR, SET_USE_DARKMODE } from "../actions/appsettings";
 const initialState = {
     hideTabBar: false,
-    useDarkMode: true
+    useDarkMode: false
 };
 
 export default (state = initialState, action) => {

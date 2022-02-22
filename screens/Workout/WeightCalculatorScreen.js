@@ -6,6 +6,8 @@ import {
 	Pressable,
 	Keyboard,
 } from "react-native";
+import { useSelector, useDispatch } from "react-redux";
+
 import RPEMap from "../../shared/utils/RPEMap";
 
 import { Themes } from "../../shared/Theme";
@@ -17,7 +19,6 @@ import DisplayText from "../../components/Text/Display";
 import Divider from "../../components/UI/Divider";
 import FilledButton from "../../components/Buttons/FilledButton";
 import OutlineButton from "../../components/Buttons/OutlineButton";
-const theme = Themes.dark;
 
 const SET_KWEIGHT = "SET_KWEIGHT";
 const SET_KREPS = "SET_KREPS";
@@ -40,7 +41,7 @@ const rpeReducer = (state, action) => {
 			return { ...state, wReps: action.value };
 		case SET_WRPE:
 			return { ...state, wRPE: action.value };
-		case RESET: 
+		case RESET:
 			return initialState;
 		default:
 			return state;
@@ -61,6 +62,20 @@ const WeightCalculatorScreen = (props) => {
 	const [rpeState, dispatch] = useReducer(rpeReducer, initialState);
 	const [isValid, setIsValid] = useState(false);
 	const [calcWeight, setCalcWeight] = useState(0);
+
+	// Themes
+	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
+	const [styles, setStyles] = useState(
+		getStyles(useDarkMode ? Themes.dark : Themes.light)
+	);
+	const [currentTheme, setCurrentTheme] = useState(
+		useDarkMode ? Themes.dark : Themes.light
+	);
+
+	useEffect(() => {
+		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
+		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
+	}, [useDarkMode]);
 
 	useEffect(() => {
 		if (checkValidState()) {
@@ -125,7 +140,7 @@ const WeightCalculatorScreen = (props) => {
 					<TitleText
 						large={true}
 						style={{
-							color: theme.onSurfaceVariant,
+							color: currentTheme.onSurfaceVariant,
 							textAlign: "center",
 						}}
 					>
@@ -136,7 +151,7 @@ const WeightCalculatorScreen = (props) => {
 							<NumberInput
 								keyboardType="numeric"
 								textAlign="center"
-								selectionColor={theme.tertiary}
+								selectionColor={currentTheme.tertiary}
 								onChangeText={(number) =>
 									dispatch({
 										type: SET_KWEIGHT,
@@ -144,13 +159,13 @@ const WeightCalculatorScreen = (props) => {
 									})
 								}
 							/>
-							<BodyText large={true}>Known Weight...</BodyText>
+							<BodyText style={{color: currentTheme.onSurface}}  large={true}>Known Weight...</BodyText>
 						</View>
 						<View style={styles.numberInput}>
 							<NumberInput
 								keyboardType="numeric"
 								textAlign="center"
-								selectionColor={theme.tertiary}
+								selectionColor={currentTheme.tertiary}
 								onChangeText={(number) =>
 									dispatch({
 										type: SET_KREPS,
@@ -158,13 +173,13 @@ const WeightCalculatorScreen = (props) => {
 									})
 								}
 							/>
-							<BodyText large={true}>How Many Reps...</BodyText>
+							<BodyText style={{color: currentTheme.onSurface}}  large={true}>How Many Reps...</BodyText>
 						</View>
 						<View style={styles.numberInput}>
 							<NumberInput
 								keyboardType="numeric"
 								textAlign="center"
-								selectionColor={theme.tertiary}
+								selectionColor={currentTheme.tertiary}
 								onChangeText={(number) =>
 									dispatch({
 										type: SET_KRPE,
@@ -172,7 +187,7 @@ const WeightCalculatorScreen = (props) => {
 									})
 								}
 							/>
-							<BodyText large={true}>At RPE</BodyText>
+							<BodyText style={{color: currentTheme.onSurface}}  large={true}>At RPE</BodyText>
 						</View>
 					</View>
 					<Divider width="90%" />
@@ -180,7 +195,7 @@ const WeightCalculatorScreen = (props) => {
 					<TitleText
 						large={true}
 						style={{
-							color: theme.onSurfaceVariant,
+							color: currentTheme.onSurfaceVariant,
 							textAlign: "center",
 						}}
 					>
@@ -191,7 +206,7 @@ const WeightCalculatorScreen = (props) => {
 							<NumberInput
 								keyboardType="numeric"
 								textAlign="center"
-								selectionColor={theme.tertiary}
+								selectionColor={currentTheme.tertiary}
 								onChangeText={(number) =>
 									dispatch({
 										type: SET_WREPS,
@@ -199,13 +214,13 @@ const WeightCalculatorScreen = (props) => {
 									})
 								}
 							/>
-							<BodyText large={true}>Reps</BodyText>
+							<BodyText style={{color: currentTheme.onSurface}}  large={true}>Reps</BodyText>
 						</View>
 						<View style={styles.numberInput}>
 							<NumberInput
 								keyboardType="numeric"
 								textAlign="center"
-								selectionColor={theme.tertiary}
+								selectionColor={currentTheme.tertiary}
 								onChangeText={(number) =>
 									dispatch({
 										type: SET_WRPE,
@@ -213,7 +228,7 @@ const WeightCalculatorScreen = (props) => {
 									})
 								}
 							/>
-							<BodyText large={true}>At RPE</BodyText>
+							<BodyText style={{color: currentTheme.onSurface}}  large={true}>At RPE</BodyText>
 						</View>
 					</View>
 					<FilledButton
@@ -228,14 +243,16 @@ const WeightCalculatorScreen = (props) => {
 				{calcWeight > 0 && (
 					<View style={styles.resultContainer}>
 						<TitleText
-							style={{ color: theme.onSecondaryContainer }}
+							style={{ color: currentTheme.onSecondaryContainer }}
 							large={true}
 						>
 							Target Weight
 						</TitleText>
 						<View style={styles.result}>
 							<DisplayText
-								style={{ color: theme.onSecondaryContainer }}
+								style={{
+									color: currentTheme.onSecondaryContainer,
+								}}
 								large={true}
 							>
 								{calcWeight}kg
@@ -244,67 +261,125 @@ const WeightCalculatorScreen = (props) => {
 					</View>
 				)}
 			</Pressable>
-			{/* <View style={styles.wantedContainer}> */}
-			{/* </View> */}
 		</View>
 	);
 };
 
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		// justifyContent: "center",
-		alignItems: "center",
-	},
-	knownContainer: {
-		marginTop: 60,
-		width: "90%",
-		// ,backgroundColor: theme.secondary
-		borderStyle: "solid",
-		borderColor: theme.outline,
-		borderWidth: 1,
-		borderRadius: 16,
-		alignItems: "center",
-		paddingVertical: 10,
-		// justifyContent: "center"
-	},
-	wantedContainer: {
-		marginTop: 20,
-		width: "90%",
-		// ,backgroundColor: theme.secondary
-		borderStyle: "solid",
-		borderColor: theme.outline,
-		borderWidth: 1,
-		borderRadius: 16,
-	},
-	inputContainer: {
-		height: 200,
-		flexDirection: "row",
-		justifyContent: "space-around",
-		alignItems: "center",
-	},
-	wantedInputContainer: {
-		marginVertical: 10,
-		flexDirection: "row",
-		justifyContent: "space-around",
-		alignItems: "center",
-	},
-	resultContainer: {
-		// width: "100%",
-		// height: 100,
-		marginTop: 20,
-		borderRadius: 12,
-		backgroundColor: theme.secondaryContainer,
-		padding: 10,
-		alignItems: "center",
-	},
-	numberInput: {
-		height: 150,
-		width: 120,
-		// backgroundColor: theme.secondaryContainer,
-		alignItems: "center",
-		// justifyContent: "space-around",
-	},
-});
+const getStyles = (theme) => {
+	return StyleSheet.create({
+		container: {
+			flex: 1,
+			// justifyContent: "center",
+			alignItems: "center",
+			backgroundColor: theme.surface
+		},
+		knownContainer: {
+			marginTop: 60,
+			width: "90%",
+			// ,backgroundColor: theme.secondary
+			borderStyle: "solid",
+			borderColor: theme.outline,
+			borderWidth: 1,
+			borderRadius: 16,
+			alignItems: "center",
+			paddingVertical: 10,
+			// justifyContent: "center"
+		},
+		wantedContainer: {
+			marginTop: 20,
+			width: "90%",
+			// ,backgroundColor: theme.secondary
+			borderStyle: "solid",
+			borderColor: theme.outline,
+			borderWidth: 1,
+			borderRadius: 16,
+		},
+		inputContainer: {
+			height: 200,
+			flexDirection: "row",
+			justifyContent: "space-around",
+			alignItems: "center",
+		},
+		wantedInputContainer: {
+			marginVertical: 10,
+			flexDirection: "row",
+			justifyContent: "space-around",
+			alignItems: "center",
+		},
+		resultContainer: {
+			// width: "100%",
+			// height: 100,
+			marginTop: 20,
+			borderRadius: 12,
+			backgroundColor: theme.secondaryContainer,
+			padding: 10,
+			alignItems: "center",
+		},
+		numberInput: {
+			height: 150,
+			width: 120,
+			// backgroundColor: theme.secondaryContainer,
+			alignItems: "center",
+			// justifyContent: "space-around",
+		},
+	});
+};
+
+// const styles = StyleSheet.create({
+// 	container: {
+// 		flex: 1,
+// 		// justifyContent: "center",
+// 		alignItems: "center",
+// 	},
+// 	knownContainer: {
+// 		marginTop: 60,
+// 		width: "90%",
+// 		// ,backgroundColor: theme.secondary
+// 		borderStyle: "solid",
+// 		borderColor: theme.outline,
+// 		borderWidth: 1,
+// 		borderRadius: 16,
+// 		alignItems: "center",
+// 		paddingVertical: 10,
+// 		// justifyContent: "center"
+// 	},
+// 	wantedContainer: {
+// 		marginTop: 20,
+// 		width: "90%",
+// 		// ,backgroundColor: theme.secondary
+// 		borderStyle: "solid",
+// 		borderColor: theme.outline,
+// 		borderWidth: 1,
+// 		borderRadius: 16,
+// 	},
+// 	inputContainer: {
+// 		height: 200,
+// 		flexDirection: "row",
+// 		justifyContent: "space-around",
+// 		alignItems: "center",
+// 	},
+// 	wantedInputContainer: {
+// 		marginVertical: 10,
+// 		flexDirection: "row",
+// 		justifyContent: "space-around",
+// 		alignItems: "center",
+// 	},
+// 	resultContainer: {
+// 		// width: "100%",
+// 		// height: 100,
+// 		marginTop: 20,
+// 		borderRadius: 12,
+// 		backgroundColor: theme.secondaryContainer,
+// 		padding: 10,
+// 		alignItems: "center",
+// 	},
+// 	numberInput: {
+// 		height: 150,
+// 		width: 120,
+// 		// backgroundColor: theme.secondaryContainer,
+// 		alignItems: "center",
+// 		// justifyContent: "space-around",
+// 	},
+// });
 
 export default WeightCalculatorScreen;

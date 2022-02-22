@@ -7,7 +7,7 @@ import * as UserActions from "../../store/actions/user";
 import { Themes } from "../../shared/Theme";
 import User from "../../models/User";
 import { SET_USE_DARKMODE } from "../../store/actions/appsettings";
-const theme = Themes.dark;
+// const theme = Themes.dark;
 
 const UserSettingsScreen = (props) => {
 	const user = useSelector((state) => state.user.user);
@@ -24,6 +24,8 @@ const UserSettingsScreen = (props) => {
 
 
 	const [styles, setStyles] = useState(getStyles(Themes.light));
+	const [currentTheme, setCurrentTheme] = useState(useDarkMode ? Themes.dark : Themes.light);
+
 
 	// useEffect(() => {
 	// 	setStyles(getStyles(useDarkMode ? Themes.dark: Themes.light));
@@ -36,14 +38,9 @@ const UserSettingsScreen = (props) => {
 	}, [user]);
 
 	useEffect(() => {
-		console.log("USEdarkmode: ");
-		console.log(useDarkMode);
+		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
+		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
 		setUseDarkModeValue(useDarkMode);
-		if(useDarkMode){
-			setStyles(getStyles(Themes.dark));
-		}else{
-			setStyles(getStyles(Themes.light));
-		}
 	}, [useDarkMode]);
 
 	useEffect(() => {
@@ -101,15 +98,15 @@ const UserSettingsScreen = (props) => {
 						value={useMetricValue}
 						disabled={isSwitchDisabled}
 						trackColor={{
-							false: theme.onSurface,
-							true: theme.secondary,
+							false: currentTheme.onSurface,
+							true: currentTheme.secondary,
 						}}
 						thumbColor={
 							useMetricValue
-								? theme.primary
-								: theme.onSurfaceVariant
+								? currentTheme.primary
+								: currentTheme.onSurfaceVariant
 						}
-						ios_backgroundColor={theme.primary}
+						ios_backgroundColor={currentTheme.primary}
 					/>
 				</View>
 				<View style={styles.userSettingsItem}>
@@ -122,15 +119,15 @@ const UserSettingsScreen = (props) => {
 						value={useDarkModeValue}
 						disabled={isSwitchDisabled}
 						trackColor={{
-							false: theme.onSurface,
-							true: theme.secondary,
+							false: currentTheme.onSurface,
+							true: currentTheme.secondary,
 						}}
 						thumbColor={
 							useMetricValue
-								? theme.primary
-								: theme.onSurfaceVariant
+								? currentTheme.primary
+								: currentTheme.onSurfaceVariant
 						}
-						ios_backgroundColor={theme.primary}
+						ios_backgroundColor={currentTheme.primary}
 					/>
 				</View>
 

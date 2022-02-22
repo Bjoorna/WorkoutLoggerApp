@@ -16,7 +16,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { TextInput } from "react-native-paper";
 
 import { Themes } from "../../shared/Theme";
-const theme = Themes.dark;
+// const theme = Themes.dark;
 
 import HeadlineText from "../../components/Text/Headline";
 import FilledButton from "../../components/Buttons/FilledButton";
@@ -53,6 +53,15 @@ const formReducer = (state, action) => {
 };
 
 const AuthScreen = (props) => {
+	// Themes
+	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
+	const [styles, setStyles] = useState(
+		getStyles(useDarkMode ? Themes.dark : Themes.light)
+	);
+	const [currentTheme, setCurrentTheme] = useState(
+		useDarkMode ? Themes.dark : Themes.light
+	);
+
 	const authStatus = useSelector((state) => state.auth);
 
 	const dispatch = useDispatch();
@@ -78,7 +87,12 @@ const AuthScreen = (props) => {
 	useEffect(() => {
 		console.log("Authstatus: ");
 		console.log(authStatus);
-	},[])
+	}, []);
+
+	useEffect(() => {
+		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
+		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
+	}, [useDarkMode]);
 
 	useEffect(() => {
 		dispatchFormState({ type: FORM_INPUT_UPDATE });
@@ -134,7 +148,7 @@ const AuthScreen = (props) => {
 			>
 				{isLoading && (
 					<View style={styles.loadingSpinner}>
-						<ActivityIndicator size="large" color={theme.primary} />
+						<ActivityIndicator size="large" color={currentTheme.primary} />
 					</View>
 				)}
 				{!isLoading && (
@@ -143,7 +157,7 @@ const AuthScreen = (props) => {
 							<View style={styles.authCardHeader}>
 								<HeadlineText
 									large={true}
-									style={{ color: theme.onSurfaceVariant }}
+									style={{ color: currentTheme.onSurfaceVariant }}
 								>
 									Login
 								</HeadlineText>
@@ -151,37 +165,37 @@ const AuthScreen = (props) => {
 							<View style={styles.authCardContent}>
 								<TextInput
 									style={styles.authTextInput}
-									outlineColor={theme.outline}
+									outlineColor={currentTheme.outline}
 									activeOutlineColor={
-										theme.onPrimaryContainer
+										currentTheme.onPrimaryContainer
 									}
-									selectionColor={theme.secondary}
+									selectionColor={currentTheme.secondary}
 									mode="outlined"
 									label="Email"
 									email
 									theme={{
 										colors: {
-											text: theme.onPrimaryContainer,
-											placeholder: theme.onSurface,
+											text: currentTheme.onPrimaryContainer,
+											placeholder: currentTheme.onSurface,
 										},
 									}}
 									onChangeText={(text) => setEmail(text)}
 								/>
 								<TextInput
 									style={styles.authTextInput}
-									outlineColor={theme.outline}
+									outlineColor={currentTheme.outline}
 									activeOutlineColor={
-										theme.onPrimaryContainer
+										currentTheme.onPrimaryContainer
 									}
-									selectionColor={theme.secondary}
+									selectionColor={currentTheme.secondary}
 									mode="outlined"
 									label="Password"
 									keyboardType="default"
 									secureTextEntry
 									theme={{
 										colors: {
-											text: theme.onPrimaryContainer,
-											placeholder: theme.onSurface,
+											text: currentTheme.onPrimaryContainer,
+											placeholder: currentTheme.onSurface,
 										},
 									}}
 									onChangeText={(text) => setPassword(text)}
@@ -197,9 +211,14 @@ const AuthScreen = (props) => {
 								>
 									Login
 								</FilledButton>
-								<TextButton onButtonPress={()=>{
-									props.navigation.navigate("NewUserScreen");
-								}} style={{ width: "100%" }}>
+								<TextButton
+									onButtonPress={() => {
+										props.navigation.navigate(
+											"NewUserScreen"
+										);
+									}}
+									style={{ width: "100%" }}
+								>
 									Create new user
 								</TextButton>
 								<TextButton
@@ -236,62 +255,122 @@ const AuthScreen = (props) => {
 	);
 };
 
-const styles = StyleSheet.create({
-	screen: {
-		flex: 1,
-		backgroundColor: theme.surface,
-	},
-	pressable: {
-		flex: 1,
-	},
-	authScreenContent: {
-		flex: 1,
-		height: "100%",
-		width: "100%",
-		paddingTop: 100,
-		alignItems: "center",
-	},
-	loadingSpinner: {
-		flex: 1,
-		height: "100%",
-		width: "100%",
-		justifyContent: "center",
-		alignItems: "center",
-	},
-	authCardContainer: {
-		width: "90%",
-		// height: 200,
-		paddingHorizontal: 16,
-		paddingBottom: 12,
-		borderRadius: 12,
-		backgroundColor: theme.surfaceVariant,
-	},
-	authCardHeader: {
-		paddingVertical: 10,
-	},
-	authCardContent: {
-		// marginTop: 20,
-		// flexDirection: "row",
-		// justifyContent: "flex-end"
-	},
-	authCardDivider: {
-		borderStyle: "solid",
-		width: "100%",
-		height: 2,
-		borderTopWidth: 1,
-		borderTopColor: theme.outline,
-		marginVertical: 3,
-	},
-	authCardButtonRow: {
-		marginTop: 10,
-		flexDirection: "column",
-		alignItems: "center",
-		// justifyContent: "flex-end",
-	},
-	authTextInput: {
-		paddingVertical: 5,
-		backgroundColor: theme.surfaceVariant,
-	},
-});
+const getStyles = (theme) => {
+	return StyleSheet.create({
+		screen: {
+			flex: 1,
+			backgroundColor: theme.surface,
+		},
+		pressable: {
+			flex: 1,
+		},
+		authScreenContent: {
+			flex: 1,
+			height: "100%",
+			width: "100%",
+			paddingTop: 100,
+			alignItems: "center",
+		},
+		loadingSpinner: {
+			flex: 1,
+			height: "100%",
+			width: "100%",
+			justifyContent: "center",
+			alignItems: "center",
+		},
+		authCardContainer: {
+			width: "90%",
+			// height: 200,
+			paddingHorizontal: 16,
+			paddingBottom: 12,
+			borderRadius: 12,
+			backgroundColor: theme.surfaceVariant,
+		},
+		authCardHeader: {
+			paddingVertical: 10,
+		},
+		authCardContent: {
+			// marginTop: 20,
+			// flexDirection: "row",
+			// justifyContent: "flex-end"
+		},
+		authCardDivider: {
+			borderStyle: "solid",
+			width: "100%",
+			height: 2,
+			borderTopWidth: 1,
+			borderTopColor: theme.outline,
+			marginVertical: 3,
+		},
+		authCardButtonRow: {
+			marginTop: 10,
+			flexDirection: "column",
+			alignItems: "center",
+			// justifyContent: "flex-end",
+		},
+		authTextInput: {
+			paddingVertical: 5,
+			backgroundColor: theme.surfaceVariant,
+		},
+	});
+};
+
+// const styles = StyleSheet.create({
+// 	screen: {
+// 		flex: 1,
+// 		backgroundColor: theme.surface,
+// 	},
+// 	pressable: {
+// 		flex: 1,
+// 	},
+// 	authScreenContent: {
+// 		flex: 1,
+// 		height: "100%",
+// 		width: "100%",
+// 		paddingTop: 100,
+// 		alignItems: "center",
+// 	},
+// 	loadingSpinner: {
+// 		flex: 1,
+// 		height: "100%",
+// 		width: "100%",
+// 		justifyContent: "center",
+// 		alignItems: "center",
+// 	},
+// 	authCardContainer: {
+// 		width: "90%",
+// 		// height: 200,
+// 		paddingHorizontal: 16,
+// 		paddingBottom: 12,
+// 		borderRadius: 12,
+// 		backgroundColor: theme.surfaceVariant,
+// 	},
+// 	authCardHeader: {
+// 		paddingVertical: 10,
+// 	},
+// 	authCardContent: {
+// 		// marginTop: 20,
+// 		// flexDirection: "row",
+// 		// justifyContent: "flex-end"
+// 	},
+// 	authCardDivider: {
+// 		borderStyle: "solid",
+// 		width: "100%",
+// 		height: 2,
+// 		borderTopWidth: 1,
+// 		borderTopColor: theme.outline,
+// 		marginVertical: 3,
+// 	},
+// 	authCardButtonRow: {
+// 		marginTop: 10,
+// 		flexDirection: "column",
+// 		alignItems: "center",
+// 		// justifyContent: "flex-end",
+// 	},
+// 	authTextInput: {
+// 		paddingVertical: 5,
+// 		backgroundColor: theme.surfaceVariant,
+// 	},
+// });
 
 export default AuthScreen;

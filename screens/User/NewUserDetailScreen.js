@@ -22,9 +22,24 @@ import User from "../../models/User";
 
 import { Themes } from "../../shared/Theme";
 
-const theme = Themes.dark;
+// const theme = Themes.dark;
 
 const NewUserDetailScreen = (props) => {
+	// Themes
+	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
+	const [styles, setStyles] = useState(
+		getStyles(useDarkMode ? Themes.dark : Themes.light)
+	);
+	const [currentTheme, setCurrentTheme] = useState(
+		useDarkMode ? Themes.dark : Themes.light
+	);
+
+	useEffect(() => {
+		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
+		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
+	}, [useDarkMode]);
+
+
 	const dispatch = useDispatch();
 	const userID = useSelector((state) => state.auth.userID);
 
@@ -33,7 +48,7 @@ const NewUserDetailScreen = (props) => {
 	const [isLoading, setIsLoading] = useState(false);
 
 	const saveOnlyName = async () => {
-		const newUser = new User(userName, null, null, null, null);
+		const newUser = new User(userName, null, null, null, null, null);
 		if (userID) {
 			console.log(userID);
 			try {
@@ -52,6 +67,7 @@ const NewUserDetailScreen = (props) => {
 		}
 	}, [error]);
 
+
 	return (
 		<View style={styles.screen}>
 			<Pressable
@@ -63,7 +79,7 @@ const NewUserDetailScreen = (props) => {
 						<View style={styles.loadingSpinner}>
 							<ActivityIndicator
 								size="large"
-								color={theme.primary}
+								color={currentTheme.primary}
 							/>
 						</View>
 					)}
@@ -72,7 +88,9 @@ const NewUserDetailScreen = (props) => {
 							<View style={styles.cardContent}>
 								<View style={styles.personalInfoHeader}>
 									<TitleText
-										style={{ color: theme.onSurface }}
+										style={{
+											color: currentTheme.onSurface,
+										}}
 										large={true}
 									>
 										Enter Personal Info
@@ -81,15 +99,16 @@ const NewUserDetailScreen = (props) => {
 								<View style={styles.personalInfoInput}>
 									<TextInput
 										style={styles.textInput}
-										outlineColor={theme.outline}
+										outlineColor={currentTheme.outline}
 										activeOutlineColor={
-											theme.onPrimaryContainer
+											currentTheme.onPrimaryContainer
 										}
-										selectionColor={theme.secondary}
+										selectionColor={currentTheme.secondary}
 										theme={{
 											colors: {
-												text: theme.onPrimaryContainer,
-												placeholder: theme.onSurface,
+												text: currentTheme.onPrimaryContainer,
+												placeholder:
+													currentTheme.onSurface,
 											},
 										}}
 										mode="outlined"
@@ -109,7 +128,7 @@ const NewUserDetailScreen = (props) => {
 												alignItems: "baseline",
 												paddingVertical: 10,
 												borderBottomColor:
-													theme.outline,
+													currentTheme.outline,
 												borderBottomWidth: 1,
 											}}
 										>
@@ -133,49 +152,96 @@ const NewUserDetailScreen = (props) => {
 	);
 };
 
-const styles = StyleSheet.create({
-	screen: {
-		flex: 1,
-		backgroundColor: theme.surface,
-	},
-	pressable: {
-		flex: 1,
-		// height: "100%",
-		// width: "100%",
-		// alignItems: "",
-	},
-	contentView: {
-		flex: 1,
-		// height: "100%",
-		// width: "100%",
+const getStyles = (theme) => {
+	return StyleSheet.create({
+		screen: {
+			flex: 1,
+			backgroundColor: theme.surface,
+		},
+		pressable: {
+			flex: 1,
+			// height: "100%",
+			// width: "100%",
+			// alignItems: "",
+		},
+		contentView: {
+			flex: 1,
+			// height: "100%",
+			// width: "100%",
 
-		alignItems: "center",
-	},
+			alignItems: "center",
+		},
 
-	textInput: {
-		backgroundColor: theme.surfaceVariant,
-	},
-	card: {
-		marginTop: 10,
-		width: "90%",
-		// height: 400,
-		backgroundColor: theme.surfaceVariant,
-		borderRadius: 12,
-		padding: 10,
-	},
-	cardContent: {},
-	personalInfoHeader: { marginBottom: 15 },
-	personalInfoInput: {},
-	personalInfoDetailInput: {
-		marginVertical: 20,
-	},
-	loadingSpinner: {
-		flex: 1,
-		height: "100%",
-		width: "100%",
-		justifyContent: "center",
-		alignItems: "center",
-	},
-});
+		textInput: {
+			backgroundColor: theme.surfaceVariant,
+		},
+		card: {
+			marginTop: 10,
+			width: "90%",
+			// height: 400,
+			backgroundColor: theme.surfaceVariant,
+			borderRadius: 12,
+			padding: 10,
+		},
+		cardContent: {},
+		personalInfoHeader: { marginBottom: 15 },
+		personalInfoInput: {},
+		personalInfoDetailInput: {
+			marginVertical: 20,
+		},
+		loadingSpinner: {
+			flex: 1,
+			height: "100%",
+			width: "100%",
+			justifyContent: "center",
+			alignItems: "center",
+		},
+	});
+};
+
+// const styles = StyleSheet.create({
+// 	screen: {
+// 		flex: 1,
+// 		backgroundColor: theme.surface,
+// 	},
+// 	pressable: {
+// 		flex: 1,
+// 		// height: "100%",
+// 		// width: "100%",
+// 		// alignItems: "",
+// 	},
+// 	contentView: {
+// 		flex: 1,
+// 		// height: "100%",
+// 		// width: "100%",
+
+// 		alignItems: "center",
+// 	},
+
+// 	textInput: {
+// 		backgroundColor: theme.surfaceVariant,
+// 	},
+// 	card: {
+// 		marginTop: 10,
+// 		width: "90%",
+// 		// height: 400,
+// 		backgroundColor: theme.surfaceVariant,
+// 		borderRadius: 12,
+// 		padding: 10,
+// 	},
+// 	cardContent: {},
+// 	personalInfoHeader: { marginBottom: 15 },
+// 	personalInfoInput: {},
+// 	personalInfoDetailInput: {
+// 		marginVertical: 20,
+// 	},
+// 	loadingSpinner: {
+// 		flex: 1,
+// 		height: "100%",
+// 		width: "100%",
+// 		justifyContent: "center",
+// 		alignItems: "center",
+// 	},
+// });
 
 export default NewUserDetailScreen;

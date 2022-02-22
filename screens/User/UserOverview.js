@@ -45,15 +45,10 @@ const UserOverviewScreen = (props) => {
 	);
 
 	useEffect(() => {
-		console.log("DARKMODE IS NOW: ");
-		console.log(useDarkMode);
 		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
 		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
 	}, [useDarkMode]);
 
-	// useEffect(() => {
-	// 	setCurrentTheme()
-	// }, [styles])
 
 	const dispatch = useDispatch();
 
