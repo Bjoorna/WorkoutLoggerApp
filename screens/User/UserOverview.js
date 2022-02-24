@@ -18,8 +18,8 @@ import DisplayText from "../../components/Text/Display";
 import LabelText from "../../components/Text/Label";
 import HeadlineText from "../../components/Text/Headline";
 import OutlineButton from "../../components/Buttons/OutlineButton";
+
 import { Themes } from "../../shared/Theme";
-// const theme = Themes.dark;
 
 function calculateAge(user) {
 	const now = new Date();
@@ -120,9 +120,9 @@ const UserOverviewScreen = (props) => {
 					</HeadlineText>
 				</View>
 			</View>
-			<OutlineButton onButtonPress={() => console.log(user)}>
+			{/* <OutlineButton onButtonPress={() => console.log(user)}>
 				UserDetaail
-			</OutlineButton>
+			</OutlineButton> */}
 			<OutlineButton
 				style={{ marginTop: 20 }}
 				onButtonPress={() => logoutUser()}

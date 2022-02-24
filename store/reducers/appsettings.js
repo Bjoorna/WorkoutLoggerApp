@@ -1,4 +1,4 @@
-import {SET_HIDE_TABBAR, SET_USE_DARKMODE } from "../actions/appsettings";
+import {SET_TAB_BAR_VALUE, SET_USE_DARKMODE } from "../actions/appsettings";
 const initialState = {
     hideTabBar: false,
     useDarkMode: true
@@ -6,8 +6,7 @@ const initialState = {
 
 export default (state = initialState, action) => {
     switch (action.type){
-        case SET_HIDE_TABBAR:
-            console.log("APPSETTINGS REDUCER");
+        case SET_TAB_BAR_VALUE:
             return{...state, hideTabBar: action.value};
         case SET_USE_DARKMODE: 
             console.log("setUseDarkmode from reducer");

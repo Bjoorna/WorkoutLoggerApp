@@ -91,6 +91,6 @@ export default function App() {
 const styles = StyleSheet.create({
 	baseScreen: {
 		flex: 1,
-		backgroundColor: theme.primary,
+		backgroundColor: theme.surface,
 	},
 });

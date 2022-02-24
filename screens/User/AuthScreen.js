@@ -221,12 +221,12 @@ const AuthScreen = (props) => {
 								>
 									Create new user
 								</TextButton>
-								<TextButton
+								{/* <TextButton
 									style={{ width: "100%" }}
 									onButtonPress={() => setTempLoginCreds()}
 								>
 									Set TempCreds
-								</TextButton>
+								</TextButton> */}
 								{/* <OutlineButton onButtonPress={() => setTempLoginCreds()}>SetCredsTEMP</OutlineButton>
 								<OutlineButton
 									onButtonPress={() => setIsSignup(!isSignup)}

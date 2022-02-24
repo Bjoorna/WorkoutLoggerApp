@@ -38,7 +38,7 @@ import OutlineButton from "../../components/Buttons/OutlineButton";
 import TextButton from "../../components/Buttons/TextButton";
 import FilterSelect from "../../components/FilterSelect";
 
-import { SET_HIDE_TABBAR } from "../../store/actions/appsettings";
+import { SET_TAB_BAR_VALUE } from "../../store/actions/appsettings";
 
 const theme = Themes.dark;
 
@@ -55,12 +55,15 @@ const WorkoutListScreen = (props) => {
 	const userID = useSelector((state) => state.auth.userID);
 	const reduxWorkoutRef = useSelector((state) => state.workout.workouts);
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
+	const isHidingTabBar = useSelector((state) => state.appSettings.hideTabBar);
 
 	const [workouts, setWorkouts] = useState([]);
 	const [refreshing, setRefreshing] = useState(false);
 	const [showFilter, setShowFilter] = useState(false);
 	const [filterToggle, setFilterToggle] = useState(false);
-	const [styles, setStyles] = useState(getStyles(useDarkMode ? Themes.dark : Themes.light));
+	const [styles, setStyles] = useState(
+		getStyles(useDarkMode ? Themes.dark : Themes.light)
+	);
 	const [currentTheme, setCurrentTheme] = useState(
 		useDarkMode ? Themes.dark : Themes.light
 	);
@@ -69,10 +72,14 @@ const WorkoutListScreen = (props) => {
 	const bottomSheetRef = useRef(null);
 	const handleSheetChanges = useCallback((index) => {
 		if (index === -1) {
+			dispatch({type: SET_TAB_BAR_VALUE, value: false});
+
 			if (!filterToggle) {
 				return;
 			}
 			setFilterToggle((state) => !state);
+		} else {
+			// dispatch({type: SET_TAB_BAR_VALUE, value: true});
 		}
 	});
 	const snapPoints = useMemo(() => ["25%", "50%"], []);
@@ -95,18 +102,6 @@ const WorkoutListScreen = (props) => {
 							onPress={toggle}
 						/>
 					</HeaderButtons>
-					<HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
-						<Item
-							title="add"
-							iconName="add"
-							onPress={() =>
-								dispatch({
-									type: AppSettingsActions.SET_USE_DARKMODE,
-									value: !useDarkMode,
-								})
-							}
-						/>
-					</HeaderButtons>
 				</View>
 			),
 		});
@@ -127,7 +122,8 @@ const WorkoutListScreen = (props) => {
 	useEffect(() => {
 		setShowFilter(filterToggle);
 		if (filterToggle) {
-			bottomSheetRef.current.snapToIndex(0);
+			dispatch({type: SET_TAB_BAR_VALUE, value: true});
+		// 	bottomSheetRef.current.snapToIndex(0);
 		} else {
 			bottomSheetRef.current.close();
 		}
@@ -137,6 +133,13 @@ const WorkoutListScreen = (props) => {
 		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
 		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
 	}, [useDarkMode]);
+
+	useEffect(() => {
+		// The assumtion is that when the tab bar is hidden, we want to show the bottom sheet
+		if (isHidingTabBar && filterToggle) {
+			bottomSheetRef.current.snapToIndex(0);
+		}
+	}, [isHidingTabBar]);
 
 	const toggle = () => {
 		if (filterToggle) {
@@ -252,6 +255,5 @@ const getStyles = (theme) => {
 		},
 	});
 };
-
 
 export default WorkoutListScreen;

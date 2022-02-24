@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Pressable, StyleSheet, View, ActivityIndicator, ProgressViewIOSComponent } from "react-native";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 
 import BodyText from "./Text/Body";
 import { Themes } from "../shared/Theme";
@@ -9,6 +9,7 @@ import Exercise from "../models/Exercise";
 import LabelText from "./Text/Label";
 import { FlatList } from "react-native-gesture-handler";
 import { useNavigation } from "@react-navigation/core";
+import { SET_TAB_BAR_VALUE } from "../store/actions/appsettings";
 // const theme = Themes.dark;
 
 const ExerciseItem = (props) => {
@@ -81,6 +82,7 @@ const getExerciseStyles = theme => {
 // });
 
 const WorkoutListItem = (props) => {
+	const dispatch = useDispatch();
 	const navigation = useNavigation();
 	const [exercises, setExercises] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
@@ -135,13 +137,17 @@ const WorkoutListItem = (props) => {
 		fetchExercises();
 	}, [props.workout]);
 
+	const navigateToDetailPage = () => {
+		// hide TabBar
+		dispatch({type: SET_TAB_BAR_VALUE, value: true});
+		navigation.navigate("WorkoutDetail", {workoutID: props.workout.id});
+	} ;
+
 	return (
 		<View style={styles.workoutItemContainer}>
 			<Pressable
 				style={styles.pressableView}
-				onPress={() => {
-					navigation.navigate("WorkoutDetail", {workoutID: props.workout.id});
-				}}
+				onPress={navigateToDetailPage}
 			>
 				<View style={styles.workoutItemLayout}>
 					<View style={styles.workoutItemHeader}>

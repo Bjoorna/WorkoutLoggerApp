@@ -47,10 +47,13 @@ const TabNavigator = createBottomTabNavigator();
 
 export const AppTabNavigator = () => {
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
+	const hideTabBar = useSelector((state) => state.appSettings.hideTabBar);
 	const [currentTheme, setCurrentTheme] = useState(Themes.dark);
 	useEffect(() => {
 		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
 	}, [useDarkMode]);
+
+
 
 	return (
 		<TabNavigator.Navigator
@@ -69,26 +72,7 @@ export const AppTabNavigator = () => {
 				tabBarHideOnKeyboard: true,
 			}}
 		>
-			<TabNavigator.Screen
-				options={{
-					tabBarIcon: (props) => (
-						<MaterialIcons
-							name="fitness-center"
-							size={24}
-							color={
-								props.focused
-									? currentTheme.onSecondaryContainer
-									: currentTheme.onSurfaceVariant
-							}
-						/>
-					),
-				}}
-				name="Workout"
-				component={WorkoutStackScreen}
-			/>
-
-			{/* incase i want to hide the tabbar*/}
-			{/* {!shouldHideTabBar && (
+			{hideTabBar && (
 				<TabNavigator.Screen
 					options={{
 						tabBarIcon: (props) => (
@@ -97,8 +81,31 @@ export const AppTabNavigator = () => {
 								size={24}
 								color={
 									props.focused
-										? theme.onSecondaryContainer
-										: theme.onSurfaceVariant
+										? currentTheme.onSecondaryContainer
+										: currentTheme.onSurfaceVariant
+								}
+							/>
+						),
+						tabBarStyle: {
+							display: "none",
+						},
+					}}
+					name="Workout"
+					component={WorkoutStackScreen}
+				/>
+			)}
+
+			 {!hideTabBar && (
+				<TabNavigator.Screen
+					options={{
+						tabBarIcon: (props) => (
+							<MaterialIcons
+								name="fitness-center"
+								size={24}
+								color={
+									props.focused
+										? currentTheme.onSecondaryContainer
+										: currentTheme.onSurfaceVariant
 								}
 							/>
 						),
@@ -106,7 +113,7 @@ export const AppTabNavigator = () => {
 					name="Workout"
 					component={WorkoutStackScreen}
 				/>
-			)} */}
+			)}
 
 			<TabNavigator.Screen
 				name="Calculator"
@@ -190,8 +197,17 @@ export const WorkoutStackScreen = () => {
 					}}
 				/>
 			</WorkoutStackNavigator.Group>
-			<WorkoutStackNavigator.Group screenOptions={{presentation: "modal"}}>
-				<WorkoutStackNavigator.Screen name="WorkoutDetail" component={WorkoutDetailScreen} options={{...getDefaultStyleOptions(currentTheme)}} />
+			<WorkoutStackNavigator.Group
+				screenOptions={{
+					presentation: "modal",
+					tabBarStyle: { display: "none" },
+				}}
+			>
+				<WorkoutStackNavigator.Screen
+					name="WorkoutDetail"
+					component={WorkoutDetailScreen}
+					options={{ ...getDefaultStyleOptions(currentTheme) }}
+				/>
 			</WorkoutStackNavigator.Group>
 		</WorkoutStackNavigator.Navigator>
 	);
