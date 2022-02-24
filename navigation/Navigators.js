@@ -18,6 +18,7 @@ import WorkoutListScreen from "../screens/Workout/WorkoutListScreen";
 import WorkoutAnalysisScreen from "../screens/Workout/WorkoutAnalysisScreen";
 import NewUserScreen from "../screens/User/NewUserScreen";
 import NewUserDetailScreen from "../screens/User/NewUserDetailScreen";
+import WorkoutDetailScreen from "../screens/Workout/WorkoutDetailScreen";
 const theme = Themes.dark;
 
 // const defaultStyleOptions = {
@@ -48,10 +49,8 @@ export const AppTabNavigator = () => {
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
 	const [currentTheme, setCurrentTheme] = useState(Themes.dark);
 	useEffect(() => {
-		console.log("setDarkMode NAvigator");
 		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
 	}, [useDarkMode]);
-
 
 	return (
 		<TabNavigator.Navigator
@@ -168,26 +167,32 @@ export const AppTabNavigator = () => {
 const WorkoutStackNavigator = createStackNavigator();
 
 export const WorkoutStackScreen = () => {
-
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
 	const [currentTheme, setCurrentTheme] = useState(Themes.dark);
 	useEffect(() => {
 		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
 	}, [useDarkMode]);
 
-
 	return (
 		<WorkoutStackNavigator.Navigator>
-			<WorkoutStackNavigator.Screen
-				name="Workouts"
-				component={WorkoutListScreen}
-				options={{ ...getDefaultStyleOptions(currentTheme) }}
-			/>
-			<WorkoutStackNavigator.Screen
-				name="AddWorkout"
-				component={AddWorkoutScreen}
-				options={{ ...getDefaultStyleOptions(currentTheme) , headerTitle: "Add Workout" }}
-			/>
+			<WorkoutStackNavigator.Group>
+				<WorkoutStackNavigator.Screen
+					name="Workouts"
+					component={WorkoutListScreen}
+					options={{ ...getDefaultStyleOptions(currentTheme) }}
+				/>
+				<WorkoutStackNavigator.Screen
+					name="AddWorkout"
+					component={AddWorkoutScreen}
+					options={{
+						...getDefaultStyleOptions(currentTheme),
+						headerTitle: "Add Workout",
+					}}
+				/>
+			</WorkoutStackNavigator.Group>
+			<WorkoutStackNavigator.Group screenOptions={{presentation: "modal"}}>
+				<WorkoutStackNavigator.Screen name="WorkoutDetail" component={WorkoutDetailScreen} options={{...getDefaultStyleOptions(currentTheme)}} />
+			</WorkoutStackNavigator.Group>
 		</WorkoutStackNavigator.Navigator>
 	);
 };

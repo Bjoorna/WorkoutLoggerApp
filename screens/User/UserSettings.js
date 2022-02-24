@@ -27,10 +27,6 @@ const UserSettingsScreen = (props) => {
 	const [currentTheme, setCurrentTheme] = useState(useDarkMode ? Themes.dark : Themes.light);
 
 
-	// useEffect(() => {
-	// 	setStyles(getStyles(useDarkMode ? Themes.dark: Themes.light));
-	// 	console.log(getStyles(Themes.dark));
-	// })
 	// initialize userSettingsValues
 	useEffect(() => {
 		setUseMetricValue(user.useMetric);

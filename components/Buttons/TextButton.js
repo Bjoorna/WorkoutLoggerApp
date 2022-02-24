@@ -6,7 +6,6 @@ import LabelText from "../Text/Label";
 const theme = Themes.dark;
 
 const TextButton = (props) => {
-	console.log(props.textStyle);
 	const [isPressed, setIsPressed] = useState(false);
 	const isDisabled = props.disabled;
 

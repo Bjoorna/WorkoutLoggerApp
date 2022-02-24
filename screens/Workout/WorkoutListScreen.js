@@ -68,7 +68,6 @@ const WorkoutListScreen = (props) => {
 	// BottomSheet stuff
 	const bottomSheetRef = useRef(null);
 	const handleSheetChanges = useCallback((index) => {
-		console.log("Handlesheetchanges: ", index);
 		if (index === -1) {
 			if (!filterToggle) {
 				return;

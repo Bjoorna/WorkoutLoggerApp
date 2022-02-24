@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Pressable, StyleSheet, View, ActivityIndicator } from "react-native";
+import { Pressable, StyleSheet, View, ActivityIndicator, ProgressViewIOSComponent } from "react-native";
 import { useSelector } from "react-redux";
 
 import BodyText from "./Text/Body";
@@ -8,6 +8,7 @@ import * as firebase from "../firebase/firebase";
 import Exercise from "../models/Exercise";
 import LabelText from "./Text/Label";
 import { FlatList } from "react-native-gesture-handler";
+import { useNavigation } from "@react-navigation/core";
 // const theme = Themes.dark;
 
 const ExerciseItem = (props) => {
@@ -80,6 +81,7 @@ const getExerciseStyles = theme => {
 // });
 
 const WorkoutListItem = (props) => {
+	const navigation = useNavigation();
 	const [exercises, setExercises] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
 
@@ -138,8 +140,7 @@ const WorkoutListItem = (props) => {
 			<Pressable
 				style={styles.pressableView}
 				onPress={() => {
-					if (exercises.length > 0) {
-					}
+					navigation.navigate("WorkoutDetail", {workoutID: props.workout.id});
 				}}
 			>
 				<View style={styles.workoutItemLayout}>
