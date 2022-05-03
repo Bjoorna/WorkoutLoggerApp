@@ -26,13 +26,7 @@ import * as firebase from "../../firebase/firebase";
 import OutlineButton from "../../components/Buttons/OutlineButton";
 import { ExerciseTypes } from "../../shared/utils/ExerciseTypes";
 import LabelText from "../../components/Text/Label";
-// const theme = Themes.dark;
 
-const ExerciseArray = ["Squat", "Deadlift", "Bench-Press"];
-
-// const TestItem = Type => (
-// 	<View></View>
-// )
 
 // TODO make this separate component?
 const ExerciseList = (props) => {
@@ -238,22 +232,12 @@ const AddWorkoutScreen = (props) => {
 								</LabelText>
 							)}
 						/>
-						{/* <FlatList
-							keyExtractor={(item) => Math.random()}
-							data={ExerciseArray}
-							renderItem={(itemData) => (
-								<ExerciseList
-									selectExercise={selectExercise}
-									item={itemData.item}
-								/>
-							)}
-						/> */}
-						<FilledButton
+						{/* <FilledButton
 							style={{ marginTop: 15 }}
 							onButtonPress={hideModal}
 						>
 							Dismiss
-						</FilledButton>
+						</FilledButton> */}
 					</Modal>
 				</Portal>
 				<View style={styles.contentView}>
