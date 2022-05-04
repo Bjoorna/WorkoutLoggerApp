@@ -9,6 +9,9 @@ import { useSelector, useDispatch } from "react-redux";
 import { useFocusEffect } from "@react-navigation/core";
 import { Themes } from "../../shared/Theme";
 import { SET_TAB_BAR_VALUE } from "../../store/actions/appsettings";
+import { HeaderButtons, Item } from "react-navigation-header-buttons";
+import CustomHeaderButton from "../../components/Buttons/CustomHeaderButton";
+
 
 const WorkoutDetailScreen = (props) => {
 	const dispatch = useDispatch();
@@ -39,13 +42,32 @@ const WorkoutDetailScreen = (props) => {
 		setStyles(useDarkMode ? Themes.dark : Themes.light);
 	}, [useDarkMode]);
 
-	useEffect(() => {
-		if (workout) {
+	useLayoutEffect(()=> {
+		if(workout){
 			props.navigation.setOptions({
+				headerRight: () => (
+					<View style={{ flexDirection: "row" }}>
+					<HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
+						<Item
+							title="delete"
+							iconName="delete"
+							onPress={deleteWorkout}
+						/>
+					</HeaderButtons>
+					</View>
+				),
+
 				title: new Date(workout.date.seconds * 1000).toDateString(),
 			});
 		}
-	}, [workout]);
+	}, [props.navigation, workout]);
+
+	const deleteWorkout = () => {
+		console.log("Delete Workout");
+		if(workout){
+			console.log(workout);
+		}
+	}
 
 	useFocusEffect(
 		useCallback(() => {
