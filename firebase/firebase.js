@@ -15,6 +15,8 @@ import {
 	orderBy,
 	limit,
 	updateDoc,
+	deleteDoc,
+	
 } from "firebase/firestore";
 import {
 	getAuth,
@@ -62,6 +64,34 @@ export const updateUser = async (userID, newUserState) => {
 		throw new Error(error);
 	}
 };
+
+export const deleteWorkout = async (userID, workout) => {
+	try{
+		const workoutID = workout.id;
+		const exerciseIDs = workout.exercises
+		const docRef = doc(database, "workouts", workoutID);
+		console.log(workoutID);
+		console.log(userID);
+		const deletedDoc = await deleteDoc(docRef);
+		return await deleteExercise(userID, exerciseIDs);
+	}catch(error) {
+		throw new Error(error);
+	}
+}
+
+export const deleteExercise = async(userID, exerciseIDs) => {
+	try {
+		const batch = writeBatch(database);
+		for(let exerciseID of exerciseIDs){
+			const exerciseRef = doc(database, "exercises", exerciseID);
+			console.log(exerciseID);
+			batch.delete(exerciseRef);
+		}
+		return await batch.commit();
+	} catch (error) {
+		throw new Error(error);
+	}
+}
 
 export const writeExercisesToDatabase = async (
 	exercises,

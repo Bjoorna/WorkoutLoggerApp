@@ -11,11 +11,12 @@ import { Themes } from "../../shared/Theme";
 import { SET_TAB_BAR_VALUE } from "../../store/actions/appsettings";
 import { HeaderButtons, Item } from "react-navigation-header-buttons";
 import CustomHeaderButton from "../../components/Buttons/CustomHeaderButton";
-
+import * as firebase from '../../firebase/firebase';
 
 const WorkoutDetailScreen = (props) => {
 	const dispatch = useDispatch();
 	const workoutID = props.route.params.workoutID;
+	const userID = useSelector((state) => state.auth.userID);
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
 	const workoutsRef = useSelector((state) => state.workout.workouts);
 	const [styles, setStyles] = useState(
@@ -62,10 +63,11 @@ const WorkoutDetailScreen = (props) => {
 		}
 	}, [props.navigation, workout]);
 
-	const deleteWorkout = () => {
-		console.log("Delete Workout");
+	const deleteWorkout = async() => {
 		if(workout){
 			console.log(workout);
+			await firebase.deleteWorkout(userID, workout);
+			console.log("workout and exercises deleted");	
 		}
 	}
 
