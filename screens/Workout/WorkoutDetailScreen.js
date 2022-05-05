@@ -11,7 +11,7 @@ import { Themes } from "../../shared/Theme";
 import { SET_TAB_BAR_VALUE } from "../../store/actions/appsettings";
 import { HeaderButtons, Item } from "react-navigation-header-buttons";
 import CustomHeaderButton from "../../components/Buttons/CustomHeaderButton";
-import * as firebase from '../../firebase/firebase';
+import * as firebase from "../../firebase/firebase";
 
 const WorkoutDetailScreen = (props) => {
 	const dispatch = useDispatch();
@@ -25,14 +25,6 @@ const WorkoutDetailScreen = (props) => {
 	const [workout, setWorkout] = useState();
 
 	useEffect(() => {
-		// console.log(props);
-		// console.log(workoutID);
-		// props.navigation.setOptions({
-		//     tabBarStyle: {
-		//         display: "none",
-		//     }
-		// });
-
 		const onWorkout = workoutsRef.find(
 			(workout) => workout.id == workoutID
 		);
@@ -43,18 +35,20 @@ const WorkoutDetailScreen = (props) => {
 		setStyles(useDarkMode ? Themes.dark : Themes.light);
 	}, [useDarkMode]);
 
-	useLayoutEffect(()=> {
-		if(workout){
+	useLayoutEffect(() => {
+		if (workout) {
 			props.navigation.setOptions({
 				headerRight: () => (
 					<View style={{ flexDirection: "row" }}>
-					<HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
-						<Item
-							title="delete"
-							iconName="delete"
-							onPress={deleteWorkout}
-						/>
-					</HeaderButtons>
+						<HeaderButtons
+							HeaderButtonComponent={CustomHeaderButton}
+						>
+							<Item
+								title="delete"
+								iconName="delete"
+								onPress={deleteWorkout}
+							/>
+						</HeaderButtons>
 					</View>
 				),
 
@@ -63,19 +57,19 @@ const WorkoutDetailScreen = (props) => {
 		}
 	}, [props.navigation, workout]);
 
-	const deleteWorkout = async() => {
-		if(workout){
+	const deleteWorkout = async () => {
+		if (workout) {
 			console.log(workout);
 			await firebase.deleteWorkout(userID, workout);
-			console.log("workout and exercises deleted");	
+			console.log("workout and exercises deleted");
 		}
-	}
+	};
 
 	useFocusEffect(
 		useCallback(() => {
 			console.log("IS OPENING SCREEN");
 			const onCloseScreen = () => {
-                console.log("IS CLOSING SCREEN");
+				console.log("IS CLOSING SCREEN");
 
 				dispatch({
 					type: SET_TAB_BAR_VALUE,

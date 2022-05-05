@@ -5,6 +5,7 @@ import {
 	KeyboardAvoidingView,
 	Pressable,
 	Keyboard,
+	StatusBar
 } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 
@@ -268,6 +269,7 @@ const WeightCalculatorScreen = (props) => {
 const getStyles = (theme) => {
 	return StyleSheet.create({
 		container: {
+			paddingTop: StatusBar.currentheight,
 			flex: 1,
 			// justifyContent: "center",
 			alignItems: "center",

@@ -273,7 +273,7 @@ const WorkoutAnalysisScreen = (props) => {
 const getStyles = theme => {
 	return StyleSheet.create({
 		container: {
-			marginTop: StatusBar.currentHeight,
+			paddingTop: StatusBar.currentHeight,
 			flex: 1,
 			backgroundColor: theme.surface,
 			alignItems: "center",

@@ -27,18 +27,13 @@ import OutlineButton from "../../components/Buttons/OutlineButton";
 import { ExerciseTypes } from "../../shared/utils/ExerciseTypes";
 import LabelText from "../../components/Text/Label";
 
-
 // TODO make this separate component?
 const ExerciseList = (props) => {
 	const [isPressed, setIsPressed] = useState(false);
 
 	// const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
-	const [modalStyles, setModalStyles] = useState(
-		props.modalStyle
-	);
-	const [currentTheme, setCurrentTheme] = useState(
-		props.currentTheme
-	);
+	const [modalStyles, setModalStyles] = useState(props.modalStyle);
+	const [currentTheme, setCurrentTheme] = useState(props.currentTheme);
 
 	useEffect(() => {
 		setModalStyles(props.modalStyle);
@@ -127,7 +122,9 @@ const AddWorkoutScreen = (props) => {
 
 	useEffect(() => {
 		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
-		setModalStyles(getModalStyles(useDarkMode ? Themes.dark : Themes.light));
+		setModalStyles(
+			getModalStyles(useDarkMode ? Themes.dark : Themes.light)
+		);
 		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
 	}, [useDarkMode]);
 
@@ -281,12 +278,20 @@ const AddWorkoutScreen = (props) => {
 											placeholder="Weight"
 											keyboardType="numeric"
 											textAlign="center"
-											selectionColor={currentTheme.tertiary}
+											selectionColor={
+												currentTheme.tertiary
+											}
 											onChangeText={(number) =>
 												setSelectedWeight(number)
 											}
 										/>
-										<BodyText style={{color: currentTheme.onSurface}}>Weight</BodyText>
+										<BodyText
+											style={{
+												color: currentTheme.onSurface,
+											}}
+										>
+											Weight
+										</BodyText>
 									</View>
 									<View style={styles.newExerciseInputValues}>
 										<NumberInput
@@ -294,12 +299,20 @@ const AddWorkoutScreen = (props) => {
 											placeholder="Reps"
 											keyboardType="numeric"
 											textAlign="center"
-											selectionColor={currentTheme.tertiary}
+											selectionColor={
+												currentTheme.tertiary
+											}
 											onChangeText={(number) =>
 												setSelectedReps(number)
 											}
 										/>
-										<BodyText style={{color: currentTheme.onSurface}}>Reps</BodyText>
+										<BodyText
+											style={{
+												color: currentTheme.onSurface,
+											}}
+										>
+											Reps
+										</BodyText>
 									</View>
 								</View>
 								<View style={styles.newExerciseValuesRow}>
@@ -309,12 +322,20 @@ const AddWorkoutScreen = (props) => {
 											placeholder="Sets"
 											keyboardType="numeric"
 											textAlign="center"
-											selectionColor={currentTheme.tertiary}
+											selectionColor={
+												currentTheme.tertiary
+											}
 											onChangeText={(number) =>
 												setSelectedSets(number)
 											}
 										/>
-										<BodyText style={{color: currentTheme.onSurface}}>Sets</BodyText>
+										<BodyText
+											style={{
+												color: currentTheme.onSurface,
+											}}
+										>
+											Sets
+										</BodyText>
 									</View>
 									<View style={styles.newExerciseInputValues}>
 										<NumberInput
@@ -322,12 +343,20 @@ const AddWorkoutScreen = (props) => {
 											placeholder="RPE"
 											keyboardType="numeric"
 											textAlign="center"
-											selectionColor={currentTheme.tertiary}
+											selectionColor={
+												currentTheme.tertiary
+											}
 											onChangeText={(number) =>
 												setSelectedRPE(number)
 											}
 										/>
-										<BodyText style={{color: currentTheme.onSurface}}>RPE</BodyText>
+										<BodyText
+											style={{
+												color: currentTheme.onSurface,
+											}}
+										>
+											RPE
+										</BodyText>
 									</View>
 								</View>
 							</View>
@@ -365,13 +394,20 @@ const AddWorkoutScreen = (props) => {
 					{!isLoading && (
 						<View style={styles.workoutSummary}>
 							<View style={styles.workoutSummaryInfo}>
-								<BodyText style={{color: currentTheme.onSurfaceVariant}} large={true}>
+								<BodyText
+									style={{
+										color: currentTheme.onSurfaceVariant,
+									}}
+									large={true}
+								>
 									Workout Summary
 								</BodyText>
 								<BodyText
 									large={true}
-
-									style={{ marginLeft: 20, color: currentTheme.onSurfaceVariant }}
+									style={{
+										marginLeft: 20,
+										color: currentTheme.onSurfaceVariant,
+									}}
 								>
 									Date: {selectedDate.toDateString()}
 								</BodyText>
@@ -413,7 +449,7 @@ const AddWorkoutScreen = (props) => {
 	);
 };
 
-const getStyles = theme => {
+const getStyles = (theme) => {
 	return StyleSheet.create({
 		container: {
 			flex: 1,
@@ -460,7 +496,7 @@ const getStyles = theme => {
 			height: 60,
 			borderRadius: 16,
 			backgroundColor: theme.secondaryContainer,
-	
+
 			flexDirection: "row",
 			justifyContent: "center",
 			alignItems: "center",
@@ -501,11 +537,9 @@ const getStyles = theme => {
 			alignItems: "center",
 		},
 	});
-	
-}
+};
 
-
-const getModalStyles = theme => {
+const getModalStyles = (theme) => {
 	return StyleSheet.create({
 		modalStyle: {
 			left: "5%",
@@ -535,6 +569,6 @@ const getModalStyles = theme => {
 			height: "100%",
 		},
 	});
-}
+};
 
 export default AddWorkoutScreen;
