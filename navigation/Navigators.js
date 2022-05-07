@@ -19,6 +19,7 @@ import WorkoutAnalysisScreen from "../screens/Workout/WorkoutAnalysisScreen";
 import NewUserScreen from "../screens/User/NewUserScreen";
 import NewUserDetailScreen from "../screens/User/NewUserDetailScreen";
 import WorkoutDetailScreen from "../screens/Workout/WorkoutDetailScreen";
+import CustomTabBar from "../components/UI/CustomTabBar";
 const theme = Themes.dark;
 
 // const defaultStyleOptions = {
@@ -55,21 +56,10 @@ export const AppTabNavigator = () => {
 
 	return (
 		<TabNavigator.Navigator
-			screenOptions={{
-				...getDefaultStyleOptions(currentTheme),
-				tabBarStyle: {
-					backgroundColor: currentTheme.surface,
-					height: 80,
-					paddingBottom: 16,
-					paddingTop: 12,
-				},
-
-				tabBarActiveTintColor: currentTheme.onSurface,
-				tabBarInactiveTintColor: currentTheme.onSurfaceVariant,
-				headerShown: false,
-				tabBarHideOnKeyboard: true,
-			}}
+			screenOptions={{ headerShown: false }}
+			tabBar={(props) => <CustomTabBar {...props} />}
 		>
+			{/* When the Filter is Activated on workoutListScreen */}
 			{hideTabBar && (
 				<TabNavigator.Screen
 					options={{
@@ -92,22 +82,8 @@ export const AppTabNavigator = () => {
 					component={WorkoutStackScreen}
 				/>
 			)}
-
 			{!hideTabBar && (
 				<TabNavigator.Screen
-					options={{
-						tabBarIcon: (props) => (
-							<MaterialIcons
-								name="fitness-center"
-								size={24}
-								color={
-									props.focused
-										? currentTheme.onSecondaryContainer
-										: currentTheme.onSurfaceVariant
-								}
-							/>
-						),
-					}}
 					name="Workout"
 					component={WorkoutStackScreen}
 				/>
@@ -116,20 +92,8 @@ export const AppTabNavigator = () => {
 			<TabNavigator.Screen
 				name="Calculator"
 				component={WeightCalculatorScreen}
-				options={{
-					tabBarIcon: (props) => (
-						<MaterialIcons
-							name="calculate"
-							size={24}
-							color={
-								props.focused
-									? currentTheme.onSecondaryContainer
-									: currentTheme.onSurfaceVariant
-							}
-						/>
-					),
-				}}
 			/>
+			
 			<TabNavigator.Screen
 				name="Analysis"
 				component={WorkoutAnalysisScreen}
@@ -147,33 +111,146 @@ export const AppTabNavigator = () => {
 					),
 				}}
 			/>
-			<TabNavigator.Screen
-				name="User"
-				component={UserStackScreen}
-				options={{
-					headerShown: false,
-					tabBarIcon: (props) => (
-						<MaterialIcons
-							name="account-circle"
-							size={24}
-							color={
-								props.focused
-									? currentTheme.onSecondaryContainer
-									: currentTheme.onSurfaceVariant
-							}
-						/>
-					),
-				}}
-			/>
+
+			<TabNavigator.Screen name="User" component={UserStackScreen} />
 		</TabNavigator.Navigator>
 	);
 };
+
+// REAL FUNCTIONING
+
+// export const AppTabNavigator = () => {
+// 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
+// 	const hideTabBar = useSelector((state) => state.appSettings.hideTabBar);
+// 	const [currentTheme, setCurrentTheme] = useState(Themes.dark);
+// 	useEffect(() => {
+// 		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
+// 	}, [useDarkMode]);
+
+// 	return (
+// 		<TabNavigator.Navigator
+// 			screenOptions={{
+// 				...getDefaultStyleOptions(currentTheme),
+// 				tabBarStyle: {
+// 					backgroundColor: currentTheme.surface,
+// 					height: 80,
+// 					paddingBottom: 16,
+// 					paddingTop: 12,
+// 				},
+
+// 				tabBarActiveTintColor: currentTheme.onSurface,
+// 				tabBarInactiveTintColor: currentTheme.onSurfaceVariant,
+// 				headerShown: false,
+// 				tabBarHideOnKeyboard: true,
+// 			}}
+// 		>
+// 			{/* When the Filter is Activated on workoutListScreen */}
+// 			{hideTabBar && (
+// 				<TabNavigator.Screen
+// 					options={{
+// 						tabBarIcon: (props) => (
+// 							<MaterialIcons
+// 								name="fitness-center"
+// 								size={24}
+// 								color={
+// 									props.focused
+// 										? currentTheme.onSecondaryContainer
+// 										: currentTheme.onSurfaceVariant
+// 								}
+// 							/>
+// 						),
+// 						tabBarStyle: {
+// 							display: "none",
+// 						},
+// 					}}
+// 					name="Workout"
+// 					component={WorkoutStackScreen}
+// 				/>
+// 			)}
+
+// 			{!hideTabBar && (
+// 				<TabNavigator.Screen
+// 					options={{
+// 						tabBarIcon: (props) => (
+// 							<MaterialIcons
+// 								name="fitness-center"
+// 								size={24}
+// 								color={
+// 									props.focused
+// 										? currentTheme.onSecondaryContainer
+// 										: currentTheme.onSurfaceVariant
+// 								}
+// 							/>
+// 						),
+// 					}}
+// 					name="Workout"
+// 					component={WorkoutStackScreen}
+// 				/>
+// 			)}
+
+// 			<TabNavigator.Screen
+// 				name="Calculator"
+// 				component={WeightCalculatorScreen}
+// 				options={{
+// 					tabBarIcon: (props) => (
+// 						<MaterialIcons
+// 							name="calculate"
+// 							size={24}
+// 							color={
+// 								props.focused
+// 									? currentTheme.onSecondaryContainer
+// 									: currentTheme.onSurfaceVariant
+// 							}
+// 						/>
+// 					),
+// 				}}
+// 			/>
+// 			<TabNavigator.Screen
+// 				name="Analysis"
+// 				component={WorkoutAnalysisScreen}
+// 				options={{
+// 					tabBarIcon: (props) => (
+// 						<MaterialIcons
+// 							name="analytics"
+// 							size={24}
+// 							color={
+// 								props.focused
+// 									? currentTheme.onSecondaryContainer
+// 									: currentTheme.onSurfaceVariant
+// 							}
+// 						/>
+// 					),
+// 				}}
+// 			/>
+// 			<TabNavigator.Screen
+// 				name="User"
+// 				component={UserStackScreen}
+// 				options={{
+// 					headerShown: false,
+// 					tabBarIcon: (props) => (
+// 						<MaterialIcons
+// 							name="account-circle"
+// 							size={24}
+// 							color={
+// 								props.focused
+// 									? currentTheme.onSecondaryContainer
+// 									: currentTheme.onSurfaceVariant
+// 							}
+// 						/>
+// 					),
+// 				}}
+// 			/>
+// 		</TabNavigator.Navigator>
+// 	);
+// };
 
 const WorkoutStackNavigator = createStackNavigator();
 
 export const WorkoutStackScreen = () => {
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
-	const [currentTheme, setCurrentTheme] = useState(useDarkMode ? Themes.dark : Themes.light);
+	const [currentTheme, setCurrentTheme] = useState(
+		useDarkMode ? Themes.dark : Themes.light
+	);
 	useEffect(() => {
 		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
 	}, [useDarkMode]);
@@ -210,8 +287,8 @@ export const WorkoutStackScreen = () => {
 						},
 						headerTintColor: currentTheme.onSurface,
 						cardStyle: {
-							backgroundColor: currentTheme.surface
-						}
+							backgroundColor: currentTheme.surface,
+						},
 					}}
 				/>
 			</WorkoutStackNavigator.Group>
