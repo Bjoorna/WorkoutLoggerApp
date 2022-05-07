@@ -59,60 +59,34 @@ export const AppTabNavigator = () => {
 			screenOptions={{ headerShown: false }}
 			tabBar={(props) => <CustomTabBar {...props} />}
 		>
-			{/* When the Filter is Activated on workoutListScreen */}
-			{hideTabBar && (
-				<TabNavigator.Screen
-					options={{
-						tabBarIcon: (props) => (
-							<MaterialIcons
-								name="fitness-center"
-								size={24}
-								color={
-									props.focused
-										? currentTheme.onSecondaryContainer
-										: currentTheme.onSurfaceVariant
-								}
-							/>
-						),
-						tabBarStyle: {
-							display: "none",
-						},
-					}}
-					name="Workout"
-					component={WorkoutStackScreen}
-				/>
-			)}
-			{!hideTabBar && (
-				<TabNavigator.Screen
-					name="Workout"
-					component={WorkoutStackScreen}
-				/>
-			)}
+			<TabNavigator.Screen
+				name="Workout"
+				initialParams={
+					{labelName: "fitness-center"}
+				}
+				component={WorkoutStackScreen}
+			/>
 
 			<TabNavigator.Screen
 				name="Calculator"
 				component={WeightCalculatorScreen}
+				initialParams={
+					{labelName: "calculate"}
+				}
+
 			/>
-			
+
 			<TabNavigator.Screen
 				name="Analysis"
 				component={WorkoutAnalysisScreen}
-				options={{
-					tabBarIcon: (props) => (
-						<MaterialIcons
-							name="analytics"
-							size={24}
-							color={
-								props.focused
-									? currentTheme.onSecondaryContainer
-									: currentTheme.onSurfaceVariant
-							}
-						/>
-					),
-				}}
+				initialParams={
+					{labelName: "analytics"}
+				}
 			/>
 
-			<TabNavigator.Screen name="User" component={UserStackScreen} />
+			<TabNavigator.Screen name="User" component={UserStackScreen} initialParams={
+					{labelName: "account-circle"}
+				} />
 		</TabNavigator.Navigator>
 	);
 };

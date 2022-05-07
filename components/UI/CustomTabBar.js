@@ -16,20 +16,22 @@ import { useSelector, useDispatch } from "react-redux";
 import LabelText from "../Text/Label";
 
 const CustomTabBar = ({ state, descriptors, navigation }) => {
-	// console.log("Hello from custom tab bar");
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
+    const hideTabBar = useSelector((state) => state.appSettings.hideTabBar);
 	const [styles, setStyles] = useState(
 		getStyles(useDarkMode ? Themes.dark : Themes.light)
 	);
-	console.log("Use DarkMode: " + useDarkMode);
 
 	useEffect(() => {
 		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
 	}, [useDarkMode]);
 	return (
-		<View style={styles.tabBarContainer}>
+		<View style={hideTabBar ? {display: "none"} : styles.tabBarContainer}>
 			{state.routes.map((route, index) => {
 				const { options } = descriptors[route.key];
+                // const labelName = "account-circle";
+
+                const labelName = route.params.labelName;
 				const label =
 					options.tabBarLabel !== undefined
 						? options.tabBarLabel
@@ -75,7 +77,7 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
 						>
 							{useDarkMode && (
 								<MaterialIcons
-									name="fitness-center"
+									name={labelName}
 									size={24}
 									color={
 										isFocused
@@ -86,7 +88,7 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
 							)}
                             {!useDarkMode && (
 								<MaterialIcons
-									name="fitness-center"
+									name={labelName}
 									size={24}
 									color={
 										isFocused
