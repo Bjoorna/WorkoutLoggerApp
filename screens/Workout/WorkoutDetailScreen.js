@@ -12,6 +12,7 @@ import { SET_TAB_BAR_VALUE } from "../../store/actions/appsettings";
 import { HeaderButtons, Item } from "react-navigation-header-buttons";
 import CustomHeaderButton from "../../components/Buttons/CustomHeaderButton";
 import * as firebase from "../../firebase/firebase";
+import BodyText from "../../components/Text/Body";
 
 const WorkoutDetailScreen = (props) => {
 	const dispatch = useDispatch();
@@ -35,6 +36,7 @@ const WorkoutDetailScreen = (props) => {
 		setStyles(useDarkMode ? Themes.dark : Themes.light);
 	}, [useDarkMode]);
 
+	// REAL
 	useLayoutEffect(() => {
 		if (workout) {
 			props.navigation.setOptions({
@@ -55,7 +57,29 @@ const WorkoutDetailScreen = (props) => {
 				title: new Date(workout.date.seconds * 1000).toDateString(),
 			});
 		}
+
+		// BandAid to fix react rendering without the stylesheet on changes
+		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
 	}, [props.navigation, workout]);
+
+	// UNREAL
+	// useLayoutEffect(() => {
+	// 	// props.navigation.setOptions({
+	// 	// 	headerRight: () => (
+	// 	// 		<View style={{ flexDirection: "row" }}>
+	// 	// 			<HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
+	// 	// 				<Item
+	// 	// 					title="delete"
+	// 	// 					iconName="delete"
+	// 	// 					onPress={deleteWorkout}
+	// 	// 				/>
+	// 	// 			</HeaderButtons>
+	// 	// 		</View>
+	// 	// 	),
+
+	// 	// 	title: "TEst",
+	// 	// });
+	// }, [props.navigation]);
 
 	const deleteWorkout = async () => {
 		if (workout) {
@@ -67,9 +91,9 @@ const WorkoutDetailScreen = (props) => {
 
 	useFocusEffect(
 		useCallback(() => {
-			console.log("IS OPENING SCREEN");
+			// console.log("IS OPENING SCREEN");
 			const onCloseScreen = () => {
-				console.log("IS CLOSING SCREEN");
+				// console.log("IS CLOSING SCREEN");
 
 				dispatch({
 					type: SET_TAB_BAR_VALUE,
@@ -79,15 +103,29 @@ const WorkoutDetailScreen = (props) => {
 			return () => onCloseScreen();
 		}, [props.navigation])
 	);
-
-	return <View style={styles.screen}></View>;
+	return (
+		<View style={styles.screen}>
+			<View style={styles.contentView}>
+				<View style={styles.overview}>
+					<BodyText>HELLO</BodyText>
+				</View>
+			</View>
+		</View>
+	);
 };
 
 const getStyles = (theme) => {
 	return StyleSheet.create({
 		screen: {
 			flex: 1,
-			backgroundColor: theme.surfaceE5,
+		},
+		contentView: {
+			width: "100%",
+			alignItems: "center",
+		},
+		overview: {
+			height: 200,
+			width: "90%",
 		},
 	});
 };

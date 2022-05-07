@@ -34,11 +34,11 @@ const theme = Themes.dark;
 const getDefaultStyleOptions = (theme) => {
 	return {
 		headerStyle: {
-			backgroundColor: theme.surfaceE2,
+			backgroundColor: theme.surface,
 		},
 		headerTintColor: theme.onSurface,
 		cardStyle: {
-			backgroundColor: theme.background,
+			backgroundColor: theme.surface,
 		},
 	};
 };
@@ -52,8 +52,6 @@ export const AppTabNavigator = () => {
 	useEffect(() => {
 		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
 	}, [useDarkMode]);
-
-
 
 	return (
 		<TabNavigator.Navigator
@@ -95,7 +93,7 @@ export const AppTabNavigator = () => {
 				/>
 			)}
 
-			 {!hideTabBar && (
+			{!hideTabBar && (
 				<TabNavigator.Screen
 					options={{
 						tabBarIcon: (props) => (
@@ -175,7 +173,7 @@ const WorkoutStackNavigator = createStackNavigator();
 
 export const WorkoutStackScreen = () => {
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
-	const [currentTheme, setCurrentTheme] = useState(Themes.dark);
+	const [currentTheme, setCurrentTheme] = useState(useDarkMode ? Themes.dark : Themes.light);
 	useEffect(() => {
 		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
 	}, [useDarkMode]);
@@ -206,7 +204,15 @@ export const WorkoutStackScreen = () => {
 				<WorkoutStackNavigator.Screen
 					name="WorkoutDetail"
 					component={WorkoutDetailScreen}
-					options={{ ...getDefaultStyleOptions(currentTheme) }}
+					options={{
+						headerStyle: {
+							backgroundColor: currentTheme.surface,
+						},
+						headerTintColor: currentTheme.onSurface,
+						cardStyle: {
+							backgroundColor: currentTheme.surface
+						}
+					}}
 				/>
 			</WorkoutStackNavigator.Group>
 		</WorkoutStackNavigator.Navigator>
