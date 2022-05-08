@@ -56,7 +56,7 @@ export const AppTabNavigator = () => {
 
 	return (
 		<TabNavigator.Navigator
-			screenOptions={{ headerShown: false }}
+			screenOptions={{ headerShown: false}}
 			tabBar={(props) => <CustomTabBar {...props} />}
 		>
 			<TabNavigator.Screen
@@ -73,7 +73,6 @@ export const AppTabNavigator = () => {
 				initialParams={
 					{labelName: "calculate"}
 				}
-
 			/>
 
 			<TabNavigator.Screen

@@ -6,6 +6,7 @@ import {
 	StyleSheet,
 	TouchableOpacity,
 	Pressable,
+	Keyboard,
 } from "react-native";
 
 import { MaterialIcons } from "@expo/vector-icons";
@@ -17,21 +18,38 @@ import LabelText from "../Text/Label";
 
 const CustomTabBar = ({ state, descriptors, navigation }) => {
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
-    const hideTabBar = useSelector((state) => state.appSettings.hideTabBar);
+	const hideTabBar = useSelector((state) => state.appSettings.hideTabBar);
 	const [styles, setStyles] = useState(
 		getStyles(useDarkMode ? Themes.dark : Themes.light)
 	);
 
+	const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+
+	useEffect(() => {
+		const keyboardShowListener = Keyboard.addListener("keyboardDidShow", () => {setIsKeyboardVisible(true)});
+		const keyboardHideListener = Keyboard.addListener("keyboardDidHide", () => {setIsKeyboardVisible(false)});
+		return () => {
+			keyboardShowListener.remove();
+			keyboardHideListener.remove();
+		}
+	}, []);
+
+	useEffect(() => {
+		console.log("Keyboard is visible: " + isKeyboardVisible);
+	}, [isKeyboardVisible]);
+
 	useEffect(() => {
 		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
 	}, [useDarkMode]);
+
 	return (
-		<View style={hideTabBar ? {display: "none"} : styles.tabBarContainer}>
+		<View style={hideTabBar || isKeyboardVisible ? { display: "none" } : styles.tabBarContainer}>
 			{state.routes.map((route, index) => {
 				const { options } = descriptors[route.key];
-                // const labelName = "account-circle";
+				// console.log(options);
+				// const labelName = "account-circle";
 
-                const labelName = route.params.labelName;
+				const labelName = route.params.labelName;
 				const label =
 					options.tabBarLabel !== undefined
 						? options.tabBarLabel
@@ -79,25 +97,16 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
 								<MaterialIcons
 									name={labelName}
 									size={24}
-									color={
-										isFocused
-											? "#d5e4f7"
-											: "#c2c7ce"
-									}
+									color={isFocused ? "#d5e4f7" : "#c2c7ce"}
 								/>
 							)}
-                            {!useDarkMode && (
+							{!useDarkMode && (
 								<MaterialIcons
 									name={labelName}
 									size={24}
-									color={
-										isFocused
-											? "#0e1d2a"
-											: "#42474d"
-									}
+									color={isFocused ? "#0e1d2a" : "#42474d"}
 								/>
 							)}
-                            
 						</View>
 						<LabelText
 							large={false}
