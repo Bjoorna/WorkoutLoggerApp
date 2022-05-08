@@ -23,19 +23,11 @@ import CustomHeaderButton from "../../components/Buttons/CustomHeaderButton";
 import FabButton from "../../components/Buttons/Fab";
 import { Themes } from "../../shared/Theme";
 import { useSelector, useDispatch } from "react-redux";
-import TitleText from "../../components/Text/Title";
-
-import { FlatList as GestureFlatList } from "react-native-gesture-handler";
-
 import BottomSheet, { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 
 import * as WorkoutActions from "../../store/actions/workout";
-import * as AppSettingsActions from "../../store/actions/appsettings";
 import WorkoutListItem from "../../components/WorkoutListItem";
 
-import FilterChip from "../../components/UI/Chips/FilterChip";
-import OutlineButton from "../../components/Buttons/OutlineButton";
-import TextButton from "../../components/Buttons/TextButton";
 import FilterSelect from "../../components/FilterSelect";
 
 import { SET_TAB_BAR_VALUE } from "../../store/actions/appsettings";
@@ -222,14 +214,15 @@ const getStyles = (theme) => {
 			backgroundColor: theme.surfaceE2,
 		},
 		contentView: {
+			flexDirection: "column",
 			width: "100%",
 			// height: 300,
-			alignItems: "center",
-			// justifyContent: "center",
-			marginTop: 40,
+			// alignItems: "center",
+			justifyContent: "center",
+			// marginTop: 40,
 		},
 		flatListStyle: {
-			width: "90%",
+			width: "100%",
 		},
 		cardView: {
 			flex: 1,

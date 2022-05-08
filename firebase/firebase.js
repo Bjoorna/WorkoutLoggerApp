@@ -128,11 +128,16 @@ export const writeExercisesToDatabase = async (
 
 export const getUserWorkouts = async (userID) => {
 	try {
+		// const q = query(
+		// 	collection(database, "workouts"),
+		// 	where("owner", "==", userID),
+		// 	orderBy("date", "desc"),
+		// 	limit(5)
+		// );
 		const q = query(
 			collection(database, "workouts"),
 			where("owner", "==", userID),
-			orderBy("date", "desc"),
-			limit(5)
+			orderBy("date", "desc")
 		);
 		const querySnapshot = await getDocs(q);
 		return querySnapshot;

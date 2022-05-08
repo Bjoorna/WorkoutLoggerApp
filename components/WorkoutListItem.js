@@ -185,7 +185,8 @@ const WorkoutListItem = (props) => {
 const getStyles = theme => {
 	return StyleSheet.create({
 		workoutItemContainer: {
-			width: "100%",
+			width: "90%",
+			alignSelf: "center",
 			minHeight: 130,
 			borderRadius: 12,
 			overflow: "hidden",
