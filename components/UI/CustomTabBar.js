@@ -46,9 +46,6 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
 		<View style={hideTabBar || isKeyboardVisible ? { display: "none" } : styles.tabBarContainer}>
 			{state.routes.map((route, index) => {
 				const { options } = descriptors[route.key];
-				// console.log(options);
-				// const labelName = "account-circle";
-
 				const labelName = route.params.labelName;
 				const label =
 					options.tabBarLabel !== undefined
@@ -85,6 +82,7 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
 						onPressIn={onPress}
 						onLongPress={onLongPress}
 						style={styles.tabBarItemContainer}
+						key={route.key}
 					>
 						<View
 							style={
