@@ -17,10 +17,11 @@ import { Themes } from "../../shared/Theme";
 import { useDispatch, useSelector } from "react-redux";
 import { ExerciseTypes } from "../../shared/utils/ExerciseTypes";
 
-
 const WorkoutAnalysisScreen = (props) => {
 	const userID = useSelector((state) => state.auth.userID);
-	const exerciseStoreRef = useSelector((state) => state.workout.exercisesFilterArray);
+	const exerciseStoreRef = useSelector(
+		(state) => state.workout.exercisesFilterArray
+	);
 
 	const dispatch = useDispatch();
 
@@ -30,13 +31,17 @@ const WorkoutAnalysisScreen = (props) => {
 	const [chartDataObject, setChartDataObject] = useState(null);
 	const [isLoading, setIsLoading] = useState(false);
 	const [currentChartExercise, setCurrentChartExercise] = useState();
-	const [onlyOneExerciseRecorded, setOnlyOneExerciseRecorded] = useState(false);
+	const [onlyOneExerciseRecorded, setOnlyOneExerciseRecorded] =
+		useState(false);
 
 	// Themes
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
-	const [styles, setStyles] = useState(getStyles(useDarkMode ? Themes.dark : Themes.light));
-	const [currentTheme, setCurrentTheme] = useState(useDarkMode ? Themes.dark : Themes.light);
-
+	const [styles, setStyles] = useState(
+		getStyles(useDarkMode ? Themes.dark : Themes.light)
+	);
+	const [currentTheme, setCurrentTheme] = useState(
+		useDarkMode ? Themes.dark : Themes.light
+	);
 
 	useEffect(() => {
 		// componentdidmount
@@ -53,11 +58,10 @@ const WorkoutAnalysisScreen = (props) => {
 		if (exerciseStoreRef.length > 1) {
 			createChartData(exerciseStoreRef);
 			setOnlyOneExerciseRecorded(false);
-		} else if(exerciseStoreRef.length === 1){
+		} else if (exerciseStoreRef.length === 1) {
 			setOnlyOneExerciseRecorded(true);
 			setChartDataObject(null);
-		}
-		 else {
+		} else {
 			setChartDataObject(null);
 			setOnlyOneExerciseRecorded(false);
 		}
@@ -77,7 +81,6 @@ const WorkoutAnalysisScreen = (props) => {
 		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
 		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
 	}, [useDarkMode]);
-
 
 	const loadExercise = (type) => {
 		setIsLoading(true);
@@ -123,7 +126,6 @@ const WorkoutAnalysisScreen = (props) => {
 		}
 		setExerciseTypes(finalArray);
 	};
-
 
 	const createChartData = (data) => {
 		// Sort exercises before transformation
@@ -177,11 +179,16 @@ const WorkoutAnalysisScreen = (props) => {
 		// return "rgb("+ +r + "," + +g + "," + +b + ")";
 	};
 
+	const testClickPoint = (value, dataset, getColor) => {};
+
 	return (
 		<View style={styles.container}>
 			<View style={styles.contentView}>
 				{isLoading && (
-					<ActivityIndicator color={currentTheme.primary} size="large" />
+					<ActivityIndicator
+						color={currentTheme.primary}
+						size="large"
+					/>
 				)}
 				{!isLoading && (
 					<View style={styles.chartContainer}>
@@ -193,25 +200,33 @@ const WorkoutAnalysisScreen = (props) => {
 									alignItems: "center",
 								}}
 							>
-								{currentChartExercise && !onlyOneExerciseRecorded && (
-									<DisplayText
-										style={{ color: currentTheme.onSurface }}
-									>
-										No DATA Avaliable for{" "}
-										{currentChartExercise}
-									</DisplayText>
-								)}
-								{currentChartExercise && onlyOneExerciseRecorded && (
-									<DisplayText
-										style={{ color: currentTheme.onSurface }}
-									>
-										Only One Recorded Instance of {" "}
-										{currentChartExercise}
-									</DisplayText>
-								)}
+								{currentChartExercise &&
+									!onlyOneExerciseRecorded && (
+										<DisplayText
+											style={{
+												color: currentTheme.onSurface,
+											}}
+										>
+											No DATA Avaliable for{" "}
+											{currentChartExercise}
+										</DisplayText>
+									)}
+								{currentChartExercise &&
+									onlyOneExerciseRecorded && (
+										<DisplayText
+											style={{
+												color: currentTheme.onSurface,
+											}}
+										>
+											Only One Recorded Instance of{" "}
+											{currentChartExercise}
+										</DisplayText>
+									)}
 								{!currentChartExercise && (
 									<DisplayText
-										style={{ color: currentTheme.onSurface }}
+										style={{
+											color: currentTheme.onSurface,
+										}}
 									>
 										Select an exercise to display trends
 									</DisplayText>
@@ -225,27 +240,38 @@ const WorkoutAnalysisScreen = (props) => {
 								height={220}
 								yAxisSuffix="kg"
 								yAxisInterval={1} // optional, defaults to 1
+								withInnerLines={false}
+								onDataPointClick={(props) => {
+									console.log(props);
+								}}
 								chartConfig={{
 									backgroundColor: currentTheme.surface,
-									backgroundGradientFrom: currentTheme.surface,
+									backgroundGradientFrom:
+										currentTheme.surface,
 									backgroundGradientTo: currentTheme.surface,
 									decimalPlaces: 2, // optional, defaults to 2dp
 									color: (opacity = 1) =>
-										`rgba(${hexToRGB(currentTheme.tertiary)[0]}, ${
+										`rgba(${
+											hexToRGB(currentTheme.tertiary)[0]
+										}, ${
 											hexToRGB(currentTheme.tertiary)[1]
 										}, ${
 											hexToRGB(currentTheme.tertiary)[2]
 										}, ${opacity})`,
 									labelColor: (opacity = 1) =>
-										`rgba(255, 255, 255, ${opacity})`,
+										`rgba(${
+											hexToRGB(currentTheme.onSurface)[0]
+										}, ${
+											hexToRGB(currentTheme.onSurface)[1]
+										}, ${hexToRGB(currentTheme.onSurface)[2]}, ${opacity})`,
 									style: {
 										borderRadius: 12,
 									},
-									propsForDots: {
-										r: "1",
-										strokeWidth: "1",
-										stroke: "#ffa726",
-									},
+									// propsForDots: {
+									// 	r: "1",
+									// 	strokeWidth: "1",
+									// 	stroke: currentTheme.errorContainer,
+									// },
 								}}
 								style={{
 									marginVertical: 8,
@@ -282,7 +308,7 @@ const WorkoutAnalysisScreen = (props) => {
 	);
 };
 
-const getStyles = theme => {
+const getStyles = (theme) => {
 	return StyleSheet.create({
 		container: {
 			paddingTop: StatusBar.currentHeight,
@@ -304,6 +330,6 @@ const getStyles = theme => {
 			width: "100%",
 		},
 	});
-}
+};
 
 export default WorkoutAnalysisScreen;
