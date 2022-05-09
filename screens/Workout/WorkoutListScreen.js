@@ -83,6 +83,13 @@ const WorkoutListScreen = (props) => {
 		dispatch(WorkoutActions.getUserWorkouts(userID));
 	}, []);
 
+	useEffect(() => {
+		console.log("Page Loaded");
+		const newArray = [...reduxWorkoutRef];
+		setWorkouts(newArray);
+		setRefreshing(false);
+	}, [reduxWorkoutRef]);
+
 	useLayoutEffect(() => {
 		props.navigation.setOptions({
 			headerRight: () => (
@@ -104,12 +111,7 @@ const WorkoutListScreen = (props) => {
 		dispatch(WorkoutActions.getUserWorkouts(userID));
 	}, []);
 
-	useEffect(() => {
-		console.log("Page Loaded");
-		const newArray = [...reduxWorkoutRef];
-		setWorkouts(newArray);
-		setRefreshing(false);
-	}, [reduxWorkoutRef]);
+	
 
 	useEffect(() => {
 		setShowFilter(filterToggle);

@@ -15,13 +15,12 @@ import * as WorkoutActions from "../../store/actions/workout";
 
 import { Themes } from "../../shared/Theme";
 import { useDispatch, useSelector } from "react-redux";
-import OutlineButton from "../../components/Buttons/OutlineButton";
 import { ExerciseTypes } from "../../shared/utils/ExerciseTypes";
 
 
 const WorkoutAnalysisScreen = (props) => {
 	const userID = useSelector((state) => state.auth.userID);
-	const exerciseStoreRef = useSelector((state) => state.workout.exercises);
+	const exerciseStoreRef = useSelector((state) => state.workout.exercisesFilterArray);
 
 	const dispatch = useDispatch();
 
@@ -31,6 +30,7 @@ const WorkoutAnalysisScreen = (props) => {
 	const [chartDataObject, setChartDataObject] = useState(null);
 	const [isLoading, setIsLoading] = useState(false);
 	const [currentChartExercise, setCurrentChartExercise] = useState();
+	const [onlyOneExerciseRecorded, setOnlyOneExerciseRecorded] = useState(false);
 
 	// Themes
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
@@ -50,17 +50,21 @@ const WorkoutAnalysisScreen = (props) => {
 
 	useEffect(() => {
 		setExercises(exerciseStoreRef);
-		console.log(exercises);
-		if (exerciseStoreRef.length > 0) {
+		if (exerciseStoreRef.length > 1) {
 			createChartData(exerciseStoreRef);
-		} else {
+			setOnlyOneExerciseRecorded(false);
+		} else if(exerciseStoreRef.length === 1){
+			setOnlyOneExerciseRecorded(true);
 			setChartDataObject(null);
+		}
+		 else {
+			setChartDataObject(null);
+			setOnlyOneExerciseRecorded(false);
 		}
 		setIsLoading(false);
 	}, [exerciseStoreRef]);
 
 	useEffect(() => {
-		console.log("FilterStateIS updated");
 		const selectedExercise = filterState.find(
 			(exercise) => exercise.selected == true
 		);
@@ -117,9 +121,9 @@ const WorkoutAnalysisScreen = (props) => {
 		for (let eData of ExerciseTypes) {
 			finalArray = finalArray.concat(eData.data);
 		}
-		console.log(finalArray);
 		setExerciseTypes(finalArray);
 	};
+
 
 	const createChartData = (data) => {
 		// Sort exercises before transformation
@@ -189,11 +193,19 @@ const WorkoutAnalysisScreen = (props) => {
 									alignItems: "center",
 								}}
 							>
-								{currentChartExercise && (
+								{currentChartExercise && !onlyOneExerciseRecorded && (
 									<DisplayText
 										style={{ color: currentTheme.onSurface }}
 									>
 										No DATA Avaliable for{" "}
+										{currentChartExercise}
+									</DisplayText>
+								)}
+								{currentChartExercise && onlyOneExerciseRecorded && (
+									<DisplayText
+										style={{ color: currentTheme.onSurface }}
+									>
+										Only One Recorded Instance of {" "}
 										{currentChartExercise}
 									</DisplayText>
 								)}

@@ -1,6 +1,7 @@
 export const ADD_WORKOUT = "ADD_WORKOUT";
 export const GET_WORKOUTS = "GET_WORKOUTS";
 export const GET_EXERCISES = "GET_EXERCISES";
+export const SET_EXERCISES_FROM_WORKOUT = "SET_EXERCISES_FROM_WORKOUT";
 import Workout from "../../models/workout";
 import * as firebase from "../../firebase/firebase";
 import Exercise from "../../models/Exercise";
@@ -98,6 +99,10 @@ export const getExerciseByType = (userID, exercise) => {
 		}
 	};
 };
+
+// export const setExercises = (exercises) => {
+// 	dispatch({type: SET_EXERCISES_FROM_WORKOUT, exercises: exercises});
+// }
 
 export const getUserWorkouts = (userID) => {
 	return async (dispatch) => {

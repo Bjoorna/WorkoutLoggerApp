@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Pressable, StyleSheet, View, ActivityIndicator, ProgressViewIOSComponent } from "react-native";
+import {
+	Pressable,
+	StyleSheet,
+	View,
+	ActivityIndicator,
+	ProgressViewIOSComponent,
+} from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 
 import BodyText from "./Text/Body";
@@ -10,28 +16,36 @@ import LabelText from "./Text/Label";
 import { FlatList } from "react-native-gesture-handler";
 import { useNavigation } from "@react-navigation/core";
 import { SET_TAB_BAR_VALUE } from "../store/actions/appsettings";
+import { SET_EXERCISES_FROM_WORKOUT } from "../store/actions/workout";
 // const theme = Themes.dark;
 
 const ExerciseItem = (props) => {
 	const exercise = props.exercise;
 	const [currentTheme, setCurrentTheme] = useState(props.currentTheme);
-	const [exerciseStyles, setExerciseStyles] = useState(getExerciseStyles(currentTheme)); 
+	const [exerciseStyles, setExerciseStyles] = useState(
+		getExerciseStyles(currentTheme)
+	);
 	// const currentTheme = props.ocurrentTheme;
 
 	useEffect(() => {
 		setCurrentTheme(props.currentTheme);
-	}, [props])
-	
+	}, [props]);
+
 	useEffect(() => {
 		setExerciseStyles(getExerciseStyles(currentTheme));
-	},[currentTheme])
+	}, [currentTheme]);
 	return (
 		<View style={exerciseStyles.exerciseItem}>
-			
 			<View style={exerciseStyles.exerciseValues}>
-			<BodyText style={{ color: currentTheme.onSecondaryContainer ,height: 20, overflow: "hidden" }}>
-				{exercise.exercise}
-			</BodyText>
+				<BodyText
+					style={{
+						color: currentTheme.onSecondaryContainer,
+						height: 20,
+						overflow: "hidden",
+					}}
+				>
+					{exercise.exercise}
+				</BodyText>
 				<LabelText style={{ color: currentTheme.onSecondaryContainer }}>
 					{exercise.weight} kg
 				</LabelText>
@@ -49,7 +63,7 @@ const ExerciseItem = (props) => {
 	);
 };
 
-const getExerciseStyles = theme => {
+const getExerciseStyles = (theme) => {
 	return StyleSheet.create({
 		exerciseItem: {
 			width: 100,
@@ -61,10 +75,10 @@ const getExerciseStyles = theme => {
 		},
 		exerciseValues: {
 			alignItems: "center",
-			paddingHorizontal: 4
-		}
+			paddingHorizontal: 4,
+		},
 	});
-}
+};
 
 // const exerciseStyles = StyleSheet.create({
 // 	exerciseItem: {
@@ -104,13 +118,13 @@ const WorkoutListItem = (props) => {
 
 	const getExercises = async () => {
 		setIsLoading(true);
-		const test = await firebase.getExercisesInWorkout(
+		const exercises = await firebase.getExercisesInWorkout(
 			props.workout.exercises,
 			props.userID
 		);
 
 		setIsLoading(false);
-		return test;
+		return exercises;
 	};
 
 	useEffect(() => {
@@ -127,8 +141,10 @@ const WorkoutListItem = (props) => {
 					data.rpe,
 					data.date,
 					data.owner,
+					props.workout.id,
 					query.id
 				);
+
 				exercisesArray.push(newExercise);
 			});
 			setExercises(exercisesArray);
@@ -137,11 +153,22 @@ const WorkoutListItem = (props) => {
 		fetchExercises();
 	}, [props.workout]);
 
+	useEffect(() => {		
+		if (exercises.length < 1) {
+			return;
+		} else {
+			dispatch({
+				type: SET_EXERCISES_FROM_WORKOUT,
+				exercises: exercises,
+			});
+		}
+	}, [exercises]);
+
 	const navigateToDetailPage = () => {
 		// hide TabBar
-		dispatch({type: SET_TAB_BAR_VALUE, value: true});
-		navigation.navigate("WorkoutDetail", {workoutID: props.workout.id});
-	} ;
+		dispatch({ type: SET_TAB_BAR_VALUE, value: true });
+		navigation.navigate("WorkoutDetail", { workoutID: props.workout.id });
+	};
 
 	return (
 		<View style={styles.workoutItemContainer}>
@@ -171,7 +198,10 @@ const WorkoutListItem = (props) => {
 								horizontal={true}
 								data={exercises}
 								renderItem={(itemData) => (
-									<ExerciseItem currentTheme={currentTheme} exercise={itemData.item} />
+									<ExerciseItem
+										currentTheme={currentTheme}
+										exercise={itemData.item}
+									/>
 								)}
 							/>
 						)}
@@ -182,7 +212,7 @@ const WorkoutListItem = (props) => {
 	);
 };
 
-const getStyles = theme => {
+const getStyles = (theme) => {
 	return StyleSheet.create({
 		workoutItemContainer: {
 			width: "90%",
@@ -212,7 +242,6 @@ const getStyles = theme => {
 		},
 		workoutItemExerciseContainer: {},
 	});
-}
-
+};
 
 export default WorkoutListItem;

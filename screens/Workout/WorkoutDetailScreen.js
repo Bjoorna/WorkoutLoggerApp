@@ -20,6 +20,7 @@ const WorkoutDetailScreen = (props) => {
 	const userID = useSelector((state) => state.auth.userID);
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
 	const workoutsRef = useSelector((state) => state.workout.workouts);
+	const exercisesRef = useSelector((state) => state.workout.exercises)
 	const [styles, setStyles] = useState(
 		getStyles(useDarkMode ? Themes.dark : Themes.light)
 	);
