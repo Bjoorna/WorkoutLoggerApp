@@ -20,17 +20,6 @@ import NewUserScreen from "../screens/User/NewUserScreen";
 import NewUserDetailScreen from "../screens/User/NewUserDetailScreen";
 import WorkoutDetailScreen from "../screens/Workout/WorkoutDetailScreen";
 import CustomTabBar from "../components/UI/CustomTabBar";
-const theme = Themes.dark;
-
-// const defaultStyleOptions = {
-// 	headerStyle: {
-// 		backgroundColor: theme.surfaceE2,
-// 	},
-// 	headerTintColor: theme.onSurface,
-// 	cardStyle: {
-// 		backgroundColor: theme.background,
-// 	},
-// };
 
 const getDefaultStyleOptions = (theme) => {
 	return {
@@ -56,7 +45,7 @@ export const AppTabNavigator = () => {
 
 	return (
 		<TabNavigator.Navigator
-			screenOptions={{ headerShown: false}}
+			screenOptions={{ headerShown: false,}}
 			tabBar={(props) => <CustomTabBar {...props} />}
 		>
 			<TabNavigator.Screen
@@ -90,7 +79,7 @@ export const AppTabNavigator = () => {
 	);
 };
 
-// REAL FUNCTIONING
+// Old
 
 // export const AppTabNavigator = () => {
 // 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
@@ -224,6 +213,7 @@ export const WorkoutStackScreen = () => {
 	const [currentTheme, setCurrentTheme] = useState(
 		useDarkMode ? Themes.dark : Themes.light
 	);
+
 	useEffect(() => {
 		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
 	}, [useDarkMode]);

@@ -30,9 +30,11 @@ import WorkoutListItem from "../../components/WorkoutListItem";
 
 import FilterSelect from "../../components/FilterSelect";
 
-import { SET_TAB_BAR_VALUE } from "../../store/actions/appsettings";
+import {
+	SET_IS_SCROLLING,
+	SET_TAB_BAR_VALUE,
+} from "../../store/actions/appsettings";
 
-const theme = Themes.dark;
 
 if (
 	Platform.OS === "android" &&
@@ -48,8 +50,8 @@ const WorkoutListScreen = (props) => {
 	const reduxWorkoutRef = useSelector((state) => state.workout.workouts);
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
 	const isHidingTabBar = useSelector((state) => state.appSettings.hideTabBar);
-
 	const [workouts, setWorkouts] = useState([]);
+
 	const [refreshing, setRefreshing] = useState(false);
 	const [showFilter, setShowFilter] = useState(false);
 	const [filterToggle, setFilterToggle] = useState(false);
@@ -59,12 +61,14 @@ const WorkoutListScreen = (props) => {
 	const [currentTheme, setCurrentTheme] = useState(
 		useDarkMode ? Themes.dark : Themes.light
 	);
+	const [isScrolling, setIsScrolling] = useState(false);
 
 	// BottomSheet stuff
 	const bottomSheetRef = useRef(null);
+	const snapPoints = useMemo(() => ["25%", "50%"], []);
 	const handleSheetChanges = useCallback((index) => {
 		if (index === -1) {
-			dispatch({type: SET_TAB_BAR_VALUE, value: false});
+			dispatch({ type: SET_TAB_BAR_VALUE, value: false });
 
 			if (!filterToggle) {
 				return;
@@ -74,7 +78,6 @@ const WorkoutListScreen = (props) => {
 			// dispatch({type: SET_TAB_BAR_VALUE, value: true});
 		}
 	});
-	const snapPoints = useMemo(() => ["25%", "50%"], []);
 
 	// load workouts on page open
 	useEffect(() => {
@@ -90,39 +93,6 @@ const WorkoutListScreen = (props) => {
 		setRefreshing(false);
 	}, [reduxWorkoutRef]);
 
-	useLayoutEffect(() => {
-		props.navigation.setOptions({
-			headerRight: () => (
-				<View style={{ flexDirection: "row" }}>
-					<HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
-						<Item
-							title="filter"
-							iconName={filterToggle ? "close" : "filter-list"}
-							onPress={toggle}
-						/>
-					</HeaderButtons>
-				</View>
-			),
-		});
-	}, [props.navigation, filterToggle]);
-
-	const onRefresh = useCallback(() => {
-		setRefreshing(true);
-		dispatch(WorkoutActions.getUserWorkouts(userID));
-	}, []);
-
-	
-
-	useEffect(() => {
-		setShowFilter(filterToggle);
-		if (filterToggle) {
-			dispatch({type: SET_TAB_BAR_VALUE, value: true});
-		// 	bottomSheetRef.current.snapToIndex(0);
-		} else {
-			bottomSheetRef.current.close();
-		}
-	}, [filterToggle]);
-
 	useEffect(() => {
 		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
 		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
@@ -135,11 +105,79 @@ const WorkoutListScreen = (props) => {
 		}
 	}, [isHidingTabBar]);
 
+
+	useLayoutEffect(() => {
+		if (isScrolling) {
+			props.navigation.setOptions({
+				headerStyle: { backgroundColor: currentTheme.surfaceE2 },
+				headerRight: () => (
+					<View style={{ flexDirection: "row" }}>
+						<HeaderButtons
+							HeaderButtonComponent={CustomHeaderButton}
+						>
+							<Item
+								title="filter"
+								iconName={
+									filterToggle ? "close" : "filter-list"
+								}
+								onPress={toggle}
+							/>
+						</HeaderButtons>
+					</View>
+				),
+			});
+		} else {
+			props.navigation.setOptions({
+				headerStyle: { backgroundColor: currentTheme.surface },
+				headerRight: () => (
+					<View style={{ flexDirection: "row" }}>
+						<HeaderButtons
+							HeaderButtonComponent={CustomHeaderButton}
+						>
+							<Item
+								title="filter"
+								iconName={
+									filterToggle ? "close" : "filter-list"
+								}
+								onPress={toggle}
+							/>
+						</HeaderButtons>
+					</View>
+				),
+			});
+		}
+	}, [props.navigation, filterToggle, isScrolling]);
+
+	const onRefresh = useCallback(() => {
+		setRefreshing(true);
+		dispatch(WorkoutActions.getUserWorkouts(userID));
+	}, []);
+
+	useEffect(() => {
+		setShowFilter(filterToggle);
+		if (filterToggle) {
+			dispatch({ type: SET_TAB_BAR_VALUE, value: true });
+			// 	bottomSheetRef.current.snapToIndex(0);
+		} else {
+			bottomSheetRef.current.close();
+		}
+	}, [filterToggle]);
+
+
 	const toggle = () => {
 		if (filterToggle) {
 			setFilterToggle(false);
 		} else {
 			setFilterToggle(true);
+		}
+	};
+
+	const scrollHandler = (event) => {
+		const y = event.nativeEvent.contentOffset.y;
+		if (y > 0 && !isScrolling) {
+			setIsScrolling(true);
+		} else if (y === 0 && isScrolling) {
+			setIsScrolling(false);
 		}
 	};
 
@@ -167,6 +205,7 @@ const WorkoutListScreen = (props) => {
 					style={styles.flatListStyle}
 					data={workouts}
 					keyExtractor={(item) => item.id}
+					onScroll={(e) => scrollHandler(e)}
 					refreshControl={
 						<RefreshControl
 							refreshing={refreshing}

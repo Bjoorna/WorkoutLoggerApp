@@ -19,6 +19,8 @@ import LabelText from "../Text/Label";
 const CustomTabBar = ({ state, descriptors, navigation }) => {
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
 	const hideTabBar = useSelector((state) => state.appSettings.hideTabBar);
+	// const isScrolling = useSelector((state) => state.appSettings.isScrolling);
+
 	const [styles, setStyles] = useState(
 		getStyles(useDarkMode ? Themes.dark : Themes.light)
 	);
