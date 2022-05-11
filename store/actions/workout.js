@@ -49,9 +49,12 @@ export const getWorkoutFilteredByExerciseType = (userID, exerciseArray) => {
 			const workoutDocs = await firebase.getWorkoutsBasedOnWorkoutIDs(
 				workoutIDArray
 			);
+
+			console.log(workoutDocs);
 			const transformedWorkouts = [];
 			workoutDocs.forEach((query) => {
 				const workoutData = query.data();
+				console.log(workoutData);
 				const newWorkout = new Workout(
 					workoutData.exercises,
 					workoutData.date,

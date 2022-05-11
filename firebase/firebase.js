@@ -165,6 +165,10 @@ export const getExercisesFilteredByExerciseType = async (
 ) => {
 	try {
 		const exerciseRef = collection(database, "exercises");
+		console.log("FROM FIREBASE");
+		for (let e of exerciseArray) {
+			console.log(e);
+		}
 		const q = query(
 			exerciseRef,
 			where("owner", "==", userID),

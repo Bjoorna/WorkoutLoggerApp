@@ -6,16 +6,15 @@ import React, {
 	useLayoutEffect,
 	useRef,
 	useMemo,
+	useReducer
 } from "react";
 import {
 	FlatList,
 	StyleSheet,
 	View,
 	RefreshControl,
-	LayoutAnimation,
 	UIManager,
 	Platform,
-	Animated,
 } from "react-native";
 import { useDimensions } from "@react-native-community/hooks";
 import { HeaderButtons, Item } from "react-navigation-header-buttons";
@@ -23,7 +22,7 @@ import CustomHeaderButton from "../../components/Buttons/CustomHeaderButton";
 import FabButton from "../../components/Buttons/Fab";
 import { Themes } from "../../shared/Theme";
 import { useSelector, useDispatch } from "react-redux";
-import BottomSheet, { BottomSheetFlatList } from "@gorhom/bottom-sheet";
+import BottomSheet from "@gorhom/bottom-sheet";
 
 import * as WorkoutActions from "../../store/actions/workout";
 import WorkoutListItem from "../../components/WorkoutListItem";
@@ -62,6 +61,9 @@ const WorkoutListScreen = (props) => {
 		useDarkMode ? Themes.dark : Themes.light
 	);
 	const [isScrolling, setIsScrolling] = useState(false);
+	const [yValue, setYValue] = useState(0);
+
+	const [force, forceUpdate] = useReducer(x => x+1, 0);
 
 	// BottomSheet stuff
 	const bottomSheetRef = useRef(null);
@@ -105,7 +107,6 @@ const WorkoutListScreen = (props) => {
 		}
 	}, [isHidingTabBar]);
 
-
 	useLayoutEffect(() => {
 		if (isScrolling) {
 			props.navigation.setOptions({
@@ -146,7 +147,7 @@ const WorkoutListScreen = (props) => {
 				),
 			});
 		}
-	}, [props.navigation, filterToggle, isScrolling]);
+	}, [props.navigation, filterToggle, isScrolling, currentTheme]);
 
 	const onRefresh = useCallback(() => {
 		setRefreshing(true);
@@ -230,9 +231,12 @@ const WorkoutListScreen = (props) => {
 				enablePanDownToClose={true}
 				enableOverDrag={false}
 				handleStyle={{
-					backgroundColor: currentTheme.primaryContainer,
+					backgroundColor: currentTheme.surfaceE4,
 					borderTopLeftRadius: 10,
 					borderTopRightRadius: 10,
+				}}
+				handleIndicatorStyle={{
+					backgroundColor: currentTheme.onSurface
 				}}
 			>
 				<View style={styles.bottomSheetContainer}>
@@ -252,7 +256,7 @@ const getStyles = (theme) => {
 		bottomSheetContainer: {
 			flex: 1,
 			alignItems: "center",
-			backgroundColor: theme.surfaceE2,
+			backgroundColor: theme.surfaceE4,
 		},
 		contentView: {
 			flexDirection: "column",

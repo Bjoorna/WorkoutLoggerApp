@@ -88,6 +88,7 @@ const workoutReducer = (state, action) => {
 };
 
 // TODO save users workout when page is exited before user has saved workout to server
+// TODO Move save workoutbutton to header
 // https://reactnavigation.org/docs/function-after-focusing-screen/
 
 const AddWorkoutScreen = (props) => {

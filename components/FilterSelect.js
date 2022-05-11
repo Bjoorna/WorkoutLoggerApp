@@ -31,6 +31,7 @@ const FilterSelect = (props) => {
 	const userID = useSelector((state) => state.auth.userID);
 	const dispatch = useDispatch();
 	const [exerciseTypes, setExerciseTypes] = useState([]);
+	const [error, setError] = useState();
 
 	const [exerciseFilterState, setExerciseFilterState] = useState([]);
 
@@ -40,11 +41,16 @@ const FilterSelect = (props) => {
 	}, []);
 
 	useEffect(() => {
-        initFilterState();
-    }, [exerciseTypes]);
+		initFilterState();
+	}, [exerciseTypes]);
 
 	useEffect(() => {
-	}, [exerciseFilterState]);
+		if (error) {
+			Alert.alert("Error on AuthAttempt", error, [{ text: "Dismiss" }]);
+		}
+	}, [error]);
+
+	useEffect(() => {}, [exerciseFilterState]);
 
 	const updateFilterState = (exercise) => {
 		const newState = [...exerciseFilterState];
@@ -66,6 +72,10 @@ const FilterSelect = (props) => {
 			if (exerciseFilter.length < 1) {
 				dispatch(WorkoutActions.getUserWorkouts(userID));
 			} else {
+				console.log("Filter is: ");
+				for (let e of exerciseFilter) {
+					console.log(e);
+				}
 				dispatch(
 					WorkoutActions.getWorkoutFilteredByExerciseType(
 						userID,
@@ -75,6 +85,7 @@ const FilterSelect = (props) => {
 			}
 		} catch (error) {
 			console.log(error);
+			setError(e.message);
 		}
 	};
 
@@ -138,12 +149,12 @@ const FilterSelect = (props) => {
 					}}
 				>
 					<OutlineButton
-						style={{ width: "40%", marginRight: 10 }}
+						style={{ width: "40%", marginRight: 10 }} textStyle={{color: currentTheme.onSurfaceVariant}}
 						onButtonPress={queryForFilter}
 					>
 						Filter
 					</OutlineButton>
-					<TextButton onButtonPress={() => clearFilter()}>
+					<TextButton textStyle={{color: currentTheme.onSurfaceVariant}} onButtonPress={() => clearFilter()}>
 						Clear
 					</TextButton>
 				</View>
@@ -152,7 +163,7 @@ const FilterSelect = (props) => {
 	);
 };
 
-const getStyles = theme => {
+const getStyles = (theme) => {
 	return StyleSheet.create({
 		filterBoxContainer: {
 			width: "100%",
@@ -165,6 +176,6 @@ const getStyles = theme => {
 			borderRadius: 12,
 		},
 	});
-}
+};
 
 export default FilterSelect;
