@@ -17,6 +17,7 @@ import { Themes } from "../../shared/Theme";
 import { useDispatch, useSelector } from "react-redux";
 import { ExerciseTypes } from "../../shared/utils/ExerciseTypes";
 
+// TODO rework the hex-to-rgb on chart so that it doesnt call 3 times for one color code
 const WorkoutAnalysisScreen = (props) => {
 	const userID = useSelector((state) => state.auth.userID);
 	const exerciseStoreRef = useSelector(

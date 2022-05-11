@@ -18,6 +18,7 @@ import LabelText from "../../components/Text/Label";
 import HeadlineText from "../../components/Text/Headline";
 import TextButton from "../../components/Buttons/TextButton";
 import RPEMap from "../../shared/utils/RPEMap";
+import UtilFunctions from "../../shared/utils/UtilFunctions";
 import { backgroundColor } from "react-native/Libraries/Components/View/ReactNativeStyleAttributes";
 
 const WorkoutDetailScreen = (props) => {
@@ -39,7 +40,7 @@ const WorkoutDetailScreen = (props) => {
 	const [exercises, setExercises] = useState(null);
 	const [summaryData, setSummaryData] = useState(null);
 	const [showModal, setShowModal] = useState(false);
-
+	const [modalBackdropHex, setModalBackdropHex] = useState(UtilFunctions.hexToRGB(currentTheme.surface));
 	useEffect(() => {
 		const onWorkout = workoutsRef.find(
 			(workout) => workout.id == workoutID
@@ -47,6 +48,7 @@ const WorkoutDetailScreen = (props) => {
 		console.log("OnWorkoout: ");
 		console.log(onWorkout);
 		setWorkout(onWorkout);
+		console.log(UtilFunctions.hexToRGB(currentTheme.surface));
 	}, []);
 
 	useEffect(() => {
@@ -67,6 +69,7 @@ const WorkoutDetailScreen = (props) => {
 	useEffect(() => {
 		setStyles(useDarkMode ? Themes.dark : Themes.light);
 		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
+		setModalBackdropHex(UtilFunctions.hexToRGB(currentTheme.surface));
 	}, [useDarkMode]);
 
 	const calculateSummary = (exercises) => {
@@ -137,9 +140,7 @@ const WorkoutDetailScreen = (props) => {
 
 	useFocusEffect(
 		useCallback(() => {
-			// console.log("IS OPENING SCREEN");
 			const onCloseScreen = () => {
-				// console.log("IS CLOSING SCREEN");
 
 				dispatch({
 					type: SET_TAB_BAR_VALUE,
@@ -161,7 +162,7 @@ const WorkoutDetailScreen = (props) => {
 					onPress={() => {
 						showModalHandler(false);
 					}}
-					style={styles.modalView}
+					style={{...styles.modalView, backgroundColor: `rgba(${modalBackdropHex[0]}, ${modalBackdropHex[1]}, ${modalBackdropHex[2]}, 0.8)`}}
 				>
 					<Pressable style={styles.modalContent}>
 						<View style={styles.modalHeader}>
@@ -445,7 +446,6 @@ const getStyles = (theme) => {
 			justifyContent: "center",
 			alignItems: "center",
 			backgroundColor: theme.surface,
-			opacity: 1
 		},
 		modalContent: {
 			height: 200,
@@ -454,7 +454,6 @@ const getStyles = (theme) => {
 			borderRadius: 28,
 			padding: 24,
 			backgroundColor: theme.surfaceE3,
-			opacity: 1.0
 		},
 		modalHeader: {
 			marginBottom: 16,
