@@ -1,4 +1,3 @@
-import { StatusBar } from "expo-status-bar";
 import React, {
 	useCallback,
 	useEffect,
@@ -6,7 +5,7 @@ import React, {
 	useLayoutEffect,
 	useRef,
 	useMemo,
-	useReducer
+	useReducer,
 } from "react";
 import {
 	FlatList,
@@ -33,7 +32,6 @@ import {
 	SET_IS_SCROLLING,
 	SET_TAB_BAR_VALUE,
 } from "../../store/actions/appsettings";
-
 
 if (
 	Platform.OS === "android" &&
@@ -63,7 +61,7 @@ const WorkoutListScreen = (props) => {
 	const [isScrolling, setIsScrolling] = useState(false);
 	const [yValue, setYValue] = useState(0);
 
-	const [force, forceUpdate] = useReducer(x => x+1, 0);
+	const [force, forceUpdate] = useReducer((x) => x + 1, 0);
 
 	// BottomSheet stuff
 	const bottomSheetRef = useRef(null);
@@ -86,6 +84,7 @@ const WorkoutListScreen = (props) => {
 		console.log("Page is Loading");
 		setRefreshing(true);
 		dispatch(WorkoutActions.getUserWorkouts(userID));
+		dispatch({ type: SET_TAB_BAR_VALUE, value: false });
 	}, []);
 
 	useEffect(() => {
@@ -106,6 +105,16 @@ const WorkoutListScreen = (props) => {
 			bottomSheetRef.current.snapToIndex(0);
 		}
 	}, [isHidingTabBar]);
+
+	useEffect(() => {
+		setShowFilter(filterToggle);
+		if (filterToggle) {
+			dispatch({ type: SET_TAB_BAR_VALUE, value: true });
+			// 	bottomSheetRef.current.snapToIndex(0);
+		} else {
+			bottomSheetRef.current.close();
+		}
+	}, [filterToggle]);
 
 	useLayoutEffect(() => {
 		if (isScrolling) {
@@ -154,17 +163,6 @@ const WorkoutListScreen = (props) => {
 		dispatch(WorkoutActions.getUserWorkouts(userID));
 	}, []);
 
-	useEffect(() => {
-		setShowFilter(filterToggle);
-		if (filterToggle) {
-			dispatch({ type: SET_TAB_BAR_VALUE, value: true });
-			// 	bottomSheetRef.current.snapToIndex(0);
-		} else {
-			bottomSheetRef.current.close();
-		}
-	}, [filterToggle]);
-
-
 	const toggle = () => {
 		if (filterToggle) {
 			setFilterToggle(false);
@@ -182,13 +180,15 @@ const WorkoutListScreen = (props) => {
 		}
 	};
 
+	const navigateToAddNewWorkout = () => {
+		dispatch({ type: SET_TAB_BAR_VALUE, value: true });
+		props.navigation.navigate("AddWorkout");
+	};
 	return (
 		<View style={styles.container}>
 			{!showFilter && (
 				<FabButton
-					onButtonPress={() =>
-						props.navigation.navigate("AddWorkout")
-					}
+					onButtonPress={navigateToAddNewWorkout}
 					iconName="add"
 					style={{
 						...styles.fabButtonPlacement,
@@ -236,7 +236,7 @@ const WorkoutListScreen = (props) => {
 					borderTopRightRadius: 10,
 				}}
 				handleIndicatorStyle={{
-					backgroundColor: currentTheme.onSurface
+					backgroundColor: currentTheme.onSurface,
 				}}
 			>
 				<View style={styles.bottomSheetContainer}>

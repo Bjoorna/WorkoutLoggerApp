@@ -1,4 +1,10 @@
-import React, { cloneElement, useEffect, useReducer, useState } from "react";
+import React, {
+	cloneElement,
+	useEffect,
+	useReducer,
+	useState,
+	useLayoutEffect,
+} from "react";
 import {
 	View,
 	StyleSheet,
@@ -8,12 +14,15 @@ import {
 	Keyboard,
 	ActivityIndicator,
 	SectionList,
+	BackHandler,
+	Alert,
 } from "react-native";
 import { Modal, Portal } from "react-native-paper";
+import { useDispatch } from "react-redux";
+
 import FilledButton from "../../components/Buttons/FilledButton";
 import BodyText from "../../components/Text/Body";
 import TitleText from "../../components/Text/Title";
-import Divider from "../../components/UI/Divider";
 import ExerciseSummaryView from "../../components/ExerciseSummaryItem";
 import NumberInput from "../../components/UI/NumberInput";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -26,6 +35,10 @@ import * as firebase from "../../firebase/firebase";
 import OutlineButton from "../../components/Buttons/OutlineButton";
 import { ExerciseTypes } from "../../shared/utils/ExerciseTypes";
 import LabelText from "../../components/Text/Label";
+import TextButton from "../../components/Buttons/TextButton";
+import { HeaderButtons, Item } from "react-navigation-header-buttons";
+import CustomHeaderButton from "../../components/Buttons/CustomHeaderButton";
+import { SET_TAB_BAR_VALUE } from "../../store/actions/appsettings";
 
 // TODO make this separate component?
 const ExerciseList = (props) => {
@@ -92,6 +105,8 @@ const workoutReducer = (state, action) => {
 // https://reactnavigation.org/docs/function-after-focusing-screen/
 
 const AddWorkoutScreen = (props) => {
+	const reduxDispatch = useDispatch();
+
 	// Modal stuff
 	const [modalVisible, setModalVisible] = useState(false);
 	const showModal = () => setModalVisible(true);
@@ -107,6 +122,14 @@ const AddWorkoutScreen = (props) => {
 		workout: new Workout([], Date.now(), false, "", userID),
 	});
 	const [selectedDate, setSelectedDate] = useState(new Date());
+	const [exerciseDisplay, setExerciseDisplay] = useState([]);
+
+	// exercise states
+	const [selectedExercise, setSelectedExercise] = useState("");
+	const [selectedWeight, setSelectedWeight] = useState();
+	const [selectedReps, setSelectedReps] = useState();
+	const [selectedSets, setSelectedSets] = useState();
+	const [selectedRPE, setSelectedRPE] = useState();
 
 	// Themes
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
@@ -121,6 +144,19 @@ const AddWorkoutScreen = (props) => {
 		useDarkMode ? Themes.dark : Themes.light
 	);
 
+	const [isLoading, setIsLoading] = useState(false);
+
+	useEffect(() => {
+		const backAction = () => {
+			reduxDispatch({ type: SET_TAB_BAR_VALUE, value: false });
+		};
+		const backHandler = BackHandler.addEventListener(
+			"hardwareBackPress",
+			backAction
+		);
+		return () => backHandler.remove();
+	}, []);
+
 	useEffect(() => {
 		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
 		setModalStyles(
@@ -129,11 +165,45 @@ const AddWorkoutScreen = (props) => {
 		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
 	}, [useDarkMode]);
 
-	const [isLoading, setIsLoading] = useState(false);
+	useEffect(() => {
+		setExerciseDisplay(workoutState.workout.exercises);
+	}, [workoutState]);
+
+	useLayoutEffect(() => {
+		props.navigation.setOptions({
+			headerStyle: { backgroundColor: currentTheme.surfaceE2 },
+			headerRight: () => (
+				<View style={{ flexDirection: "row", marginRight: 10 }}>
+					<TextButton
+						disabled={exerciseDisplay.length < 1}
+						onButtonPress={() => saveWorkout()}
+					>
+						Save
+					</TextButton>
+				</View>
+			),
+			headerLeft: () => (
+				<View>
+					<HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
+						<Item
+							title="filter"
+							iconName="arrow-back"
+							onPress={navigateBack}
+						/>
+					</HeaderButtons>
+				</View>
+			),
+		});
+	}, [props.navigation, exerciseDisplay]);
 
 	const selectExercise = (exercise) => {
 		setSelectedExercise(exercise);
 		hideModal();
+	};
+
+	const navigateBack = () => {
+		reduxDispatch({ type: SET_TAB_BAR_VALUE, value: false });
+		props.navigation.goBack();
 	};
 	const addExercise = () => {
 		const newExercise = new Exercise(
@@ -171,19 +241,6 @@ const AddWorkoutScreen = (props) => {
 		setIsLoading(false);
 		props.navigation.navigate("Workouts");
 	};
-
-	const [exerciseDisplay, setExerciseDisplay] = useState([]);
-
-	useEffect(() => {
-		setExerciseDisplay(workoutState.workout.exercises);
-	}, [workoutState]);
-
-	// exercise states
-	const [selectedExercise, setSelectedExercise] = useState("");
-	const [selectedWeight, setSelectedWeight] = useState();
-	const [selectedReps, setSelectedReps] = useState();
-	const [selectedSets, setSelectedSets] = useState();
-	const [selectedRPE, setSelectedRPE] = useState();
 
 	const vibrateDevice = () => {
 		Vibration.vibrate(50);
@@ -433,17 +490,6 @@ const AddWorkoutScreen = (props) => {
 							/>
 						</View>
 					)}
-					{!isLoading && (
-						<View style={styles.saveWorkoutContainer}>
-							<FilledButton
-								disabled={exerciseDisplay.length < 1}
-								onButtonPress={() => saveWorkout()}
-								style={{ width: "100%" }}
-							>
-								Save workout
-							</FilledButton>
-						</View>
-					)}
 				</View>
 			</Pressable>
 		</View>
@@ -468,6 +514,7 @@ const getStyles = (theme) => {
 		workoutSummary: {
 			marginTop: 10,
 			width: "90%",
+			minHeight: 100,
 			maxHeight: 300,
 			backgroundColor: theme.surfaceVariant,
 			// justifyContent: "center",

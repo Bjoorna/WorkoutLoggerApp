@@ -23,7 +23,7 @@ const TextButton = (props) => {
 					...props.style,
 				}}
 			>
-				<LabelText large={true} style={{...styles.text, ...props.textStyle}}>
+				<LabelText large={true} style={{...styles.disabledText, ...props.textStyle}}>
 					{props.children}
 				</LabelText>
 			</Pressable>

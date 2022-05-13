@@ -4,7 +4,7 @@ import {
 	StyleSheet,
 	View,
 	ActivityIndicator,
-	ProgressViewIOSComponent,
+	Vibration
 } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 
@@ -167,6 +167,7 @@ const WorkoutListItem = (props) => {
 	const navigateToDetailPage = () => {
 		// hide TabBar
 		dispatch({ type: SET_TAB_BAR_VALUE, value: true });
+		Vibration.vibrate(50);
 		navigation.navigate("WorkoutDetail", { workoutID: props.workout.id });
 	};
 
