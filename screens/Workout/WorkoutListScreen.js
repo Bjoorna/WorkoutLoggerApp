@@ -14,6 +14,7 @@ import {
 	RefreshControl,
 	UIManager,
 	Platform,
+	Modal,
 } from "react-native";
 import { useDimensions } from "@react-native-community/hooks";
 import { HeaderButtons, Item } from "react-navigation-header-buttons";
@@ -27,6 +28,7 @@ import * as WorkoutActions from "../../store/actions/workout";
 import WorkoutListItem from "../../components/WorkoutListItem";
 
 import FilterSelect from "../../components/FilterSelect";
+import FullScreenDialog from "../../components/UI/FullScreenDialog";
 
 import {
 	SET_IS_SCROLLING,
@@ -59,9 +61,8 @@ const WorkoutListScreen = (props) => {
 		useDarkMode ? Themes.dark : Themes.light
 	);
 	const [isScrolling, setIsScrolling] = useState(false);
-	const [yValue, setYValue] = useState(0);
 
-	const [force, forceUpdate] = useReducer((x) => x + 1, 0);
+	const [showModal, setShowModal] = useState(false);
 
 	// BottomSheet stuff
 	const bottomSheetRef = useRef(null);
@@ -127,6 +128,16 @@ const WorkoutListScreen = (props) => {
 						>
 							<Item
 								title="filter"
+								iconName="add"
+								onPress={() => setShowModal(true)}
+							/>
+						</HeaderButtons>
+
+						<HeaderButtons
+							HeaderButtonComponent={CustomHeaderButton}
+						>
+							<Item
+								title="filter"
 								iconName={
 									filterToggle ? "close" : "filter-list"
 								}
@@ -141,6 +152,16 @@ const WorkoutListScreen = (props) => {
 				headerStyle: { backgroundColor: currentTheme.surface },
 				headerRight: () => (
 					<View style={{ flexDirection: "row" }}>
+						<HeaderButtons
+							HeaderButtonComponent={CustomHeaderButton}
+						>
+							<Item
+								title="filter"
+								iconName="add"
+								onPress={() => setShowModal(true)}
+							/>
+						</HeaderButtons>
+
 						<HeaderButtons
 							HeaderButtonComponent={CustomHeaderButton}
 						>
@@ -181,11 +202,21 @@ const WorkoutListScreen = (props) => {
 	};
 
 	const navigateToAddNewWorkout = () => {
+		// setShowModal(true);
 		dispatch({ type: SET_TAB_BAR_VALUE, value: true });
 		props.navigation.navigate("AddWorkout");
 	};
+
 	return (
 		<View style={styles.container}>
+			<Modal
+				visible={showModal}
+				animationType="slide"
+				transparent={false}
+				onRequestClose={() => setShowModal(false)}
+			>
+				<FullScreenDialog toggleModal={() => setShowModal(false)} />
+			</Modal>
 			{!showFilter && (
 				<FabButton
 					onButtonPress={navigateToAddNewWorkout}

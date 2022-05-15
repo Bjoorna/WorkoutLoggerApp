@@ -29,7 +29,6 @@ export default (state = initalState, action) => {
 				if (!exerciseKeys.includes(exercise.id)) {
 					newExercisesObject[exercise.id] = exercise;
 				} else {
-					console.log(exercise.id + " already in map");
 				}
 			}
 			return { ...state, exercisesObject: newExercisesObject };

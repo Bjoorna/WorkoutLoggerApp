@@ -117,6 +117,7 @@ const WorkoutDetailScreen = (props) => {
 				),
 
 				title: new Date(workout.date.seconds * 1000).toDateString(),
+				headerStyle: {backgroundColor: currentTheme.surfaceE2}
 			});
 		}
 
@@ -388,10 +389,10 @@ const getStyles = (theme) => {
 		},
 		overviewContainer: {
 			height: 200,
-			marginTop: 10,
-			width: "90%",
-			backgroundColor: theme.surfaceVariant,
-			borderRadius: 12,
+			// marginTop: 10,
+			// width: "90%",
+			backgroundColor: theme.surfaceE2,
+			// borderRadius: 12,
 			paddingHorizontal: 16,
 			paddingVertical: 6,
 		},
