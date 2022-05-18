@@ -37,7 +37,6 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
 	}, []);
 
 	useEffect(() => {
-		console.log("Keyboard is visible: " + isKeyboardVisible);
 	}, [isKeyboardVisible]);
 
 	useEffect(() => {

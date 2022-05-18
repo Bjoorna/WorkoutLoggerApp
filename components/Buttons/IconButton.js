@@ -48,7 +48,7 @@ const IconButton = (props) => {
 				<MaterialIcons
 					color={currentTheme.onSurface}
 					size={24}
-					name="close"
+					name={props.name}
 				/>
 			</Pressable>
 		</Pressable>

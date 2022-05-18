@@ -4,6 +4,7 @@ import React, {
 	useReducer,
 	useState,
 	useLayoutEffect,
+	useRef
 } from "react";
 import {
 	View,
@@ -39,6 +40,12 @@ import TextButton from "../../components/Buttons/TextButton";
 import { HeaderButtons, Item } from "react-navigation-header-buttons";
 import CustomHeaderButton from "../../components/Buttons/CustomHeaderButton";
 import { SET_TAB_BAR_VALUE } from "../../store/actions/appsettings";
+import {
+	TextField,
+	FilledTextField,
+	OutlinedTextField,
+} from "rn-material-ui-textfield";
+
 
 // TODO make this separate component?
 const ExerciseList = (props) => {
@@ -105,6 +112,13 @@ const workoutReducer = (state, action) => {
 // https://reactnavigation.org/docs/function-after-focusing-screen/
 
 const AddWorkoutScreen = (props) => {
+	const repRef = useRef(null);
+	const weightRef = useRef(null);
+	const setsRef = useRef(null);
+	const rpeRef = useRef(null);
+
+
+
 	const reduxDispatch = useDispatch();
 
 	// Modal stuff
@@ -451,6 +465,19 @@ const AddWorkoutScreen = (props) => {
 					)}
 					{!isLoading && (
 						<View style={styles.workoutSummary}>
+							{/* Testing */}
+							{/* <OutlinedTextField
+									ref={weightRef}
+									label="Weight"
+									keyboardType="numeric"
+									textColor={currentTheme.onSurface}
+									baseColor={currentTheme.outline}
+									tintColor={currentTheme.primary}
+									activeLineWidth={2}
+									disabledLineWidth={10}
+									title="Kilogram"
+									containerStyle={{width: "100%"}}
+								/> */}
 							<View style={styles.workoutSummaryInfo}>
 								<BodyText
 									style={{

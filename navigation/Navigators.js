@@ -19,6 +19,7 @@ import WorkoutAnalysisScreen from "../screens/Workout/WorkoutAnalysisScreen";
 import NewUserScreen from "../screens/User/NewUserScreen";
 import NewUserDetailScreen from "../screens/User/NewUserDetailScreen";
 import WorkoutDetailScreen from "../screens/Workout/WorkoutDetailScreen";
+import FullScreenDialog from "../components/UI/FullScreenDialog";
 import CustomTabBar from "../components/UI/CustomTabBar";
 
 const getDefaultStyleOptions = (theme) => {
@@ -233,6 +234,10 @@ export const WorkoutStackScreen = () => {
 						...getDefaultStyleOptions(currentTheme),
 						headerTitle: "Add Workout",
 					}}
+				/>
+				<WorkoutStackNavigator.Screen
+					name="TestAddWorkout"
+					component={FullScreenDialog}
 				/>
 			</WorkoutStackNavigator.Group>
 			<WorkoutStackNavigator.Group

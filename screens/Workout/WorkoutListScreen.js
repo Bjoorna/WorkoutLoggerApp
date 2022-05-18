@@ -207,12 +207,16 @@ const WorkoutListScreen = (props) => {
 		props.navigation.navigate("AddWorkout");
 	};
 
+	const navigateToTestWorkout = () => {
+		props.navigation.navigate("TestAddWorkout")
+	}
+
 	return (
 		<View style={styles.container}>
 			<Modal
 				visible={showModal}
 				animationType="slide"
-				transparent={false}
+				transparent={true}
 				onRequestClose={() => setShowModal(false)}
 			>
 				<FullScreenDialog toggleModal={() => setShowModal(false)} />
