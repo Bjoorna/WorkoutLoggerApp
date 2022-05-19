@@ -115,6 +115,7 @@ const FullScreenDialog = (props) => {
 	const [isFormValid, setIsFormValid] = useState(false);
 
 	const [showExerciseModal, setShowExerciseModal] = useState(false);
+	const [showCloseDialogModal, setShowCloseDialogModal] = useState(false);
 	const [modalBackdropHex, setModalBackdropHex] = useState(
 		UtilFunctions.hexToRGB(currentTheme.surface)
 	);
@@ -154,6 +155,7 @@ const FullScreenDialog = (props) => {
 
 	// when the user wants to exit the screen
 	const handleBackBehavior = () => {
+		// setShowCloseDialogModal(true);
 		props.toggleModal();
 	};
 
@@ -255,6 +257,52 @@ const FullScreenDialog = (props) => {
 
 	return (
 		<Pressable onPress={handlePress} style={styles.container}>
+			<Modal visible={showCloseDialogModal} transparent={true} onRequestClose={()=>(setShowCloseDialogModal(false))} >
+			<Pressable
+					onPress={() => {
+						setShowCloseDialogModal(false);
+					}}
+					style={{...styles.closeDialogModalView, backgroundColor: `rgba(${modalBackdropHex[0]}, ${modalBackdropHex[1]}, ${modalBackdropHex[2]}, 0.8)`}}
+				>
+					<Pressable style={styles.closeDialogModalContent}>
+						{/* <View style={styles.modalHeader}>
+							<HeadlineText
+								large={false}
+								style={{ color: currentTheme.onSurface }}
+							>
+								Delete workout?
+							</HeadlineText>
+						</View> */}
+						<View style={styles.closeDialogModalBody}>
+							<BodyText
+								large={false}
+								style={{ color: currentTheme.onSurfaceVariant }}
+							>
+								Discard workout?
+							</BodyText>
+						</View>
+						<View style={styles.closeDialogModalActions}>
+							<TextButton
+								textStyle={{ color: currentTheme.primary }}
+								disabled={false}
+								onButtonPress={() => {
+									setShowCloseDialogModal(false)
+								}}
+							>
+								Cancel
+							</TextButton>
+							<TextButton
+								textStyle={{ color: currentTheme.primary }}
+								disabled={false}
+								onButtonPress={handleBackBehavior}
+							>
+								Discard
+							</TextButton>
+						</View>
+					</Pressable>
+				</Pressable>
+
+			</Modal>
 			<Modal
 				visible={showExerciseModal}
 				animationType="fade"
@@ -358,7 +406,7 @@ const FullScreenDialog = (props) => {
 				<View style={styles.headerBackButton}>
 					<IconButton
 						name="close"
-						onButtonPress={handleBackBehavior}
+						onButtonPress={()=> setShowCloseDialogModal(true)}
 					/>
 				</View>
 				<View style={styles.headerTitle}>
@@ -786,7 +834,30 @@ const getStyles = (theme) => {
 			flex: 1,
 			justifyContent: "center",
 			alignItems: "center"
+		},
+		closeDialogModalView: {
+			flex: 1,
+			justifyContent: "center"
+			,alignItems: "center"
+			,backgroundColor: theme.surface
+		},
+		closeDialogModalContent:{
+			// height: 200,
+			minWidth: 280,
+			maxWidth: 560,
+			borderRadius: 28,
+			padding: 24,
+			backgroundColor: theme.surfaceE3,
+		},
+		closeDialogModalBody: {
+			marginBottom: 24
+		},
+		closeDialogModalActions: {
+			flexDirection: "row",
+			justifyContent: "flex-end",
+
 		}
+
 	});
 };
 
