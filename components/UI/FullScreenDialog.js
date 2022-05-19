@@ -4,10 +4,11 @@ import {
 	StyleSheet,
 	Dimensions,
 	Pressable,
-	ScrollView,
+	ActivityIndicator,
 	Modal,
 	Keyboard,
 	SectionList,
+	FlatList,
 } from "react-native";
 import { useSelector } from "react-redux";
 import { Themes } from "../../shared/Theme";
@@ -30,16 +31,37 @@ import Workout from "../../models/workout";
 import UtilFunctions from "../../shared/utils/UtilFunctions";
 import { ExerciseTypes } from "../../shared/utils/ExerciseTypes";
 import { Divider } from "react-native-paper";
+import Exercise from "../../models/Exercise";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import * as firebase from "../../firebase/firebase";
+import { async } from "@firebase/util";
 
 const windowWidth = Dimensions.get("screen").width;
 const textFieldWidth = Math.floor((windowWidth - 24 * 2 - 8) / 2);
 
+const ADD_EXERCISE = "ADD_EXERCISE";
+const REMOVE_EXERCISE = "REMOVE_EXERCISE";
 const workoutReducer = (state, action) => {
 	switch (action.type) {
 		case ADD_EXERCISE:
-			return { ...state };
+			// const newEArray = [...state.workout.exercises];
+			// newEArray.pus
+			console.log(action.exercise);
+			const newWorkoutState = { ...state.workout };
+			const eArrayCopy = [...newWorkoutState.exercises];
+			eArrayCopy.push(action.exercise);
+			newWorkoutState.exercises = eArrayCopy;
+			return { ...state, workout: newWorkoutState };
 		case REMOVE_EXERCISE:
-			return { ...state };
+			const exerciseToRemove = action.exercise;
+			let exerciseArray = [...state.workout.exercises];
+			exerciseArray = exerciseArray.filter(
+				(exercise) => exercise !== exerciseToRemove
+			);
+			const workoutWithRemovedExercise = { ...state.workout };
+			workoutWithRemovedExercise.exercises = exerciseArray;
+
+			return { ...state, workout: workoutWithRemovedExercise };
 		default:
 			return state;
 	}
@@ -81,6 +103,15 @@ const FullScreenDialog = (props) => {
 		exercise: baseExerciseState,
 	});
 
+	const [isLoading, setIsLoading] = useState(false);
+
+	// datePickerModal
+	const [datePickerModalVisible, setDatePickerModalVisible] = useState(false);
+	const [hasSetCustomDate, setHasSetCustomDate] = useState(false);
+	const [selectedDate, setSelectedDate] = useState(new Date());
+
+	const [exerciseListDisplay, setExerciseListDisplay] = useState([]);
+
 	const [isFormValid, setIsFormValid] = useState(false);
 
 	const [showExerciseModal, setShowExerciseModal] = useState(false);
@@ -104,7 +135,7 @@ const FullScreenDialog = (props) => {
 	useEffect(() => {
 		let isFormValid = true;
 		for (const [key, value] of Object.entries(exerciseState.exercise)) {
-			if (value.error === true) {
+			if (value.error === true || value.value == null) {
 				isFormValid = false;
 				break;
 			}
@@ -113,6 +144,15 @@ const FullScreenDialog = (props) => {
 		setIsFormValid(isFormValid);
 	}, [exerciseState]);
 
+	useEffect(() => {
+		setExerciseListDisplay(workoutState.workout.exercises);
+	}, [workoutState]);
+
+	useEffect(() => {
+		console.log(selectedDate);
+	}, [selectedDate]);
+
+	// when the user wants to exit the screen
 	const handleBackBehavior = () => {
 		props.toggleModal();
 	};
@@ -121,11 +161,11 @@ const FullScreenDialog = (props) => {
 		const value = ref.current.value();
 
 		// replace comma with dot
-		const sanitizedValue = +value.replace(/,/g, ".");
+		const sanitizedValue = Number(value.replace(/,/g, "."));
 		console.log(sanitizedValue);
 
 		// check if value is valid
-		const isValid = validCheck(type, sanitizedValue);
+		const isValid = inputValueValidityCheck(type, sanitizedValue);
 		if (isValid) {
 			dispatchExercise({
 				type: ADD_VALUE,
@@ -142,7 +182,6 @@ const FullScreenDialog = (props) => {
 	};
 
 	const onExerciseSelected = (value, error) => {
-		console.log(value);
 		dispatchExercise({
 			type: ADD_VALUE,
 			field: "exercise",
@@ -151,7 +190,24 @@ const FullScreenDialog = (props) => {
 		setShowExerciseModal(false);
 	};
 
-	const validCheck = (type, value) => {
+	const saveExercise = () => {
+		const exerciseValues = exerciseState.exercise;
+		const newExercise = new Exercise(
+			exerciseValues.exercise.value,
+			exerciseValues.weight.value,
+			exerciseValues.reps.value,
+			exerciseValues.sets.value,
+			exerciseValues.rpe.value
+		);
+
+		dispatchWorkout({ type: ADD_EXERCISE, exercise: newExercise });
+	};
+
+	const removeExercise = (exerciseToRemove) => {
+		dispatchWorkout({ type: REMOVE_EXERCISE, exercise: exerciseToRemove });
+	};
+
+	const inputValueValidityCheck = (type, value) => {
 		if (type === "rpe") {
 			if (value >= 6.5 && value <= 10) {
 				return true;
@@ -164,6 +220,29 @@ const FullScreenDialog = (props) => {
 			}
 			return false;
 		}
+	};
+
+	const onSaveWorkout = async () => {
+		setIsLoading(true);
+		const currentWorkoutState = workoutState.workout;
+		const newWorkout = new Workout(
+			currentWorkoutState.exercises,
+			selectedDate,
+			true,
+			"Note",
+			userID
+		);
+		await firebase.writeWorkoutToCollection(newWorkout);
+		setIsLoading(false);
+		console.log("WorkoutSaved");
+		props.toggleModal();
+	};
+
+	const onDateChange = (event, newDate) => {
+		setDatePickerModalVisible(false);
+		setHasSetCustomDate(true);
+		const currentDate = newDate || selectedDate;
+		setSelectedDate(currentDate);
 	};
 
 	const handlePress = () => {
@@ -249,12 +328,6 @@ const FullScreenDialog = (props) => {
 									</LabelText>
 								)}
 							/>
-							{/* <BodyText
-								large={false}
-								style={{ color: currentTheme.onSurfaceVariant }}
-							>
-								Test
-							</BodyText> */}
 						</View>
 						<View style={{ marginBottom: 8 }}>
 							<Divider
@@ -279,7 +352,9 @@ const FullScreenDialog = (props) => {
 					</Pressable>
 				</Pressable>
 			</Modal>
+
 			<View style={styles.headerContainer}>
+				
 				<View style={styles.headerBackButton}>
 					<IconButton
 						name="close"
@@ -296,214 +371,288 @@ const FullScreenDialog = (props) => {
 				</View>
 				<View style={styles.headerSaveButton}>
 					<TextButton
-						onButtonPress={() => console.log("SaveButtonpress")}
+						disabled={
+							workoutState.workout.exercises.length === 0
+								? true
+								: false
+						}
+						onButtonPress={onSaveWorkout}
 					>
 						Save
 					</TextButton>
 				</View>
 			</View>
-			<View style={styles.contentContainer}>
-				<View style={styles.selectExerciseContainer}>
-					<Pressable
-						onPress={() => setShowExerciseModal(true)}
-						style={styles.selectExercise}
-					>
-						<BodyText
-							large={true}
-							style={{ color: currentTheme.onSurface }}
+			{isLoading && (
+				<View style={styles.loadingSpinner}>
+					<ActivityIndicator
+						size="large"
+						color={currentTheme.primary}
+					/>
+				</View>
+			)}
+
+			{!isLoading && (
+				<View style={styles.contentContainer}>
+					<View style={styles.selectExerciseContainer}>
+						<Pressable
+							onPress={() => setShowExerciseModal(true)}
+							style={styles.selectExercise}
 						>
-							{exerciseState.exercise["exercise"].value == null
-								? "Press to select exercise ..."
-								: exerciseState.exercise["exercise"].value}
-						</BodyText>
-						{exerciseState.exercise["exercise"].value != null && (
+							<BodyText
+								large={true}
+								style={{ color: currentTheme.onSurface }}
+							>
+								{exerciseState.exercise["exercise"].value ==
+								null
+									? "Select exercise"
+									: exerciseState.exercise["exercise"].value}
+							</BodyText>
+							{exerciseState.exercise["exercise"].value !=
+								null && (
+								<IconButton
+									style={{ marginLeft: "auto" }}
+									name="close"
+									onButtonPress={() =>
+										onExerciseSelected(null, true)
+									}
+								/>
+							)}
+							{exerciseState.exercise["exercise"].value ==
+								null && (
+								<IconButton
+									style={{ marginLeft: "auto" }}
+									name="arrow-drop-down"
+									onButtonPress={() =>
+										setShowExerciseModal(true)
+									}
+								/>
+							)}
+						</Pressable>
+					</View>
+					<View
+						style={{
+							...styles.selectExerciseContainer,
+							marginTop: 8,
+						}}
+					>
+						<Pressable
+							onPress={() => setDatePickerModalVisible(true)}
+							style={styles.selectExercise}
+						>
+							<BodyText
+								large={true}
+								style={{ color: currentTheme.onSurface }}
+							>
+								Date: {selectedDate.toDateString()}
+							</BodyText>
 							<IconButton
 								style={{ marginLeft: "auto" }}
-								name="close"
-								onButtonPress={()=>onExerciseSelected(null, true)}
+								name="arrow-drop-down"
+								onButtonPress={() =>
+									setDatePickerModalVisible(true)
+								}
 							/>
-						)}
-					</Pressable>
-				</View>
-				<View style={styles.exerciseValuesContainer}>
-					<View style={styles.exerciseValuesInputs}>
-						<View style={styles.exerciseValuesInputRow}>
-							<View style={styles.exerciseValueItem}>
-								<FilledTextField
-									label="Weight"
-									ref={weightRef}
-									keyboardType="numeric"
-									textColor={currentTheme.onSurfaceVariant}
-									baseColor={currentTheme.onSurfaceVariant}
-									tintColor={currentTheme.primary}
-									// activeLineWidth={2}
-									// disabledLineWidth={10}
-									title="Kilogram"
-									inputContainerStyle={{
-										backgroundColor:
-											currentTheme.surfaceVariant,
-									}}
-									errorColor={currentTheme.error}
-									// onChangeText={(textValue) =>handleValueInput("weight", textValue)}
-									onBlur={() =>
-										onValueEntered(weightRef, "weight")
-									}
-									error={
-										exerciseState.exercise["weight"].error
-											? "Must be positive number"
-											: ""
-									}
-								/>
-							</View>
-							<View style={styles.exerciseValueItem}>
-								<FilledTextField
-									ref={repRef}
-									label="Reps"
-									keyboardType="numeric"
-									textColor={currentTheme.onSurfaceVariant}
-									baseColor={currentTheme.onSurfaceVariant}
-									tintColor={currentTheme.primary}
-									inputContainerStyle={{
-										backgroundColor:
-											currentTheme.surfaceVariant,
-									}}
-									onBlur={() =>
-										onValueEntered(repRef, "reps")
-									}
-									errorColor={currentTheme.error}
-									error={
-										exerciseState.exercise["reps"].error
-											? "Must be positive number"
-											: ""
-									}
-								/>
-							</View>
-						</View>
-						<View style={styles.exerciseValuesInputRow}>
-							<View style={styles.exerciseValueItem}>
-								<FilledTextField
-									ref={setsRef}
-									label="Sets"
-									keyboardType="numeric"
-									textColor={currentTheme.onSurfaceVariant}
-									baseColor={currentTheme.onSurfaceVariant}
-									tintColor={currentTheme.primary}
-									inputContainerStyle={{
-										backgroundColor:
-											currentTheme.surfaceVariant,
-									}}
-									onBlur={() =>
-										onValueEntered(setsRef, "sets")
-									}
-									errorColor={currentTheme.error}
-									error={
-										exerciseState.exercise["sets"].error
-											? "Must be positive number"
-											: ""
-									}
-								/>
-							</View>
-							<View style={styles.exerciseValueItem}>
-								<FilledTextField
-									ref={rpeRef}
-									label="RPE"
-									keyboardType="numeric"
-									textColor={currentTheme.onSurfaceVariant}
-									baseColor={currentTheme.onSurfaceVariant}
-									tintColor={currentTheme.primary}
-									title="Number from 6.5-10"
-									inputContainerStyle={{
-										backgroundColor:
-											currentTheme.surfaceVariant,
-									}}
-									onBlur={() => onValueEntered(rpeRef, "rpe")}
-									errorColor={currentTheme.error}
-									error={
-										exerciseState.exercise["rpe"].error
-											? "Must be a number between 6.5 and 10"
-											: ""
-									}
-								/>
-							</View>
-						</View>
-						<View style={styles.exerciseValuesInputRow}>
-							<View style={styles.exerciseValueItem}>
-								<View style={styles.exerciseValueTextField}>
-									<BodyText
-										large={true}
-										style={{
-											color: currentTheme.onSurface,
+						</Pressable>
+					</View>
+					{datePickerModalVisible && (
+						<DateTimePicker
+							mode="date"
+							is24Hour={true}
+							display="default"
+							onChange={onDateChange}
+							testID="datepicker"
+							value={selectedDate}
+						/>
+					)}
+
+					<View style={styles.exerciseValuesContainer}>
+						<View style={styles.exerciseValuesInputs}>
+							<View style={styles.exerciseValuesInputRow}>
+								<View style={styles.exerciseValueItem}>
+									<FilledTextField
+										label="Weight"
+										ref={weightRef}
+										keyboardType="numeric"
+										textColor={
+											currentTheme.onSurfaceVariant
+										}
+										baseColor={
+											currentTheme.onSurfaceVariant
+										}
+										tintColor={currentTheme.primary}
+										// activeLineWidth={2}
+										// disabledLineWidth={10}
+										title="Kilogram"
+										inputContainerStyle={{
+											backgroundColor:
+												currentTheme.surfaceVariant,
 										}}
-									>
-										Date
-									</BodyText>
+										errorColor={currentTheme.error}
+										// onChangeText={(textValue) =>handleValueInput("weight", textValue)}
+										onBlur={() =>
+											onValueEntered(weightRef, "weight")
+										}
+										error={
+											exerciseState.exercise["weight"]
+												.error
+												? "Must be positive number"
+												: ""
+										}
+									/>
+								</View>
+								<View style={styles.exerciseValueItem}>
+									<FilledTextField
+										ref={repRef}
+										label="Reps"
+										keyboardType="numeric"
+										textColor={
+											currentTheme.onSurfaceVariant
+										}
+										baseColor={
+											currentTheme.onSurfaceVariant
+										}
+										tintColor={currentTheme.primary}
+										inputContainerStyle={{
+											backgroundColor:
+												currentTheme.surfaceVariant,
+										}}
+										onBlur={() =>
+											onValueEntered(repRef, "reps")
+										}
+										errorColor={currentTheme.error}
+										error={
+											exerciseState.exercise["reps"].error
+												? "Must be positive number"
+												: ""
+										}
+									/>
 								</View>
 							</View>
-							<View style={{ ...styles.exerciseValueItem }}>
-								<FilledTonalButton
-									disabled={isFormValid ? false : true}
-								>
-									Add exercise
-								</FilledTonalButton>
+							<View style={styles.exerciseValuesInputRow}>
+								<View style={styles.exerciseValueItem}>
+									<FilledTextField
+										ref={setsRef}
+										label="Sets"
+										keyboardType="numeric"
+										textColor={
+											currentTheme.onSurfaceVariant
+										}
+										baseColor={
+											currentTheme.onSurfaceVariant
+										}
+										tintColor={currentTheme.primary}
+										inputContainerStyle={{
+											backgroundColor:
+												currentTheme.surfaceVariant,
+										}}
+										onBlur={() =>
+											onValueEntered(setsRef, "sets")
+										}
+										errorColor={currentTheme.error}
+										error={
+											exerciseState.exercise["sets"].error
+												? "Must be positive number"
+												: ""
+										}
+									/>
+								</View>
+								<View style={styles.exerciseValueItem}>
+									<FilledTextField
+										ref={rpeRef}
+										label="RPE"
+										keyboardType="numeric"
+										textColor={
+											currentTheme.onSurfaceVariant
+										}
+										baseColor={
+											currentTheme.onSurfaceVariant
+										}
+										tintColor={currentTheme.primary}
+										title="Number from 6.5-10"
+										inputContainerStyle={{
+											backgroundColor:
+												currentTheme.surfaceVariant,
+										}}
+										onBlur={() =>
+											onValueEntered(rpeRef, "rpe")
+										}
+										errorColor={currentTheme.error}
+										error={
+											exerciseState.exercise["rpe"].error
+												? "Must be a number between 6.5 and 10"
+												: ""
+										}
+									/>
+								</View>
+							</View>
+							<View style={styles.exerciseValuesInputRow}>
+								<View style={{ width: "100%" }}>
+									<FilledTonalButton
+										disabled={isFormValid ? false : true}
+										onButtonPress={saveExercise}
+									>
+										Add exercise
+									</FilledTonalButton>
+								</View>
 							</View>
 						</View>
 					</View>
-				</View>
-				<View style={styles.summaryContainer}>
-					<View style={styles.summaryHeader}>
-						<HeadlineText
-							large={true}
-							style={{ color: currentTheme.onSurface }}
-						>
-							Summary
-						</HeadlineText>
+					<View style={styles.summaryContainer}>
+						<View style={styles.summaryHeader}>
+							<HeadlineText
+								large={true}
+								style={{ color: currentTheme.onSurface }}
+							>
+								Summary
+							</HeadlineText>
+						</View>
+						<View style={styles.summaryList}>
+							<FlatList
+								data={exerciseListDisplay}
+								extraData={exerciseListDisplay}
+								keyExtractor={(item, index) => index}
+								renderItem={(itemData) => {
+									return (
+										<View style={styles.summaryListItem}>
+											<TitleText
+												large={true}
+												style={{
+													color: currentTheme.onSurface,
+												}}
+											>
+												{itemData.item.exercise}
+											</TitleText>
+											<LabelText
+												large={true}
+												style={{
+													color: currentTheme.onSurface,
+												}}
+											>
+												{itemData.item.weight}kg{" "}
+												{itemData.item.reps}reps{" "}
+												{itemData.item.sets}sets @
+												{itemData.item.rpe}
+											</LabelText>
+											<TextButton
+												textStyle={{
+													color: currentTheme.error,
+												}}
+												onButtonPress={() =>
+													removeExercise(
+														itemData.item
+													)
+												}
+											>
+												Delete
+											</TextButton>
+										</View>
+									);
+								}}
+							/>
+						</View>
 					</View>
-					<View style={styles.summaryList}>
-						<View style={styles.summaryListItem}>
-							<TitleText
-								large={true}
-								style={{ color: currentTheme.onSurface }}
-							>
-								Squat
-							</TitleText>
-							<LabelText
-								large={true}
-								style={{ color: currentTheme.onSurface }}
-							>
-								100kg 4x3x4 @8
-							</LabelText>
-						</View>
-						<View style={styles.summaryListItem}>
-							<TitleText
-								large={true}
-								style={{ color: currentTheme.onSurface }}
-							>
-								Squat
-							</TitleText>
-							<LabelText
-								large={true}
-								style={{ color: currentTheme.onSurface }}
-							>
-								100kg 4x3x4 @8
-							</LabelText>
-						</View>
-						<View style={styles.summaryListItem}>
-							<TitleText
-								large={true}
-								style={{ color: currentTheme.onSurface }}
-							>
-								Squat
-							</TitleText>
-							<LabelText
-								large={true}
-								style={{ color: currentTheme.onSurface }}
-							>
-								100kg 4x3x4 @8
-							</LabelText>
-						</View>
-					</View>
 				</View>
-			</View>
+			)}
 		</Pressable>
 	);
 };
@@ -595,13 +744,14 @@ const getStyles = (theme) => {
 			height: 300,
 		},
 		summaryList: {
-			height: 150,
+			height: 300,
 			width: "100%",
 			flexDirection: "column",
 		},
 		summaryListItem: {
 			flexDirection: "row",
-			alignItems: "baseline",
+			alignItems: "center",
+			justifyContent: "space-around",
 			width: "100%",
 			height: 60,
 			paddingHorizontal: 12,
@@ -632,6 +782,11 @@ const getStyles = (theme) => {
 			flexDirection: "row",
 			justifyContent: "flex-end",
 		},
+		loadingSpinner: {
+			flex: 1,
+			justifyContent: "center",
+			alignItems: "center"
+		}
 	});
 };
 
