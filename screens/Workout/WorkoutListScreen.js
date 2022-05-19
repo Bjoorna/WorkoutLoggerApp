@@ -28,7 +28,7 @@ import * as WorkoutActions from "../../store/actions/workout";
 import WorkoutListItem from "../../components/WorkoutListItem";
 
 import FilterSelect from "../../components/FilterSelect";
-import FullScreenDialog from "../../components/UI/FullScreenDialog";
+import AddWorkoutDialogScreen from "../../components/UI/AddWorkoutDialogScreen";
 
 import {
 	SET_IS_SCROLLING,
@@ -123,7 +123,7 @@ const WorkoutListScreen = (props) => {
 				headerStyle: { backgroundColor: currentTheme.surfaceE2 },
 				headerRight: () => (
 					<View style={{ flexDirection: "row" }}>
-						<HeaderButtons
+						{/* <HeaderButtons
 							HeaderButtonComponent={CustomHeaderButton}
 						>
 							<Item
@@ -131,7 +131,7 @@ const WorkoutListScreen = (props) => {
 								iconName="add"
 								onPress={() => setShowModal(true)}
 							/>
-						</HeaderButtons>
+						</HeaderButtons> */}
 
 						<HeaderButtons
 							HeaderButtonComponent={CustomHeaderButton}
@@ -152,7 +152,7 @@ const WorkoutListScreen = (props) => {
 				headerStyle: { backgroundColor: currentTheme.surface },
 				headerRight: () => (
 					<View style={{ flexDirection: "row" }}>
-						<HeaderButtons
+						{/* <HeaderButtons
 							HeaderButtonComponent={CustomHeaderButton}
 						>
 							<Item
@@ -160,7 +160,7 @@ const WorkoutListScreen = (props) => {
 								iconName="add"
 								onPress={() => setShowModal(true)}
 							/>
-						</HeaderButtons>
+						</HeaderButtons> */}
 
 						<HeaderButtons
 							HeaderButtonComponent={CustomHeaderButton}
@@ -202,9 +202,9 @@ const WorkoutListScreen = (props) => {
 	};
 
 	const navigateToAddNewWorkout = () => {
-		// setShowModal(true);
-		dispatch({ type: SET_TAB_BAR_VALUE, value: true });
-		props.navigation.navigate("AddWorkout");
+		setShowModal(true);
+		// dispatch({ type: SET_TAB_BAR_VALUE, value: true });
+		// props.navigation.navigate("AddWorkout");
 	};
 
 	const navigateToTestWorkout = () => {
@@ -219,7 +219,7 @@ const WorkoutListScreen = (props) => {
 				transparent={true}
 				onRequestClose={() => setShowModal(false)}
 			>
-				<FullScreenDialog toggleModal={() => setShowModal(false)} />
+				<AddWorkoutDialogScreen toggleModal={() => setShowModal(false)} />
 			</Modal>
 			{!showFilter && (
 				<FabButton

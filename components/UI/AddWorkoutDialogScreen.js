@@ -85,7 +85,7 @@ const baseExerciseState = {
 	rpe: { value: null, error: false },
 };
 
-const FullScreenDialog = (props) => {
+const AddWorkoutDialogScreen = (props) => {
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
 	const [styles, setStyles] = useState(
 		getStyles(useDarkMode ? Themes.dark : Themes.light)
@@ -132,7 +132,6 @@ const FullScreenDialog = (props) => {
 		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
 	}, [useDarkMode]);
 
-	// TODO FIX logic
 	useEffect(() => {
 		let isFormValid = true;
 		for (const [key, value] of Object.entries(exerciseState.exercise)) {
@@ -265,14 +264,6 @@ const FullScreenDialog = (props) => {
 					style={{...styles.closeDialogModalView, backgroundColor: `rgba(${modalBackdropHex[0]}, ${modalBackdropHex[1]}, ${modalBackdropHex[2]}, 0.8)`}}
 				>
 					<Pressable style={styles.closeDialogModalContent}>
-						{/* <View style={styles.modalHeader}>
-							<HeadlineText
-								large={false}
-								style={{ color: currentTheme.onSurface }}
-							>
-								Delete workout?
-							</HeadlineText>
-						</View> */}
 						<View style={styles.closeDialogModalBody}>
 							<BodyText
 								large={false}
@@ -861,4 +852,4 @@ const getStyles = (theme) => {
 	});
 };
 
-export default FullScreenDialog;
+export default AddWorkoutDialogScreen;
