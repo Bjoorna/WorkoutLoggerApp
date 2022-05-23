@@ -9,6 +9,8 @@ import {
 	Keyboard,
 	SectionList,
 	FlatList,
+	StatusBar,
+	Platform
 } from "react-native";
 import { useSelector } from "react-redux";
 import { Themes } from "../../shared/Theme";
@@ -108,7 +110,6 @@ const AddWorkoutDialogScreen = (props) => {
 
 	// datePickerModal
 	const [datePickerModalVisible, setDatePickerModalVisible] = useState(false);
-	const [hasSetCustomDate, setHasSetCustomDate] = useState(false);
 	const [selectedDate, setSelectedDate] = useState(new Date());
 
 	const [exerciseListDisplay, setExerciseListDisplay] = useState([]);
@@ -127,8 +128,9 @@ const AddWorkoutDialogScreen = (props) => {
 	const rpeRef = useRef(null);
 
 	useEffect(() => {
-
-		console.log( userData.user.useMetric);
+		console.log(userData.user.useMetric);
+		if(Platform.OS==="android"){
+		}
 	}, []);
 
 	useEffect(() => {
@@ -245,7 +247,6 @@ const AddWorkoutDialogScreen = (props) => {
 
 	const onDateChange = (event, newDate) => {
 		setDatePickerModalVisible(false);
-		setHasSetCustomDate(true);
 		const currentDate = newDate || selectedDate;
 		setSelectedDate(currentDate);
 	};
@@ -260,12 +261,19 @@ const AddWorkoutDialogScreen = (props) => {
 
 	return (
 		<Pressable onPress={handlePress} style={styles.container}>
-			<Modal visible={showCloseDialogModal} transparent={true} onRequestClose={()=>(setShowCloseDialogModal(false))} >
-			<Pressable
+			<Modal
+				visible={showCloseDialogModal}
+				transparent={true}
+				onRequestClose={() => setShowCloseDialogModal(false)}
+			>
+				<Pressable
 					onPress={() => {
 						setShowCloseDialogModal(false);
 					}}
-					style={{...styles.closeDialogModalView, backgroundColor: `rgba(${modalBackdropHex[0]}, ${modalBackdropHex[1]}, ${modalBackdropHex[2]}, 0.8)`}}
+					style={{
+						...styles.closeDialogModalView,
+						backgroundColor: `rgba(${modalBackdropHex[0]}, ${modalBackdropHex[1]}, ${modalBackdropHex[2]}, 0.8)`,
+					}}
 				>
 					<Pressable style={styles.closeDialogModalContent}>
 						<View style={styles.closeDialogModalBody}>
@@ -281,7 +289,7 @@ const AddWorkoutDialogScreen = (props) => {
 								textStyle={{ color: currentTheme.primary }}
 								disabled={false}
 								onButtonPress={() => {
-									setShowCloseDialogModal(false)
+									setShowCloseDialogModal(false);
 								}}
 							>
 								Cancel
@@ -296,7 +304,6 @@ const AddWorkoutDialogScreen = (props) => {
 						</View>
 					</Pressable>
 				</Pressable>
-
 			</Modal>
 			<Modal
 				visible={showExerciseModal}
@@ -397,11 +404,10 @@ const AddWorkoutDialogScreen = (props) => {
 			</Modal>
 
 			<View style={styles.headerContainer}>
-				
 				<View style={styles.headerBackButton}>
 					<IconButton
 						name="close"
-						onButtonPress={()=> setShowCloseDialogModal(true)}
+						onButtonPress={() => setShowCloseDialogModal(true)}
 					/>
 				</View>
 				<View style={styles.headerTitle}>
@@ -828,15 +834,15 @@ const getStyles = (theme) => {
 		loadingSpinner: {
 			flex: 1,
 			justifyContent: "center",
-			alignItems: "center"
+			alignItems: "center",
 		},
 		closeDialogModalView: {
 			flex: 1,
-			justifyContent: "center"
-			,alignItems: "center"
-			,backgroundColor: theme.surface
+			justifyContent: "center",
+			alignItems: "center",
+			backgroundColor: theme.surface,
 		},
-		closeDialogModalContent:{
+		closeDialogModalContent: {
 			// height: 200,
 			minWidth: 280,
 			maxWidth: 560,
@@ -845,14 +851,12 @@ const getStyles = (theme) => {
 			backgroundColor: theme.surfaceE3,
 		},
 		closeDialogModalBody: {
-			marginBottom: 24
+			marginBottom: 24,
 		},
 		closeDialogModalActions: {
 			flexDirection: "row",
 			justifyContent: "flex-end",
-
-		}
-
+		},
 	});
 };
 
