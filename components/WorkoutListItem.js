@@ -17,10 +17,12 @@ import { FlatList } from "react-native-gesture-handler";
 import { useNavigation } from "@react-navigation/core";
 import { SET_TAB_BAR_VALUE } from "../store/actions/appsettings";
 import { SET_EXERCISES_FROM_WORKOUT } from "../store/actions/workout";
+import UtilFunctions from "../shared/utils/UtilFunctions";
 // const theme = Themes.dark;
 
 const ExerciseItem = (props) => {
 	const exercise = props.exercise;
+	const isMetric = useSelector(state => state.user.user.useMetric);
 	const [currentTheme, setCurrentTheme] = useState(props.currentTheme);
 	const [exerciseStyles, setExerciseStyles] = useState(
 		getExerciseStyles(currentTheme)
@@ -47,7 +49,7 @@ const ExerciseItem = (props) => {
 					{exercise.exercise}
 				</BodyText>
 				<LabelText style={{ color: currentTheme.onSecondaryContainer }}>
-					{exercise.weight} kg
+					{isMetric ? exercise.weight : UtilFunctions.convertMass(exercise.weight, false)} {isMetric? "kg":"lbs"}
 				</LabelText>
 				<LabelText style={{ color: currentTheme.onSecondaryContainer }}>
 					{exercise.reps} reps

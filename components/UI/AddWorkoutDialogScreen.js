@@ -94,6 +94,7 @@ const AddWorkoutDialogScreen = (props) => {
 		useDarkMode ? Themes.dark : Themes.light
 	);
 	const userID = useSelector((state) => state.auth.userID);
+	const userData = useSelector((state) => state.user);
 
 	const [workoutState, dispatchWorkout] = useReducer(workoutReducer, {
 		workout: new Workout([], Date.now(), false, "", userID),
@@ -125,7 +126,10 @@ const AddWorkoutDialogScreen = (props) => {
 	const setsRef = useRef(null);
 	const rpeRef = useRef(null);
 
-	useEffect(() => {}, []);
+	useEffect(() => {
+
+		console.log( userData.user.useMetric);
+	}, []);
 
 	useEffect(() => {
 		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));

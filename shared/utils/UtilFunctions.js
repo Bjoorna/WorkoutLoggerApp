@@ -18,6 +18,20 @@ class UtilFunctions {
 		return [+r, +g, +b];
 		// return "rgb("+ +r + "," + +g + "," + +b + ")";
 	};
+
+	/**
+	 * Convert mass from kilogram to pounds, or the other way
+	 * @param {number} value The mass to be converted
+	 * @param {boolean} fromPounds Boolean is true if we want to convert from pounds to kg, false will convert from kg to pounds
+	 * @returns {number} Converted value
+	 */
+	static convertMass = (value, fromPounds) => {
+		if(fromPounds){
+			return value / 2.205;
+		}else {
+			return value * 2.205;
+		}
+	} 
 }
 
 export default UtilFunctions;
