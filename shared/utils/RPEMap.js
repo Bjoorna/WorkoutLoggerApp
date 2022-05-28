@@ -30,6 +30,8 @@ class RPEMap {
         if(!this.isInit){
             this.initRPEMap();
         }
+        console.log(rpe);
+        console.log(reps);
         const intensity = this.rpeMap.get(rpe)[reps-1];
         return intensity;
     }
