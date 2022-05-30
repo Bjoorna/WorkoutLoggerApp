@@ -1,3 +1,4 @@
+import { async } from '@firebase/util';
 import * as firebase from '../../firebase/firebase';
 
 export const GET_USER_FROM_DB = "GET_USER_FROM_DB"
@@ -21,6 +22,19 @@ export const updateUser = (userID, user) => {
             const updatedUser = await firebase.getDocumentFromCollection(userID, "users");
             console.log("new User: ");
             console.log(updatedUser);
+            dispatch({type: SAVE_USER, user: updatedUser});
+        } catch (error) {
+            throw new Error(error);
+        }
+    }
+}
+
+export const updateUserField = (userID, updatedField) => {
+    return async(dispatch) => {
+        try {
+            console.log("UpdateUserField ACTIONS");
+            await firebase.updateUserField(userID, updatedField);
+            const updatedUser = await firebase.getDocumentFromCollection(userID, "users");
             dispatch({type: SAVE_USER, user: updatedUser});
         } catch (error) {
             throw new Error(error);

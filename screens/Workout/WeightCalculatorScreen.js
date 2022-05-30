@@ -58,12 +58,12 @@ const WeightCalculatorScreen = (props) => {
 		calculatorReducer,
 		baseState
 	);
-	const useMetric = useSelector((state) => state.user.useMetric);
+	const userSettings = useSelector((state) => state.user.user);
 	const [calcWeight, setCalcWeight] = useState(0);
 
 	const [isFormValid, setIsFormValid] = useState(false);
-
-	const [modalVisible, setModalVisible] = useState();
+	const [useMetric, setUseMetric] = useState(true);
+	const [modalVisible, setModalVisible] = useState(false);
 
 	const knownWeightRef = useRef(null);
 	const knownRepsRef = useRef(null);
@@ -82,7 +82,11 @@ const WeightCalculatorScreen = (props) => {
 	const [scrimColor, setScrimColor] = useState(
 		UtilFunctions.hexToRGB(currentTheme.surface)
 	);
-
+	useEffect(() => {
+		console.log("USERsettings from calculator");
+		console.log(userSettings);
+		console.log(useMetric);
+	}, [])
 	useEffect(() => {
 		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
 		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
@@ -101,6 +105,10 @@ const WeightCalculatorScreen = (props) => {
 			calculcateValue();
 		}
 	}, [calculatorState]);
+
+	useEffect(()=> {
+		setUseMetric(userSettings.useMetric)
+	},[userSettings])
 
 	useEffect(() => {
 		calculcateValue();

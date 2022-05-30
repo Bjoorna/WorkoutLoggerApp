@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { View, StyleSheet, Switch, Alert } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import BodyText from "../../components/Text/Body";
@@ -7,25 +7,27 @@ import * as UserActions from "../../store/actions/user";
 import { Themes } from "../../shared/Theme";
 import User from "../../models/User";
 import { SET_USE_DARKMODE } from "../../store/actions/appsettings";
-// const theme = Themes.dark;
-
+import CustomSwitch from "../../components/UI/CustomSwitch";
+import LabelText from "../../components/Text/Label";
 const UserSettingsScreen = (props) => {
 	const user = useSelector((state) => state.user.user);
 	const userID = useSelector((state) => state.auth.userID);
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
 	const dispatch = useDispatch();
 
+	// State for different settings
+	const [useMetricValue, setUseMetricValue] = useState(user.useMetric);
+	const [useDarkModeValue, setUseDarkModeValue] = useState(useDarkMode);
+
 	const [isSwitchDisabled, setIsSwitchDisabled] = useState(false);
-	const [useMetricValue, setUseMetricValue] = useState(false);
-	const [useDarkModeValue, setUseDarkModeValue] = useState(false);
 	const [updateUser, setUpdateUser] = useState(false);
 	const [isUpdating, setIsUpdating] = useState(false);
 	const [error, setError] = useState();
 
-
 	const [styles, setStyles] = useState(getStyles(Themes.light));
-	const [currentTheme, setCurrentTheme] = useState(useDarkMode ? Themes.dark : Themes.light);
-
+	const [currentTheme, setCurrentTheme] = useState(
+		useDarkMode ? Themes.dark : Themes.light
+	);
 
 	// initialize userSettingsValues
 	useEffect(() => {
@@ -39,32 +41,38 @@ const UserSettingsScreen = (props) => {
 		setUseDarkModeValue(useDarkMode);
 	}, [useDarkMode]);
 
-	useEffect(() => {
-		if (!isUpdating) {
-			return;
-		}
-		const updateUserSettings = async () => {
-			const newUserData = { ...user };
-			newUserData.useMetric = useMetricValue;
-			setError(null);
-			setIsSwitchDisabled(true);
-			try {
-				console.log("UseEffect in userSettings");
-				await dispatch(UserActions.updateUser(userID, newUserData));
-				setIsUpdating(false);
-			} catch (error) {
-				setError(error.message);
-				setIsSwitchDisabled(false);
-				setIsUpdating(false);
-			}
-		};
-		updateUserSettings();
-	}, [isUpdating]);
+	// useEffect(() => {
+	// 	if (!isUpdating) {
+	// 		return;
+	// 	}
+	// 	const updateUserSettings = async () => {
+	// 		const newUserData = { ...user };
+	// 		newUserData.useMetric = useMetricValue;
+	// 		setError(null);
+	// 		setIsSwitchDisabled(true);
+	// 		try {
+	// 			console.log("UseEffect in userSettings");
+	// 			await dispatch(UserActions.updateUser(userID, newUserData));
+	// 			setIsUpdating(false);
+	// 		} catch (error) {
+	// 			setError(error.message);
+	// 			setIsSwitchDisabled(false);
+	// 			setIsUpdating(false);
+	// 		}
+	// 	};
+	// 	updateUserSettings();
+	// }, [isUpdating]);
 
-	const setUpdateUserFlag = (event) => {
-		console.log("ONCHANGE");
-		setIsUpdating(true);
-	};
+	// const setUpdateUserFlag = (event) => {
+	// 	console.log("ONCHANGE");
+	// 	setIsUpdating(true);
+	// };
+
+	useEffect(() => {
+		console.log("USER: ");
+		console.log(user);
+		setUseMetricValue(user.useMetric);
+	}, [user]);
 
 	useEffect(() => {
 		if (error) {
@@ -72,19 +80,100 @@ const UserSettingsScreen = (props) => {
 		}
 	}, [error]);
 
-	const toggleUseMetric = () =>
-		setUseMetricValue((previousState) => !previousState);
+	// const toggleUseDarkMode = (value) => {
+	// 	console.log(value);
+	// 	dispatch({ type: SET_USE_DARKMODE, value: value });
+	// 	// setUseDarkModeValue(state => !state);
+	// };
 
-	const toggleUseDarkMode = (value) => {
-		console.log(value);
-		dispatch({type: SET_USE_DARKMODE, value: value});
-		// setUseDarkModeValue(state => !state);
-	}
+	const onToggleDarkMode = () => {
+		console.log("ontoggledarkmode");
+		dispatch({ type: SET_USE_DARKMODE, value: !useDarkModeValue });
+	};
+
+	const onToggleUseMetric = () => {
+		console.log("ontoggleuseMetric");
+
+		try {
+			const newField = { useMetric: !useMetricValue };
+			dispatch(UserActions.updateUserField(userID, newField));
+		} catch (error) {
+			setError(error.message);
+		}
+	};
 
 	return (
 		<View style={styles.screen}>
 			<View style={styles.userSettingsList}>
-				<View style={styles.userSettingsItem}>
+				<View style={styles.userSettingsSection}>
+					<View style={styles.userSettingsHeader}>
+						<LabelText
+							large={true}
+							style={{ color: currentTheme.primary }}
+						>
+							User Settings
+						</LabelText>
+					</View>
+					<View style={styles.userSettingsItem}>
+						<View style={styles.userSettingsText}>
+							<BodyText
+								large={true}
+								style={{ color: currentTheme.onSurface }}
+							>
+								Use Metric
+							</BodyText>
+							<LabelText
+								large={false}
+								style={{ color: currentTheme.onSurfaceVariant }}
+							>
+								Display units in metric or imperial. Affects
+								units like weight and height.
+							</LabelText>
+						</View>
+						<CustomSwitch
+							isSwitchSelected={useMetricValue}
+							isSwitchDisabled={false}
+							onSwitchPressed={onToggleUseMetric}
+						/>
+					</View>
+				</View>
+				<View style={styles.userSettingsSection}>
+					<View style={styles.userSettingsHeader}>
+						<LabelText
+							large={true}
+							style={{ color: currentTheme.primary }}
+						>
+							App Settings
+						</LabelText>
+					</View>
+					<View style={styles.userSettingsItem}>
+						<BodyText
+							large={true}
+							style={{ color: currentTheme.onSurface }}
+						>
+							Dark Mode
+						</BodyText>
+						<CustomSwitch
+							isSwitchSelected={useDarkMode}
+							isSwitchDisabled={false}
+							onSwitchPressed={onToggleDarkMode}
+						/>
+					</View>
+					<View style={styles.userSettingsItem}>
+						<BodyText
+							large={true}
+							style={{ color: currentTheme.onSurface }}
+						>
+							Test Switch
+						</BodyText>
+						<CustomSwitch
+							isSwitchSelected={false}
+							isSwitchDisabled={false}
+							onSwitchPressed={() => {console.log("TestSwitch")}}
+						/>
+					</View>
+				</View>
+				{/* <View style={styles.userSettingsItem}>
 					<BodyText large={true} style={styles.text}>
 						Use Metric
 					</BodyText>
@@ -110,7 +199,7 @@ const UserSettingsScreen = (props) => {
 						Use DarkMode
 					</BodyText>
 					<Switch
-						onValueChange={value => toggleUseDarkMode(value)}
+						onValueChange={(value) => toggleUseDarkMode(value)}
 						// onChange={(event) => setUpdateUserFlag(event)}
 						value={useDarkModeValue}
 						disabled={isSwitchDisabled}
@@ -125,14 +214,13 @@ const UserSettingsScreen = (props) => {
 						}
 						ios_backgroundColor={currentTheme.primary}
 					/>
-				</View>
-
+				</View> */}
 			</View>
 		</View>
 	);
 };
 
-const getStyles = theme => {
+const getStyles = (theme) => {
 	return StyleSheet.create({
 		screen: {
 			flex: 1,
@@ -145,19 +233,28 @@ const getStyles = theme => {
 		},
 		userSettingsList: {
 			width: "100%",
+			paddingHorizontal: 24,
 			marginTop: 10,
 		},
 		userSettingsItem: {
 			width: "100%",
-			height: 60,
+			height: 80,
 			paddingVertical: 5,
-			paddingHorizontal: 20,
+			// paddingHorizontal: 20,
 			flexDirection: "row",
 			alignItems: "center",
 			justifyContent: "space-between",
+			// backgroundColor: theme.error
+		},
+		userSettingsSection: {
+			marginBottom: 16,
+		},
+		userSettingsText: {
+			flexDirection: "column",
+			justifyContent: "space-around",
+			maxWidth: "60%",
 		},
 	});
-	return styles;
-}
+};
 
 export default UserSettingsScreen;

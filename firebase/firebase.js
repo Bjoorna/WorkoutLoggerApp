@@ -16,7 +16,6 @@ import {
 	limit,
 	updateDoc,
 	deleteDoc,
-	
 } from "firebase/firestore";
 import {
 	getAuth,
@@ -29,6 +28,7 @@ import * as firebaseConfig from "./config";
 import Workout from "../models/workout";
 
 import { nanoid } from "nanoid";
+import { async } from "@firebase/util";
 // APPSETUO
 const app = initializeApp(firebaseConfig.firebaseConfig);
 
@@ -65,24 +65,34 @@ export const updateUser = async (userID, newUserState) => {
 	}
 };
 
+export const updateUserField = async (userID, updatedField) => {
+	const userRef = doc(database, "users", userID);
+	try {
+		console.log("UpdateUserField");
+		return await updateDoc(userRef, updatedField);
+	} catch (error) {
+		throw new Error(error);
+	}
+};
+
 export const deleteWorkout = async (userID, workout) => {
-	try{
+	try {
 		const workoutID = workout.id;
-		const exerciseIDs = workout.exercises
+		const exerciseIDs = workout.exercises;
 		const docRef = doc(database, "workouts", workoutID);
 		console.log(workoutID);
 		console.log(userID);
 		const deletedDoc = await deleteDoc(docRef);
 		return await deleteExercise(userID, exerciseIDs);
-	}catch(error) {
+	} catch (error) {
 		throw new Error(error);
 	}
-}
+};
 
-export const deleteExercise = async(userID, exerciseIDs) => {
+export const deleteExercise = async (userID, exerciseIDs) => {
 	try {
 		const batch = writeBatch(database);
-		for(let exerciseID of exerciseIDs){
+		for (let exerciseID of exerciseIDs) {
 			const exerciseRef = doc(database, "exercises", exerciseID);
 			console.log(exerciseID);
 			batch.delete(exerciseRef);
@@ -91,7 +101,7 @@ export const deleteExercise = async(userID, exerciseIDs) => {
 	} catch (error) {
 		throw new Error(error);
 	}
-}
+};
 
 export const writeExercisesToDatabase = async (
 	exercises,
@@ -149,7 +159,7 @@ export const getUserWorkouts = async (userID) => {
 
 export const getWorkoutsBasedOnWorkoutIDs = async (workoutIDs) => {
 	try {
-		const workoutRefs = workoutIDs.map((id) => 
+		const workoutRefs = workoutIDs.map((id) =>
 			getDoc(doc(database, "workouts", id))
 		);
 		const docSnaps = await Promise.all(workoutRefs);
@@ -157,7 +167,7 @@ export const getWorkoutsBasedOnWorkoutIDs = async (workoutIDs) => {
 	} catch (error) {
 		throw new Error(error);
 	}
-}
+};
 
 export const getExercisesFilteredByExerciseType = async (
 	userID,
@@ -180,8 +190,6 @@ export const getExercisesFilteredByExerciseType = async (
 		throw new Error(error);
 	}
 };
-
-
 
 export const getExercisesInWorkout = async (exercises, userID) => {
 	try {
