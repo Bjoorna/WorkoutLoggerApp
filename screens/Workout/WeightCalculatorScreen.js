@@ -8,54 +8,31 @@ import React, {
 import {
 	View,
 	StyleSheet,
-	KeyboardAvoidingView,
 	Pressable,
 	Keyboard,
-	StatusBar,
+	Modal,
+	ScrollView,
 } from "react-native";
-import { useSelector, useDispatch } from "react-redux";
-
+import { useSelector } from "react-redux";
 import RPEMap from "../../shared/utils/RPEMap";
-
 import { Themes } from "../../shared/Theme";
-import NumberInput from "../../components/UI/NumberInput";
 import BodyText from "../../components/Text/Body";
 import TitleText from "../../components/Text/Title";
 import DisplayText from "../../components/Text/Display";
 
-import Divider from "../../components/UI/Divider";
-import FilledButton from "../../components/Buttons/FilledButton";
-import OutlineButton from "../../components/Buttons/OutlineButton";
 import TextButton from "../../components/Buttons/TextButton";
 import HeadlineText from "../../components/Text/Headline";
 
 import { HeaderButtons, Item } from "react-navigation-header-buttons";
 import CustomHeaderButton from "../../components/Buttons/CustomHeaderButton";
 import { FilledTextField } from "rn-material-ui-textfield";
-import LabelText from "../../components/Text/Label";
+import UtilFunctions from "../../shared/utils/UtilFunctions";
 
-const SET_KWEIGHT = "SET_KWEIGHT";
-const SET_KREPS = "SET_KREPS";
-const SET_KRPE = "SET_KRPE";
-const SET_WREPS = "SET_WREPS";
-const SET_WRPE = "SET_WRPE";
 const RESET = "RESET";
-const SET_ISVALID = "SET_ISVALID";
-const CHECK_ISVALID = "CHECK_ISVALID";
 const ADD_VALUE = "ADD_VALUE";
 
 const calculatorReducer = (state, action) => {
 	switch (action.type) {
-		// case SET_KWEIGHT:
-		// 	return { ...state, kWeight: action.value };
-		// case SET_KREPS:
-		// 	return { ...state, kReps: action.value };
-		// case SET_KRPE:
-		// 	return { ...state, kRPE: action.value };
-		// case SET_WREPS:
-		// 	return { ...state, wReps: action.value };
-		// case SET_WRPE:
-		// 	return { ...state, wRPE: action.value };
 		case ADD_VALUE:
 			const newState = { ...state };
 			newState[action.field] = action.newValue;
@@ -75,25 +52,18 @@ const baseState = {
 	wantRPE: { value: null, error: false },
 };
 
-const initialState = {
-	kWeight: -1,
-	kReps: -1,
-	kRPE: -1,
-	wReps: -1,
-	wRPE: -1,
-	isValid: false,
-};
-
 const WeightCalculatorScreen = (props) => {
 	const rpeCalc = new RPEMap();
 	const [calculatorState, dispatchCalculator] = useReducer(
 		calculatorReducer,
 		baseState
 	);
-	const [isValid, setIsValid] = useState(false);
+	const useMetric = useSelector((state) => state.user.useMetric);
 	const [calcWeight, setCalcWeight] = useState(0);
 
 	const [isFormValid, setIsFormValid] = useState(false);
+
+	const [modalVisible, setModalVisible] = useState();
 
 	const knownWeightRef = useRef(null);
 	const knownRepsRef = useRef(null);
@@ -108,6 +78,9 @@ const WeightCalculatorScreen = (props) => {
 	);
 	const [currentTheme, setCurrentTheme] = useState(
 		useDarkMode ? Themes.dark : Themes.light
+	);
+	const [scrimColor, setScrimColor] = useState(
+		UtilFunctions.hexToRGB(currentTheme.surface)
 	);
 
 	useEffect(() => {
@@ -165,7 +138,7 @@ const WeightCalculatorScreen = (props) => {
 						<Item
 							title="info"
 							iconName="info"
-							onPress={() => console.log("Show Info")}
+							onPress={() => setModalVisible(true)}
 						/>
 					</HeaderButtons>
 				</View>
@@ -224,6 +197,71 @@ const WeightCalculatorScreen = (props) => {
 
 	return (
 		<Pressable onPress={handleContainerPress} style={styles.container}>
+			<Modal
+				visible={modalVisible}
+				transparent={true}
+				onRequestClose={() => setModalVisible(false)}
+			>
+				<Pressable
+					onPress={() => setModalVisible(false)}
+					style={{
+						...styles.modalScrim,
+						backgroundColor: `rgba(${scrimColor[0]}, ${scrimColor[1]}, ${scrimColor[2]}, 0.8)`,
+					}}
+				>
+					<Pressable style={styles.dialogContent}>
+						<View style={styles.dialogHeader}>
+							<HeadlineText
+								style={{ color: currentTheme.onSurface }}
+							>
+								How to use
+							</HeadlineText>
+						</View>
+						<View style={styles.dialogBody}>
+							<ScrollView>
+								<BodyText
+									large={true}
+									style={{
+										color: currentTheme.onSurfaceVariant,
+										marginBottom: 10,
+									}}
+								>
+									You can use this to get an estimate for what
+									weight you can use for an exercise
+								</BodyText>
+								<BodyText
+									large={true}
+									style={{
+										color: currentTheme.onSurfaceVariant,
+										marginBottom: 10,
+									}}
+								>
+									If you know the RPE and amount of reps for a
+									given weight, you can enter these. Then
+									enter the amount of reps at a spesific RPE
+									that you want to train at.
+								</BodyText>
+								<BodyText
+									large={true}
+									style={{
+										color: currentTheme.onSurfaceVariant,
+									}}
+								>
+									The app will then calculate an estimate for
+									what weight you should train with.
+								</BodyText>
+							</ScrollView>
+						</View>
+						<View style={styles.dialogActions}>
+							<TextButton
+								onButtonPress={() => setModalVisible(false)}
+							>
+								Close
+							</TextButton>
+						</View>
+					</Pressable>
+				</Pressable>
+			</Modal>
 			<View style={styles.inputContainer}>
 				<View style={styles.inputHeader}>
 					<TitleText
@@ -392,7 +430,7 @@ const WeightCalculatorScreen = (props) => {
 									color: currentTheme.onSecondaryContainer,
 								}}
 							>
-								kg
+								{useMetric ? "kg" : "lbs"}
 							</HeadlineText>
 						)}
 					</View>
@@ -405,24 +443,18 @@ const WeightCalculatorScreen = (props) => {
 const getStyles = (theme) => {
 	return StyleSheet.create({
 		container: {
-			// paddingTop: StatusBar.currentheight,
-			// marginTop: 20,
 			flex: 1,
-			// justifyContent: "center",
 			alignItems: "center",
 			backgroundColor: theme.surface,
 		},
 		inputContainer: {
 			width: "100%",
-			// height: 200,
 			paddingHorizontal: 24,
-			// backgroundColor: theme.error
 			marginTop: 20,
 		},
 		knownInputContainer: {
 			height: 100,
 			width: "100%",
-			// backgroundColor: theme.error,
 			flexDirection: "row",
 			justifyContent: "space-around",
 			alignItems: "center",
@@ -443,7 +475,6 @@ const getStyles = (theme) => {
 		resultContainer: {
 			flex: 1,
 			flexDirection: "column",
-			// height: 300,
 			width: "100%",
 			paddingHorizontal: 24,
 			backgroundColor: theme.secondaryContainer,
@@ -453,69 +484,37 @@ const getStyles = (theme) => {
 		resultHeader: {
 			width: "100%",
 			height: 60,
-			// backgroundColor: theme.error,
 			flexDirection: "row",
 			alignItems: "center",
 		},
 		resultView: {
-			// height: "100%",
-			// width: "100%",
-			// borderWidth:1,
-			// borderRadius: 24,
-			// borderColor: theme.outline
 			flex: 1,
 			justifyContent: "center",
 			alignItems: "center",
 		},
-		// knownContainer: {
-		// 	marginTop: 60,
-		// 	width: "90%",
-		// 	// ,backgroundColor: theme.secondary
-		// 	borderStyle: "solid",
-		// 	borderColor: theme.outline,
-		// 	borderWidth: 1,
-		// 	borderRadius: 16,
-		// 	alignItems: "center",
-		// 	paddingVertical: 10,
-		// 	// justifyContent: "center"
-		// },
-		// wantedContainer: {
-		// 	marginTop: 20,
-		// 	width: "90%",
-		// 	// ,backgroundColor: theme.secondary
-		// 	borderStyle: "solid",
-		// 	borderColor: theme.outline,
-		// 	borderWidth: 1,
-		// 	borderRadius: 16,
-		// },
-		// inputContainer: {
-		// 	height: 200,
-		// 	flexDirection: "row",
-		// 	justifyContent: "space-around",
-		// 	alignItems: "center",
-		// },
-		// wantedInputContainer: {
-		// 	marginVertical: 10,
-		// 	flexDirection: "row",
-		// 	justifyContent: "space-around",
-		// 	alignItems: "center",
-		// },
-		// resultContainer: {
-		// 	// width: "100%",
-		// 	// height: 100,
-		// 	marginTop: 20,
-		// 	borderRadius: 12,
-		// 	backgroundColor: theme.secondaryContainer,
-		// 	padding: 10,
-		// 	alignItems: "center",
-		// },
-		// numberInput: {
-		// 	height: 150,
-		// 	width: 120,
-		// 	// backgroundColor: theme.secondaryContainer,
-		// 	alignItems: "center",
-		// 	// justifyContent: "space-around",
-		// },
+		modalScrim: {
+			flex: 1,
+			justifyContent: "center",
+			alignItems: "center",
+			backgroundColor: theme.surface,
+		},
+		dialogContent: {
+			minWidth: 280,
+			maxWidth: 560,
+			maxHeight: 500,
+			borderRadius: 28,
+			padding: 24,
+			backgroundColor: theme.surfaceE3,
+		},
+		dialogHeader: { marginBottom: 16 },
+		dialogBody: {
+			width: "80%",
+			marginBottom: 24,
+		},
+		dialogActions: {
+			flexDirection: "row",
+			justifyContent: "flex-end",
+		},
 	});
 };
 

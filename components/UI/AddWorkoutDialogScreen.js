@@ -10,7 +10,7 @@ import {
 	SectionList,
 	FlatList,
 	StatusBar,
-	Platform
+	Platform,
 } from "react-native";
 import { useSelector } from "react-redux";
 import { Themes } from "../../shared/Theme";
@@ -129,7 +129,7 @@ const AddWorkoutDialogScreen = (props) => {
 
 	useEffect(() => {
 		console.log(userData.user.useMetric);
-		if(Platform.OS==="android"){
+		if (Platform.OS === "android") {
 		}
 	}, []);
 

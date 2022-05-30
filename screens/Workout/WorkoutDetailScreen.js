@@ -17,12 +17,9 @@ import TitleText from "../../components/Text/Title";
 import LabelText from "../../components/Text/Label";
 import HeadlineText from "../../components/Text/Headline";
 import TextButton from "../../components/Buttons/TextButton";
-import RPEMap from "../../shared/utils/RPEMap";
 import UtilFunctions from "../../shared/utils/UtilFunctions";
-import { backgroundColor } from "react-native/Libraries/Components/View/ReactNativeStyleAttributes";
 
 const WorkoutDetailScreen = (props) => {
-	const rpeCalc = new RPEMap();
 	const dispatch = useDispatch();
 	const workoutID = props.route.params.workoutID;
 	const userID = useSelector((state) => state.auth.userID);
