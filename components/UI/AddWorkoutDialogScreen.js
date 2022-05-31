@@ -11,6 +11,7 @@ import {
 	FlatList,
 	StatusBar,
 	Platform,
+	BackHandler
 } from "react-native";
 import { useSelector } from "react-redux";
 import { Themes } from "../../shared/Theme";
@@ -20,10 +21,7 @@ import TextButton from "../Buttons/TextButton";
 import TitleText from "../Text/Title";
 import HeadlineText from "../Text/Headline";
 import LabelText from "../Text/Label";
-import Input from "./Input";
-import FilledButton from "../Buttons/FilledButton";
 import FilledTonalButton from "../Buttons/FilledTonalButton";
-import { TextInput } from "react-native-paper";
 import {
 	TextField,
 	FilledTextField,
@@ -36,7 +34,6 @@ import { Divider } from "react-native-paper";
 import Exercise from "../../models/Exercise";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import * as firebase from "../../firebase/firebase";
-import { async } from "@firebase/util";
 
 const windowWidth = Dimensions.get("screen").width;
 const textFieldWidth = Math.floor((windowWidth - 24 * 2 - 8) / 2);

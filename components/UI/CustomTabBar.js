@@ -159,7 +159,7 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
 								</View>
 							)}
 							{!useDarkMode && (
-								<View style={{ marginBottom: 16 }}>
+								<View style={{ bottom: 16 }}>
 									<MaterialIcons
 										name={labelName}
 										size={24}
