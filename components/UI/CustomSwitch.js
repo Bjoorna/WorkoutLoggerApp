@@ -60,25 +60,6 @@ const CustomSwitch = ({
 		setIsSelected(!isSelected);
 	};
 
-	// const animateValueChange = (value, cb = () => {}) => {
-	// 	Animated.parallel([]);
-	// };
-
-	const animateToSelected = () => {
-		Animated.spring(thumbAnim, {
-			toValue: 18,
-			duration: 1000,
-			useNativeDriver: false,
-		}).start();
-	};
-
-	const animateToUnSelected = () => {
-		Animated.spring(thumbAnim, {
-			toValue: 0,
-			duration: 1000,
-			useNativeDriver: false,
-		}).start();
-	};
 
 	const animateThumb = (toTrackValue, toHeightValue, toWidthValue) => {
 		Animated.parallel([

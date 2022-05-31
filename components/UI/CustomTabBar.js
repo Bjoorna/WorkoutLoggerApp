@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
 	View,
 	Text,
@@ -7,6 +7,8 @@ import {
 	TouchableOpacity,
 	Pressable,
 	Keyboard,
+	Animated,
+	Easing,
 } from "react-native";
 
 import { MaterialIcons } from "@expo/vector-icons";
@@ -24,27 +26,72 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
 	const [styles, setStyles] = useState(
 		getStyles(useDarkMode ? Themes.dark : Themes.light)
 	);
+	const defaultLabelWidthBeforeAnim = 40;
+	const [onTabIndex, setOnTabIndex] = useState(0);
+	const [labelIndicatorWidths, setLabelIndicatorWidth] = useState([
+		useRef(new Animated.Value(defaultLabelWidthBeforeAnim)).current,
+		useRef(new Animated.Value(defaultLabelWidthBeforeAnim)).current,
+		useRef(new Animated.Value(defaultLabelWidthBeforeAnim)).current,
+		useRef(new Animated.Value(defaultLabelWidthBeforeAnim)).current,
+	]);
 
 	const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
 
 	useEffect(() => {
-		const keyboardShowListener = Keyboard.addListener("keyboardDidShow", () => {setIsKeyboardVisible(true)});
-		const keyboardHideListener = Keyboard.addListener("keyboardDidHide", () => {setIsKeyboardVisible(false)});
+		const keyboardShowListener = Keyboard.addListener(
+			"keyboardDidShow",
+			() => {
+				setIsKeyboardVisible(true);
+			}
+		);
+		const keyboardHideListener = Keyboard.addListener(
+			"keyboardDidHide",
+			() => {
+				setIsKeyboardVisible(false);
+			}
+		);
 		return () => {
 			keyboardShowListener.remove();
 			keyboardHideListener.remove();
-		}
+		};
 	}, []);
 
 	useEffect(() => {
-	}, [isKeyboardVisible]);
+		if (state.index == onTabIndex) {
+			return;
+		}
+		const newIndex = state.index;
+		const newLabelValues = [...labelIndicatorWidths];
+		newLabelValues[onTabIndex].setValue(defaultLabelWidthBeforeAnim);
+		setLabelIndicatorWidth(newLabelValues);
+		setOnTabIndex(state.index);
+		animateLabel(labelIndicatorWidths[newIndex]);
+	}, [state]);
+
+	useEffect(() => {}, [isKeyboardVisible]);
 
 	useEffect(() => {
 		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
 	}, [useDarkMode]);
 
+	const animateLabel = (refToAnimate) => {
+		Animated.sequence([
+			Animated.spring(refToAnimate, {
+				toValue: 64,
+				useNativeDriver: false,
+				bounciness: 4
+			}),
+		]).start();
+	};
+
 	return (
-		<View style={hideTabBar || isKeyboardVisible ? { display: "none" } : styles.tabBarContainer}>
+		<View
+			style={
+				hideTabBar || isKeyboardVisible
+					? { display: "none" }
+					: styles.tabBarContainer
+			}
+		>
 			{state.routes.map((route, index) => {
 				const { options } = descriptors[route.key];
 				const labelName = route.params.labelName;
@@ -88,23 +135,39 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
 						<View
 							style={
 								isFocused
-									? styles.activeLabel
-									: styles.inActiveLabel
+									? styles.activeLabelContainer
+									: styles.inActiveLabelContainer
 							}
 						>
+							<Animated.View
+								style={[
+									isFocused
+										? styles.activeLabel
+										: styles.inActiveLabel,
+									{ width: labelIndicatorWidths[index] },
+								]}
+							></Animated.View>
 							{useDarkMode && (
-								<MaterialIcons
-									name={labelName}
-									size={24}
-									color={isFocused ? "#d5e4f7" : "#c2c7ce"}
-								/>
+								<View style={{ bottom: 16 }}>
+									<MaterialIcons
+										name={labelName}
+										size={24}
+										color={
+											isFocused ? "#d5e4f7" : "#c2c7ce"
+										}
+									/>
+								</View>
 							)}
 							{!useDarkMode && (
-								<MaterialIcons
-									name={labelName}
-									size={24}
-									color={isFocused ? "#0e1d2a" : "#42474d"}
-								/>
+								<View style={{ marginBottom: 16 }}>
+									<MaterialIcons
+										name={labelName}
+										size={24}
+										color={
+											isFocused ? "#0e1d2a" : "#42474d"
+										}
+									/>
+								</View>
 							)}
 						</View>
 						<LabelText
@@ -136,17 +199,15 @@ const getStyles = (theme) => {
 			backgroundColor: theme.surface,
 			alignItems: "center",
 		},
-		activeLabel: {
+		activeLabelContainer: {
 			height: 32,
 			width: 64,
 			marginTop: 12,
 			marginBottom: 4,
-			borderRadius: 16,
-			backgroundColor: theme.secondaryContainer,
 			justifyContent: "center",
 			alignItems: "center",
 		},
-		inActiveLabel: {
+		inActiveLabelContainer: {
 			height: 32,
 			width: 64,
 			marginTop: 12,
@@ -155,6 +216,18 @@ const getStyles = (theme) => {
 			backgroundColor: theme.surface,
 			justifyContent: "center",
 			alignItems: "center",
+		},
+		activeLabel: {
+			height: 32,
+			width: 40,
+			backgroundColor: theme.secondaryContainer,
+			borderRadius: 16,
+			top: 12,
+		},
+		inActiveLabel: {
+			height: "100%",
+			width: "100%",
+			top: 12,
 		},
 		activeLabelIcon: { color: theme.onSecondaryContainer },
 		inActiveLabelIcon: { color: theme.onSurfaceVariant },
