@@ -11,7 +11,7 @@ import {
 	Easing,
 } from "react-native";
 
-import { MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 
 import { Themes } from "../../shared/Theme";
 import { useSelector, useDispatch } from "react-redux";
@@ -95,6 +95,9 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
 			{state.routes.map((route, index) => {
 				const { options } = descriptors[route.key];
 				const labelName = route.params.labelName;
+				const labelNameFocused = route.params.labelNameFocused
+				const labelNameUnFocused = route.params.labelNameUnFocused
+
 				const label =
 					options.tabBarLabel !== undefined
 						? options.tabBarLabel
@@ -149,8 +152,8 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
 							></Animated.View>
 							{useDarkMode && (
 								<View style={{ bottom: 16 }}>
-									<MaterialIcons
-										name={labelName}
+									<Ionicons
+										name={isFocused ? labelNameFocused : labelNameUnFocused}
 										size={24}
 										color={
 											isFocused ? "#d5e4f7" : "#c2c7ce"
@@ -160,8 +163,8 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
 							)}
 							{!useDarkMode && (
 								<View style={{ bottom: 16 }}>
-									<MaterialIcons
-										name={labelName}
+									<Ionicons
+										name={isFocused ? labelNameFocused : labelNameUnFocused}
 										size={24}
 										color={
 											isFocused ? "#0e1d2a" : "#42474d"

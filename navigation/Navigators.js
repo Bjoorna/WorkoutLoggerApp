@@ -46,41 +46,42 @@ export const AppTabNavigator = () => {
 
 	return (
 		<TabNavigator.Navigator
-			screenOptions={{ headerShown: false,}}
+			screenOptions={{ headerShown: false }}
 			tabBar={(props) => <CustomTabBar {...props} />}
 		>
 			<TabNavigator.Screen
 				name="Workout"
-				initialParams={
-					{labelName: "fitness-center"}
-				}
+				initialParams={{ 
+					labelNameFocused: "fitness", labelNameUnFocused: "fitness-outline"  }}
 				component={WorkoutStackScreen}
 			/>
 
 			<TabNavigator.Screen
 				name="Calculator"
 				component={WeightCalculatorScreen}
-				options={{headerShown: true}}
-				initialParams={
-					{labelName: "calculate"}
-				}
+				options={{ headerShown: true }}
+				initialParams={{ labelNameFocused: "calculator", labelNameUnFocused: "calculator-outline"   }}
 			/>
 
 			<TabNavigator.Screen
 				name="Analysis"
 				component={WorkoutAnalysisScreen}
-				initialParams={
-					{labelName: "analytics"}
-				}
+				initialParams={{
+					labelNameFocused: "analytics",
+					labelNameUnFocused: "analytics-outline",
+				}}
 			/>
 
-			<TabNavigator.Screen name="User" component={UserStackScreen} initialParams={
-					{labelName: "account-circle"}
-				} />
+			<TabNavigator.Screen
+				name="User"
+				component={UserStackScreen}
+				initialParams={{ 
+					labelNameFocused: "person-circle-sharp",
+				labelNameUnFocused: "person-circle-outline" }}
+			/>
 		</TabNavigator.Navigator>
 	);
 };
-
 
 const WorkoutStackNavigator = createStackNavigator();
 
