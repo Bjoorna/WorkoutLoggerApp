@@ -22,8 +22,8 @@ import DisplayText from "../../components/Text/Display";
 
 import TextButton from "../../components/Buttons/TextButton";
 import HeadlineText from "../../components/Text/Headline";
-
-import { HeaderButtons, Item } from "react-navigation-header-buttons";
+import IconButton from "../../components/Buttons/IconButton";
+// import { HeaderButtons, Item } from "react-navigation-header-buttons";
 import CustomHeaderButton from "../../components/Buttons/CustomHeaderButton";
 import { FilledTextField } from "rn-material-ui-textfield";
 import UtilFunctions from "../../shared/utils/UtilFunctions";
@@ -142,13 +142,15 @@ const WeightCalculatorScreen = (props) => {
 			headerTintColor: currentTheme.onSurface,
 			headerRight: () => (
 				<View style={{ flexDirection: "row" }}>
-					<HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
+					<IconButton name="info" onButtonPress={() => console.log("Iconbuttonpressed")} />
+
+					{/* <HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
 						<Item
 							title="info"
 							iconName="info"
 							onPress={() => setModalVisible(true)}
 						/>
-					</HeaderButtons>
+					</HeaderButtons> */}
 				</View>
 			),
 		});

@@ -37,7 +37,8 @@ import OutlineButton from "../../components/Buttons/OutlineButton";
 import { ExerciseTypes } from "../../shared/utils/ExerciseTypes";
 import LabelText from "../../components/Text/Label";
 import TextButton from "../../components/Buttons/TextButton";
-import { HeaderButtons, Item } from "react-navigation-header-buttons";
+import IconButton from "../../components/Buttons/IconButton";
+// import { HeaderButtons, Item } from "react-navigation-header-buttons";
 import CustomHeaderButton from "../../components/Buttons/CustomHeaderButton";
 import { SET_TAB_BAR_VALUE } from "../../store/actions/appsettings";
 import {
@@ -198,13 +199,15 @@ const AddWorkoutScreen = (props) => {
 			),
 			headerLeft: () => (
 				<View>
-					<HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
+					<IconButton name="arrow-back" onButtonPress={() => console.log("Iconbuttonpressed")} />
+
+					{/* <HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
 						<Item
 							title="filter"
 							iconName="arrow-back"
 							onPress={navigateBack}
 						/>
-					</HeaderButtons>
+					</HeaderButtons> */}
 				</View>
 			),
 		});

@@ -9,7 +9,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useFocusEffect } from "@react-navigation/core";
 import { Themes } from "../../shared/Theme";
 import { SET_TAB_BAR_VALUE } from "../../store/actions/appsettings";
-import { HeaderButtons, Item } from "react-navigation-header-buttons";
+// import { HeaderButtons, Item } from "react-navigation-header-buttons";
 import CustomHeaderButton from "../../components/Buttons/CustomHeaderButton";
 import * as firebase from "../../firebase/firebase";
 import BodyText from "../../components/Text/Body";
@@ -17,6 +17,7 @@ import TitleText from "../../components/Text/Title";
 import LabelText from "../../components/Text/Label";
 import HeadlineText from "../../components/Text/Headline";
 import TextButton from "../../components/Buttons/TextButton";
+import IconButton from "../../components/Buttons/IconButton";
 import UtilFunctions from "../../shared/utils/UtilFunctions";
 
 const WorkoutDetailScreen = (props) => {
@@ -101,7 +102,7 @@ const WorkoutDetailScreen = (props) => {
 								onPress={() => showModalHandler(true)}
 							/>
 						</HeaderButtons> */}
-						<HeaderButtons
+						{/* <HeaderButtons
 							HeaderButtonComponent={CustomHeaderButton}
 						>
 							<Item
@@ -109,7 +110,9 @@ const WorkoutDetailScreen = (props) => {
 								iconName="delete"
 								onPress={() => showModalHandler(true)}
 							/>
-						</HeaderButtons>
+						</HeaderButtons> */}
+						<IconButton name="delete" onButtonPress={() => console.log("Iconbuttonpressed")} />
+
 					</View>
 				),
 

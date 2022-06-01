@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from "react";
 import { useSelector } from "react-redux";
 
-import { HeaderButton } from "react-navigation-header-buttons";
+// import { HeaderButton } from "react-navigation-header-buttons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Themes } from "../../shared/Theme";
 const theme = Themes.dark;
@@ -21,12 +21,16 @@ const CustomHeaderButton = (props) => {
 	}, [useDarkMode]);
 
 	return (
-		<HeaderButton
-			{...props}
-			IconComponent={MaterialIcons}
-			iconSize={23}
-			color={currentTheme.primary}
-		/>
+		// placeholder
+		<View> 
+
+		</View>
+		// <HeaderButton
+		// 	{...props}
+		// 	IconComponent={MaterialIcons}
+		// 	iconSize={23}
+		// 	color={currentTheme.primary}
+		// />
 	);
 };
 

@@ -17,9 +17,10 @@ import {
 	Modal,
 } from "react-native";
 import { useDimensions } from "@react-native-community/hooks";
-import { HeaderButtons, Item } from "react-navigation-header-buttons";
+// import { HeaderButtons, Item } from "react-navigation-header-buttons";
 import CustomHeaderButton from "../../components/Buttons/CustomHeaderButton";
 import FabButton from "../../components/Buttons/Fab";
+import IconButton from "../../components/Buttons/IconButton";
 import { Themes } from "../../shared/Theme";
 import { useSelector, useDispatch } from "react-redux";
 import BottomSheet from "@gorhom/bottom-sheet";
@@ -133,7 +134,7 @@ const WorkoutListScreen = (props) => {
 							/>
 						</HeaderButtons> */}
 
-						<HeaderButtons
+						{/* <HeaderButtons
 							HeaderButtonComponent={CustomHeaderButton}
 						>
 							<Item
@@ -143,7 +144,8 @@ const WorkoutListScreen = (props) => {
 								}
 								onPress={toggle}
 							/>
-						</HeaderButtons>
+						</HeaderButtons> */}
+						<IconButton name={filterToggle ? "close" : "filter-list"} onButtonPress={() => console.log("Iconbuttonpressed")} />
 					</View>
 				),
 			});
@@ -162,7 +164,7 @@ const WorkoutListScreen = (props) => {
 							/>
 						</HeaderButtons> */}
 
-						<HeaderButtons
+						{/* <HeaderButtons
 							HeaderButtonComponent={CustomHeaderButton}
 						>
 							<Item
@@ -172,7 +174,9 @@ const WorkoutListScreen = (props) => {
 								}
 								onPress={toggle}
 							/>
-						</HeaderButtons>
+				</HeaderButtons> */}
+						<IconButton name={filterToggle ? "close" : "filter-list"} onButtonPress={() => console.log("Iconbuttonpressed")} />
+
 					</View>
 				),
 			});

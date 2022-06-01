@@ -77,6 +77,7 @@ export default function App() {
 		);
 	}
 	return (
+		
 		<PaperProvider>
 			<Provider store={store}>
 				<View style={styles.baseScreen}>
