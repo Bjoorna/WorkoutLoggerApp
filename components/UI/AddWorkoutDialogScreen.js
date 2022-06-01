@@ -404,7 +404,7 @@ const AddWorkoutDialogScreen = (props) => {
 				<View style={styles.headerBackButton}>
 					<IconButton
 						name="close"
-						onButtonPress={() => setShowCloseDialogModal(true)}
+						onPress={() => setShowCloseDialogModal(true)}
 					/>
 				</View>
 				<View style={styles.headerTitle}>
@@ -458,7 +458,7 @@ const AddWorkoutDialogScreen = (props) => {
 								<IconButton
 									style={{ marginLeft: "auto" }}
 									name="close"
-									onButtonPress={() =>
+									onPress={() =>
 										onExerciseSelected(null, true)
 									}
 								/>
@@ -467,8 +467,8 @@ const AddWorkoutDialogScreen = (props) => {
 								null && (
 								<IconButton
 									style={{ marginLeft: "auto" }}
-									name="arrow-drop-down"
-									onButtonPress={() =>
+									name="caret-down"
+									onPress={() =>
 										setShowExerciseModal(true)
 									}
 								/>
@@ -493,8 +493,9 @@ const AddWorkoutDialogScreen = (props) => {
 							</BodyText>
 							<IconButton
 								style={{ marginLeft: "auto" }}
-								name="arrow-drop-down"
-								onButtonPress={() =>
+								name="caret-down"
+								// iconColor={currentTheme.primary}
+								onPress={() =>
 									setDatePickerModalVisible(true)
 								}
 							/>

@@ -61,8 +61,8 @@ const UserOverviewScreen = (props) => {
 		props.navigation.setOptions({
 			headerRight: () => (
 				<View style={{ flexDirection: "row" }}>
-					<IconButton name="edit" onButtonPress={() => console.log("Iconbuttonpressed")} />
-					<IconButton name="settings" onButtonPress={() => console.log("Iconbuttonpressed")} />
+					<IconButton name="pencil" onPress={() => console.log("Edit")} />
+					<IconButton name="settings"  onPress={() => props.navigation.navigate("UserSettings")} />
 
 					{/* <HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
 						<Item

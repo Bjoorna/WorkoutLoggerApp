@@ -199,7 +199,7 @@ const AddWorkoutScreen = (props) => {
 			),
 			headerLeft: () => (
 				<View>
-					<IconButton name="arrow-back" onButtonPress={() => console.log("Iconbuttonpressed")} />
+					<IconButton name="arrow-back" onPress={() => console.log("Iconbuttonpressed")} />
 
 					{/* <HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
 						<Item

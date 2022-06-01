@@ -86,7 +86,7 @@ const WeightCalculatorScreen = (props) => {
 		console.log("USERsettings from calculator");
 		console.log(userSettings);
 		console.log(useMetric);
-	}, [])
+	}, []);
 	useEffect(() => {
 		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
 		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
@@ -106,9 +106,9 @@ const WeightCalculatorScreen = (props) => {
 		}
 	}, [calculatorState]);
 
-	useEffect(()=> {
-		setUseMetric(userSettings.useMetric)
-	},[userSettings])
+	useEffect(() => {
+		setUseMetric(userSettings.useMetric);
+	}, [userSettings]);
 
 	useEffect(() => {
 		calculcateValue();
@@ -142,7 +142,11 @@ const WeightCalculatorScreen = (props) => {
 			headerTintColor: currentTheme.onSurface,
 			headerRight: () => (
 				<View style={{ flexDirection: "row" }}>
-					<IconButton name="info" onButtonPress={() => console.log("Iconbuttonpressed")} />
+					<IconButton
+						name="information-circle"
+						iconColor={currentTheme.onSurfaceVariant}
+						onPress={() => setModalVisible(true)}
+					/>
 
 					{/* <HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
 						<Item

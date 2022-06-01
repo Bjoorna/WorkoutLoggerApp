@@ -111,7 +111,7 @@ const WorkoutDetailScreen = (props) => {
 								onPress={() => showModalHandler(true)}
 							/>
 						</HeaderButtons> */}
-						<IconButton name="delete" onButtonPress={() => console.log("Iconbuttonpressed")} />
+						<IconButton name="trash" onPress={() => showModalHandler(true)} />
 
 					</View>
 				),

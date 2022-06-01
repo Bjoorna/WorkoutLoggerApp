@@ -124,28 +124,12 @@ const WorkoutListScreen = (props) => {
 				headerStyle: { backgroundColor: currentTheme.surfaceE2 },
 				headerRight: () => (
 					<View style={{ flexDirection: "row" }}>
-						{/* <HeaderButtons
-							HeaderButtonComponent={CustomHeaderButton}
-						>
-							<Item
-								title="filter"
-								iconName="add"
-								onPress={() => setShowModal(true)}
-							/>
-						</HeaderButtons> */}
-
-						{/* <HeaderButtons
-							HeaderButtonComponent={CustomHeaderButton}
-						>
-							<Item
-								title="filter"
-								iconName={
-									filterToggle ? "close" : "filter-list"
-								}
-								onPress={toggle}
-							/>
-						</HeaderButtons> */}
-						<IconButton name={filterToggle ? "close" : "filter-list"} onButtonPress={() => console.log("Iconbuttonpressed")} />
+						<IconButton
+							name={filterToggle ? "close" : "filter"}
+							iconColor={currentTheme.onSurfaceVariant}
+							shouldVibrate={false}
+							onPress={toggle}
+						/>
 					</View>
 				),
 			});
@@ -154,29 +138,12 @@ const WorkoutListScreen = (props) => {
 				headerStyle: { backgroundColor: currentTheme.surface },
 				headerRight: () => (
 					<View style={{ flexDirection: "row" }}>
-						{/* <HeaderButtons
-							HeaderButtonComponent={CustomHeaderButton}
-						>
-							<Item
-								title="filter"
-								iconName="add"
-								onPress={() => setShowModal(true)}
-							/>
-						</HeaderButtons> */}
-
-						{/* <HeaderButtons
-							HeaderButtonComponent={CustomHeaderButton}
-						>
-							<Item
-								title="filter"
-								iconName={
-									filterToggle ? "close" : "filter-list"
-								}
-								onPress={toggle}
-							/>
-				</HeaderButtons> */}
-						<IconButton name={filterToggle ? "close" : "filter-list"} onButtonPress={() => console.log("Iconbuttonpressed")} />
-
+						<IconButton
+							name={filterToggle ? "close" : "filter"}
+							iconColor={currentTheme.onSurfaceVariant}
+							shouldVibrate={false}
+							onPress={toggle}
+						/>
 					</View>
 				),
 			});
@@ -212,8 +179,8 @@ const WorkoutListScreen = (props) => {
 	};
 
 	const navigateToTestWorkout = () => {
-		props.navigation.navigate("TestAddWorkout")
-	}
+		props.navigation.navigate("TestAddWorkout");
+	};
 
 	return (
 		<View style={styles.container}>
@@ -223,7 +190,9 @@ const WorkoutListScreen = (props) => {
 				transparent={true}
 				onRequestClose={() => setShowModal(false)}
 			>
-				<AddWorkoutDialogScreen toggleModal={() => setShowModal(false)} />
+				<AddWorkoutDialogScreen
+					toggleModal={() => setShowModal(false)}
+				/>
 			</Modal>
 			{!showFilter && (
 				<FabButton

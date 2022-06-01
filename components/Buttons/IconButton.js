@@ -1,4 +1,4 @@
-import { MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import React, { useState, useEffect } from "react";
 import { Pressable, StyleSheet, Vibration, View } from "react-native";
 import { useSelector } from "react-redux";
@@ -6,7 +6,15 @@ import { useSelector } from "react-redux";
 import { Themes } from "../../shared/Theme";
 import LabelText from "../Text/Label";
 
-const IconButton = (props) => {
+/**
+ *
+ * @param {*} onPress - Function to be called when button is pressed
+ * @param {string} iconColor - Color for the icon
+ * @param {boolean} shouldVibrate - If the device should vibrate on press
+ * @returns
+ */
+
+const IconButton = ({ onPress, name, iconColor, shouldVibrate, style }) => {
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
 	const [styles, setStyles] = useState(
 		getStyles(useDarkMode ? Themes.dark : Themes.light)
@@ -25,30 +33,36 @@ const IconButton = (props) => {
 	const handleOnPressIn = () => {
 		// props.onButtonPress();
 		setIsPressed(true);
-		Vibration.vibrate(100);
+		// Vibration.vibrate(100);
+	};
+	const handlePress = () => {
+		onPress();
+		if (shouldVibrate) {
+			Vibration.vibrate(100);
+		}
 	};
 
 	return (
 		<Pressable
-			onPress={props.onButtonPress}
+			onPress={handlePress}
 			onPressIn={handleOnPressIn}
 			onPressOut={() => setIsPressed(false)}
-			style={{ ...styles.iconButton, ...props.style }}
+			style={{ ...styles.iconButton, ...style }}
 		>
 			<Pressable
-				onPress={props.onButtonPress}
+				onPress={handlePress}
 				onPressIn={handleOnPressIn}
 				onPressOut={() => setIsPressed(false)}
 				style={
 					isPressed
-						? { ...styles.innerIconPressed, ...props.style }
-						: { ...styles.innerIconUnPressed, ...props.style }
+						? { ...styles.innerIconPressed, ...style }
+						: { ...styles.innerIconUnPressed, ...style }
 				}
 			>
-				<MaterialIcons
-					color={currentTheme.onSurface}
+				<Ionicons
+					color={iconColor ? iconColor : currentTheme.onSurfaceVariant}
 					size={24}
-					name={props.name}
+					name={name}
 				/>
 			</Pressable>
 		</Pressable>
@@ -70,18 +84,16 @@ const getStyles = (theme) => {
 			overflow: "hidden",
 			backgroundColor: theme.onSurfaceVariant,
 			opacity: 0.12,
-            justifyContent: "center",
+			justifyContent: "center",
 			alignItems: "center",
-
 		},
 		innerIconUnPressed: {
 			width: 40,
 			height: 40,
 			borderRadius: 40,
 			overflow: "hidden",
-            justifyContent: "center",
+			justifyContent: "center",
 			alignItems: "center",
-
 		},
 		iconColor: { color: theme.onPrimaryContainer },
 	});
