@@ -9,8 +9,6 @@ import { useSelector, useDispatch } from "react-redux";
 import { useFocusEffect } from "@react-navigation/core";
 import { Themes } from "../../shared/Theme";
 import { SET_TAB_BAR_VALUE } from "../../store/actions/appsettings";
-// import { HeaderButtons, Item } from "react-navigation-header-buttons";
-import CustomHeaderButton from "../../components/Buttons/CustomHeaderButton";
 import * as firebase from "../../firebase/firebase";
 import BodyText from "../../components/Text/Body";
 import TitleText from "../../components/Text/Title";
@@ -38,7 +36,9 @@ const WorkoutDetailScreen = (props) => {
 	const [exercises, setExercises] = useState(null);
 	const [summaryData, setSummaryData] = useState(null);
 	const [showModal, setShowModal] = useState(false);
-	const [modalBackdropHex, setModalBackdropHex] = useState(UtilFunctions.hexToRGB(currentTheme.surface));
+	const [modalBackdropHex, setModalBackdropHex] = useState(
+		UtilFunctions.hexToRGB(currentTheme.surface)
+	);
 	useEffect(() => {
 		const onWorkout = workoutsRef.find(
 			(workout) => workout.id == workoutID
@@ -86,38 +86,22 @@ const WorkoutDetailScreen = (props) => {
 		console.log("RPE: " + rpe);
 		console.log("REPS: " + reps);
 		return 3;
-	}
+	};
 	// REAL
 	useLayoutEffect(() => {
 		if (workout) {
 			props.navigation.setOptions({
 				headerRight: () => (
 					<View style={{ flexDirection: "row" }}>
-						{/* <HeaderButtons
-							HeaderButtonComponent={CustomHeaderButton}
-						>
-							<Item
-								title="delete"
-								iconName="info"
-								onPress={() => showModalHandler(true)}
-							/>
-						</HeaderButtons> */}
-						{/* <HeaderButtons
-							HeaderButtonComponent={CustomHeaderButton}
-						>
-							<Item
-								title="delete"
-								iconName="delete"
-								onPress={() => showModalHandler(true)}
-							/>
-						</HeaderButtons> */}
-						<IconButton name="trash" onPress={() => showModalHandler(true)} />
-
+						<IconButton
+							name="trash"
+							onPress={() => showModalHandler(true)}
+						/>
 					</View>
 				),
 
 				title: new Date(workout.date.seconds * 1000).toDateString(),
-				headerStyle: {backgroundColor: currentTheme.surfaceE2}
+				headerStyle: { backgroundColor: currentTheme.surfaceE2 },
 			});
 		}
 
@@ -142,7 +126,6 @@ const WorkoutDetailScreen = (props) => {
 	useFocusEffect(
 		useCallback(() => {
 			const onCloseScreen = () => {
-
 				dispatch({
 					type: SET_TAB_BAR_VALUE,
 					value: false,
@@ -163,7 +146,10 @@ const WorkoutDetailScreen = (props) => {
 					onPress={() => {
 						showModalHandler(false);
 					}}
-					style={{...styles.modalView, backgroundColor: `rgba(${modalBackdropHex[0]}, ${modalBackdropHex[1]}, ${modalBackdropHex[2]}, 0.8)`}}
+					style={{
+						...styles.modalView,
+						backgroundColor: `rgba(${modalBackdropHex[0]}, ${modalBackdropHex[1]}, ${modalBackdropHex[2]}, 0.8)`,
+					}}
 				>
 					<Pressable style={styles.modalContent}>
 						<View style={styles.modalHeader}>
@@ -252,7 +238,10 @@ const WorkoutDetailScreen = (props) => {
 											}
 										>
 											<View
-												style={{...styles.exerciseListItem, alignSelf: "flex-start"}}
+												style={{
+													...styles.exerciseListItem,
+													alignSelf: "flex-start",
+												}}
 											>
 												<LabelText
 													style={{
@@ -274,10 +263,11 @@ const WorkoutDetailScreen = (props) => {
 											>
 												<LabelText
 													style={{
-														color: currentTheme.onSurface, alignSelf: "flex-end"
+														color: currentTheme.onSurface,
+														alignSelf: "flex-end",
 													}}
 												>
-													Weight 
+													Weight
 												</LabelText>
 												<BodyText
 													style={{
@@ -413,10 +403,9 @@ const getStyles = (theme) => {
 			height: "60%",
 			flexDirection: "column",
 
-
 			// paddingHorizontal: 16,
 		},
-		exerciseListHeader: { width: "90%", alignSelf: "center"},
+		exerciseListHeader: { width: "90%", alignSelf: "center" },
 		exerciseListItemContainer: {
 			height: 80,
 			width: "90%",
@@ -427,7 +416,7 @@ const getStyles = (theme) => {
 			marginBottom: 6,
 			backgroundColor: theme.surfaceVariant,
 			borderRadius: 12,
-			alignSelf: "center"
+			alignSelf: "center",
 		},
 		exerciseListItem: {
 			flexDirection: "column",

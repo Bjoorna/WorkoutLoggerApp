@@ -11,8 +11,6 @@ import {
 
 import * as AuthActions from "../../store/actions/auth";
 import { useDispatch, useSelector } from "react-redux";
-// import { HeaderButtons, Item } from "react-navigation-header-buttons";
-import CustomHeaderButton from "../../components/Buttons/CustomHeaderButton";
 
 import DisplayText from "../../components/Text/Display";
 import LabelText from "../../components/Text/Label";
@@ -63,24 +61,6 @@ const UserOverviewScreen = (props) => {
 				<View style={{ flexDirection: "row" }}>
 					<IconButton name="pencil" onPress={() => console.log("Edit")} />
 					<IconButton name="settings"  onPress={() => props.navigation.navigate("UserSettings")} />
-
-					{/* <HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
-						<Item
-							title="edit"
-							iconName="edit"
-							onPress={() => console.log("eddit")}
-						/>
-					</HeaderButtons>
-
-					<HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
-						<Item
-							title="usersettings"
-							iconName="settings"
-							onPress={() =>
-								props.navigation.navigate("UserSettings")
-							}
-						/>
-					</HeaderButtons> */}
 				</View>
 			),
 		});

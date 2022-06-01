@@ -17,8 +17,6 @@ import {
 	Modal,
 } from "react-native";
 import { useDimensions } from "@react-native-community/hooks";
-// import { HeaderButtons, Item } from "react-navigation-header-buttons";
-import CustomHeaderButton from "../../components/Buttons/CustomHeaderButton";
 import FabButton from "../../components/Buttons/Fab";
 import IconButton from "../../components/Buttons/IconButton";
 import { Themes } from "../../shared/Theme";

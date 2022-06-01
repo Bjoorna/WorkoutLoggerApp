@@ -4,7 +4,7 @@ import React, {
 	useReducer,
 	useState,
 	useLayoutEffect,
-	useRef
+	useRef,
 } from "react";
 import {
 	View,
@@ -38,15 +38,12 @@ import { ExerciseTypes } from "../../shared/utils/ExerciseTypes";
 import LabelText from "../../components/Text/Label";
 import TextButton from "../../components/Buttons/TextButton";
 import IconButton from "../../components/Buttons/IconButton";
-// import { HeaderButtons, Item } from "react-navigation-header-buttons";
-import CustomHeaderButton from "../../components/Buttons/CustomHeaderButton";
 import { SET_TAB_BAR_VALUE } from "../../store/actions/appsettings";
 import {
 	TextField,
 	FilledTextField,
 	OutlinedTextField,
 } from "rn-material-ui-textfield";
-
 
 // TODO make this separate component?
 const ExerciseList = (props) => {
@@ -117,8 +114,6 @@ const AddWorkoutScreen = (props) => {
 	const weightRef = useRef(null);
 	const setsRef = useRef(null);
 	const rpeRef = useRef(null);
-
-
 
 	const reduxDispatch = useDispatch();
 
@@ -199,15 +194,10 @@ const AddWorkoutScreen = (props) => {
 			),
 			headerLeft: () => (
 				<View>
-					<IconButton name="arrow-back" onPress={() => console.log("Iconbuttonpressed")} />
-
-					{/* <HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
-						<Item
-							title="filter"
-							iconName="arrow-back"
-							onPress={navigateBack}
-						/>
-					</HeaderButtons> */}
+					<IconButton
+						name="arrow-back"
+						onPress={() => console.log("Iconbuttonpressed")}
+					/>
 				</View>
 			),
 		});
