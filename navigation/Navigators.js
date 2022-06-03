@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { Animated, StyleSheet, View } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
 
 import { createStackNavigator } from "@react-navigation/stack";
@@ -8,8 +6,6 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 import UserOverviewScreen from "../screens/User/UserOverview";
 import UserSettingsScreen from "../screens/User/UserSettings";
-
-import AddWorkoutScreen from "../screens/Workout/AddWorkoutScreen";
 
 import { Themes } from "../shared/Theme";
 import AuthScreen from "../screens/User/AuthScreen";
@@ -21,6 +17,7 @@ import NewUserDetailScreen from "../screens/User/NewUserDetailScreen";
 import WorkoutDetailScreen from "../screens/Workout/WorkoutDetailScreen";
 import AddWorkoutDialogScreen from "../components/UI/AddWorkoutDialogScreen";
 import CustomTabBar from "../components/UI/CustomTabBar";
+import CalendarScreen from "../screens/CalendarScreen";
 
 const getDefaultStyleOptions = (theme) => {
 	return {
@@ -51,17 +48,29 @@ export const AppTabNavigator = () => {
 		>
 			<TabNavigator.Screen
 				name="Workout"
-				initialParams={{ 
-					labelNameFocused: "fitness", labelNameUnFocused: "fitness-outline"  }}
+				initialParams={{
+					labelNameFocused: "fitness",
+					labelNameUnFocused: "fitness-outline",
+				}}
 				component={WorkoutStackScreen}
 			/>
-
 			<TabNavigator.Screen
+				name="Calendar"
+				initialParams={{
+					labelNameFocused: "ios-calendar",
+					labelNameUnFocused: "ios-calendar-outline",
+				}}
+				component={CalendarStackScreen}
+			/>
+			{/* <TabNavigator.Screen
 				name="Calculator"
 				component={WeightCalculatorScreen}
 				options={{ headerShown: true }}
-				initialParams={{ labelNameFocused: "calculator", labelNameUnFocused: "calculator-outline"   }}
-			/>
+				initialParams={{
+					labelNameFocused: "calculator",
+					labelNameUnFocused: "calculator-outline",
+				}}
+			/> */}
 
 			<TabNavigator.Screen
 				name="Analysis"
@@ -75,11 +84,33 @@ export const AppTabNavigator = () => {
 			<TabNavigator.Screen
 				name="User"
 				component={UserStackScreen}
-				initialParams={{ 
+				initialParams={{
 					labelNameFocused: "person-circle-sharp",
-				labelNameUnFocused: "person-circle-outline" }}
+					labelNameUnFocused: "person-circle-outline",
+				}}
 			/>
 		</TabNavigator.Navigator>
+	);
+};
+
+const CalendarStackNavigator = createStackNavigator();
+export const CalendarStackScreen = () => {
+	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
+	const [currentTheme, setCurrentTheme] = useState(
+		useDarkMode ? Themes.dark : Themes.light
+	);
+
+	useEffect(() => {
+		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
+	}, [useDarkMode]);
+	return (
+		<CalendarStackNavigator.Navigator>
+			<CalendarStackNavigator.Screen
+				name="CalendarScreen"
+				component={CalendarScreen}
+				options={{ ...getDefaultStyleOptions(currentTheme) }}
+			/>
+		</CalendarStackNavigator.Navigator>
 	);
 };
 

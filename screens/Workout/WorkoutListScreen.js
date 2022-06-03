@@ -123,6 +123,14 @@ const WorkoutListScreen = (props) => {
 				headerRight: () => (
 					<View style={{ flexDirection: "row" }}>
 						<IconButton
+							onPress={() =>
+								props.navigation.navigate("Calculator")
+							}
+							shouldVibrate={false}
+							iconColor={currentTheme.onSurfaceVariant}
+							name={"calculator"}
+						/>
+						<IconButton
 							name={filterToggle ? "close" : "filter"}
 							iconColor={currentTheme.onSurfaceVariant}
 							shouldVibrate={false}
@@ -136,6 +144,15 @@ const WorkoutListScreen = (props) => {
 				headerStyle: { backgroundColor: currentTheme.surface },
 				headerRight: () => (
 					<View style={{ flexDirection: "row" }}>
+						<IconButton
+							onPress={() =>
+								props.navigation.navigate("Calculator")
+							}
+							shouldVibrate={false}
+							iconColor={currentTheme.onSurfaceVariant}
+							name={"calculator"}
+						/>
+
 						<IconButton
 							name={filterToggle ? "close" : "filter"}
 							iconColor={currentTheme.onSurfaceVariant}
