@@ -108,7 +108,10 @@ export const CalendarStackScreen = () => {
 			<CalendarStackNavigator.Screen
 				name="CalendarScreen"
 				component={CalendarScreen}
-				options={{ ...getDefaultStyleOptions(currentTheme) }}
+				options={{
+					...getDefaultStyleOptions(currentTheme),
+					headerShown: false,
+				}}
 			/>
 		</CalendarStackNavigator.Navigator>
 	);
@@ -134,6 +137,16 @@ export const WorkoutStackScreen = () => {
 					component={WorkoutListScreen}
 					options={{ ...getDefaultStyleOptions(currentTheme) }}
 				/>
+				<WorkoutStackNavigator.Screen
+					name="Calculator"
+					component={WeightCalculatorScreen}
+					options={{ headerShown: true }}
+					initialParams={{
+						labelNameFocused: "calculator",
+						labelNameUnFocused: "calculator-outline",
+					}}
+				/>
+
 				<WorkoutStackNavigator.Screen
 					name="AddWorkout"
 					component={AddWorkoutDialogScreen}

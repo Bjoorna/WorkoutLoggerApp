@@ -1,4 +1,3 @@
-import { format } from "prettier";
 import React, { useState, useEffect } from "react";
 import { View, StyleSheet } from "react-native";
 import { useSelector } from "react-redux";
@@ -6,6 +5,7 @@ import { useSelector } from "react-redux";
 import BodyText from "../Text/Body";
 
 import { Themes } from "../../shared/Theme";
+import CalendarDay from "./CalendarDay";
 
 const CalendarMonth = ({ month }) => {
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
@@ -25,7 +25,6 @@ const CalendarMonth = ({ month }) => {
 	const [monthName, setMonthName] = useState(null);
 
 	useEffect(() => {
-		setIsLoading(true);
 		if (month) {
 		} else {
 			console.log("no month yet");
@@ -39,8 +38,9 @@ const CalendarMonth = ({ month }) => {
 
 	useEffect(() => {
 		if (month) {
+			setIsLoading(true);
+
 			console.log("monthSet");
-			// console.log(month);
 
 			setOnMonth(month);
 			getMonthName(month[0].date);
@@ -49,6 +49,7 @@ const CalendarMonth = ({ month }) => {
 			// console.log("no month yet");
 		}
 	}, [month]);
+
 	useEffect(() => {
 		if (displayMonth) {
 			setIsLoading(false);
@@ -59,10 +60,8 @@ const CalendarMonth = ({ month }) => {
 
 	const createViewMonth = (month) => {
 		const monthView = [];
-		// console.log("Createviewmonth");
 
 		let week = [...Array(7).keys()].map((i) => null);
-		let onDay = 0;
 
 		for (let day of month) {
 			if (day.dayOfWeek === 6) {
@@ -71,22 +70,9 @@ const CalendarMonth = ({ month }) => {
 				week = [...Array(7).keys()].map((i) => null);
 				continue;
 			}
-
 			week[day.dayOfWeek] = day;
-			// 	if (onDay > 6) {
-			// 		onDay = 0;
-			// 		console.log("New Week");
-			// 		continue;
-			// 	}
-
-			// 	week[onDay] =
-
-			// 	console.log(day);
-
-			// 	onDay++;
 		}
 		monthView.push(week);
-		// console.log(monthView);
 		setDisplayMonth(monthView);
 	};
 
@@ -146,7 +132,7 @@ const CalendarMonth = ({ month }) => {
 
 	return (
 		<View style={styles.calendarItem}>
-			{isLoading && (
+			{/* {isLoading && (
 				<View style={styles.calendarItemHeader}>
 					<BodyText
 						large={true}
@@ -155,7 +141,7 @@ const CalendarMonth = ({ month }) => {
 						{monthName}
 					</BodyText>
 				</View>
-			)}
+			)} */}
 			<View style={styles.calendarItemHeader}>
 				<BodyText
 					large={true}
@@ -165,12 +151,13 @@ const CalendarMonth = ({ month }) => {
 				</BodyText>
 			</View>
 			<View style={styles.calendarItemDaysHeader}>
-				<BodyText
+			<BodyText
 					large={false}
 					style={{ color: currentTheme.onSurface }}
 				>
 					S
 				</BodyText>
+
 				<BodyText
 					large={false}
 					style={{ color: currentTheme.onSurface }}
@@ -212,340 +199,60 @@ const CalendarMonth = ({ month }) => {
 			{!isLoading && (
 				<View style={styles.calendarDaysContainer}>
 					{displayMonth.map((week) => {
-						console.log(week);
 						return (
-							<View style={styles.calendarItemDaysRow}>
+							<View
+								key={Math.random()}
+								style={styles.calendarItemDaysRow}
+							>
 								{week.map((day) => {
-									console.log(day);
-									if (day) {
-										return (
-											<View
-												style={styles.calendarItemDay}
-											>
-												<BodyText
-													large={false}
-													style={{
-														color: currentTheme.onSurfaceVariant,
-													}}
-												>
-													{day.dayOfMonth}
-												</BodyText>
-											</View>
-										);
-									}else {
-										return (
-											<View
-												style={styles.calendarItemDay}
-											>
-												<BodyText
-													large={false}
-													style={{
-														color: currentTheme.onSurfaceVariant,
-													}}
-												>
-													
-												</BodyText>
-											</View>
-										);
+									return (
+										<CalendarDay
+											key={
+												day === null
+													? Math.random()
+													: day.date
+											}
+											day={day}
+										/>
+									);
+									// if (day) {
+									// 	return (
+									// 		<View
+									// 			style={styles.calendarItemDay}
+									// 		>
+									// 			<BodyText
+									// 				large={false}
+									// 				style={{
+									// 					color: currentTheme.onSurfaceVariant,
+									// 				}}
+									// 			>
+									// 				{day.dayOfMonth}
+									// 			</BodyText>
+									// 		</View>
+									// 	);
+									// }else {
+									// 	return (
+									// 		<View
+									// 			style={styles.calendarItemDay}
+									// 		>
+									// 			<BodyText
+									// 				large={false}
+									// 				style={{
+									// 					color: currentTheme.onSurfaceVariant,
+									// 				}}
+									// 			>
 
-									}
+									// 			</BodyText>
+									// 		</View>
+									// 	);
+
+									// }
 								})}
 							</View>
 						);
 					})}
 				</View>
 			)}
-
-			{/* <View style={styles.calendarItemDaysRow}>
-				<View style={styles.calendarItemDay}>
-					<BodyText
-						large={false}
-						style={{ color: currentTheme.onPrimaryContainer }}
-					>
-						1
-					</BodyText>
-				</View>
-				<View style={styles.calendarItemDay}>
-					<BodyText
-						large={false}
-						style={{ color: currentTheme.onPrimaryContainer }}
-					>
-						2
-					</BodyText>
-				</View>
-				<View style={styles.calendarItemDay}>
-					<BodyText
-						large={false}
-						style={{ color: currentTheme.onPrimaryContainer }}
-					>
-						3
-					</BodyText>
-				</View>
-				<View style={styles.calendarItemDay}>
-					<BodyText
-						large={false}
-						style={{ color: currentTheme.onPrimaryContainer }}
-					>
-						4
-					</BodyText>
-				</View>
-				<View style={styles.calendarItemDay}>
-					<BodyText
-						large={false}
-						style={{ color: currentTheme.onPrimaryContainer }}
-					>
-						5
-					</BodyText>
-				</View>
-				<View style={styles.calendarItemDay}>
-					<BodyText
-						large={false}
-						style={{ color: currentTheme.onPrimaryContainer }}
-					>
-						6
-					</BodyText>
-				</View>
-				<View style={styles.calendarItemDay}>
-					<BodyText
-						large={false}
-						style={{ color: currentTheme.onPrimaryContainer }}
-					>
-						7
-					</BodyText>
-				</View>
-			</View>
-			<View style={styles.calendarItemDaysRow}>
-				<View style={styles.calendarItemDay}>
-					<BodyText
-						large={false}
-						style={{ color: currentTheme.onPrimaryContainer }}
-					>
-						1
-					</BodyText>
-				</View>
-				<View style={styles.calendarItemDay}>
-					<BodyText
-						large={false}
-						style={{ color: currentTheme.onPrimaryContainer }}
-					>
-						2
-					</BodyText>
-				</View>
-				<View style={styles.calendarItemDay}>
-					<BodyText
-						large={false}
-						style={{ color: currentTheme.onPrimaryContainer }}
-					>
-						3
-					</BodyText>
-				</View>
-				<View style={styles.calendarItemDay}>
-					<BodyText
-						large={false}
-						style={{ color: currentTheme.onPrimaryContainer }}
-					>
-						4
-					</BodyText>
-				</View>
-				<View style={styles.calendarItemDay}>
-					<BodyText
-						large={false}
-						style={{ color: currentTheme.onPrimaryContainer }}
-					>
-						5
-					</BodyText>
-				</View>
-				<View style={styles.calendarItemDay}>
-					<BodyText
-						large={false}
-						style={{ color: currentTheme.onPrimaryContainer }}
-					>
-						6
-					</BodyText>
-				</View>
-				<View style={styles.calendarItemDay}>
-					<BodyText
-						large={false}
-						style={{ color: currentTheme.onPrimaryContainer }}
-					>
-						7
-					</BodyText>
-				</View>
-			</View>
-			<View style={styles.calendarItemDaysRow}>
-				<View style={styles.calendarItemDay}>
-					<BodyText
-						large={false}
-						style={{ color: currentTheme.onPrimaryContainer }}
-					>
-						1
-					</BodyText>
-				</View>
-				<View style={styles.calendarItemDay}>
-					<BodyText
-						large={false}
-						style={{ color: currentTheme.onPrimaryContainer }}
-					>
-						2
-					</BodyText>
-				</View>
-				<View style={styles.calendarItemDay}>
-					<BodyText
-						large={false}
-						style={{ color: currentTheme.onPrimaryContainer }}
-					>
-						3
-					</BodyText>
-				</View>
-				<View style={styles.calendarItemDay}>
-					<BodyText
-						large={false}
-						style={{ color: currentTheme.onPrimaryContainer }}
-					>
-						4
-					</BodyText>
-				</View>
-				<View style={styles.calendarItemDay}>
-					<BodyText
-						large={false}
-						style={{ color: currentTheme.onPrimaryContainer }}
-					>
-						5
-					</BodyText>
-				</View>
-				<View style={styles.calendarItemDay}>
-					<BodyText
-						large={false}
-						style={{ color: currentTheme.onPrimaryContainer }}
-					>
-						6
-					</BodyText>
-				</View>
-				<View style={styles.calendarItemDay}>
-					<BodyText
-						large={false}
-						style={{ color: currentTheme.onPrimaryContainer }}
-					>
-						7
-					</BodyText>
-				</View>
-			</View>
-			<View style={styles.calendarItemDaysRow}>
-				<View style={styles.calendarItemDay}>
-					<BodyText
-						large={false}
-						style={{ color: currentTheme.onPrimaryContainer }}
-					>
-						1
-					</BodyText>
-				</View>
-				<View style={styles.calendarItemDay}>
-					<BodyText
-						large={false}
-						style={{ color: currentTheme.onPrimaryContainer }}
-					>
-						2
-					</BodyText>
-				</View>
-				<View style={styles.calendarItemDay}>
-					<BodyText
-						large={false}
-						style={{ color: currentTheme.onPrimaryContainer }}
-					>
-						3
-					</BodyText>
-				</View>
-				<View style={styles.calendarItemDay}>
-					<BodyText
-						large={false}
-						style={{ color: currentTheme.onPrimaryContainer }}
-					>
-						4
-					</BodyText>
-				</View>
-				<View style={styles.calendarItemDay}>
-					<BodyText
-						large={false}
-						style={{ color: currentTheme.onPrimaryContainer }}
-					>
-						5
-					</BodyText>
-				</View>
-				<View style={styles.calendarItemDay}>
-					<BodyText
-						large={false}
-						style={{ color: currentTheme.onPrimaryContainer }}
-					>
-						6
-					</BodyText>
-				</View>
-				<View style={styles.calendarItemDay}>
-					<BodyText
-						large={false}
-						style={{ color: currentTheme.onPrimaryContainer }}
-					>
-						7
-					</BodyText>
-				</View>
-			</View>
-			<View style={styles.calendarItemDaysRow}>
-				<View style={styles.calendarItemDay}>
-					<BodyText
-						large={false}
-						style={{ color: currentTheme.onPrimaryContainer }}
-					>
-						1
-					</BodyText>
-				</View>
-				<View style={styles.calendarItemDay}>
-					<BodyText
-						large={false}
-						style={{ color: currentTheme.onPrimaryContainer }}
-					>
-						2
-					</BodyText>
-				</View>
-				<View style={styles.calendarItemDay}>
-					<BodyText
-						large={false}
-						style={{ color: currentTheme.onPrimaryContainer }}
-					>
-						3
-					</BodyText>
-				</View>
-				<View style={styles.calendarItemDay}>
-					<BodyText
-						large={false}
-						style={{ color: currentTheme.onPrimaryContainer }}
-					>
-						4
-					</BodyText>
-				</View>
-				<View style={styles.calendarItemDay}>
-					<BodyText
-						large={false}
-						style={{ color: currentTheme.onPrimaryContainer }}
-					>
-						5
-					</BodyText>
-				</View>
-				<View style={styles.calendarItemDay}>
-					<BodyText
-						large={false}
-						style={{ color: currentTheme.onPrimaryContainer }}
-					>
-						6
-					</BodyText>
-				</View>
-				<View style={styles.calendarItemDay}>
-					<BodyText
-						large={false}
-						style={{ color: currentTheme.onPrimaryContainer }}
-					>
-						7
-					</BodyText>
-				</View>
-			</View> */}
 		</View>
 	);
 };
@@ -556,6 +263,7 @@ const getStyles = (theme) => {
 			flex: 1,
 			flexDirection: "column",
 			// backgroundColor: theme.surfaceVariant,
+			// marginBottom: 20
 		},
 		calendarItemHeader: {
 			height: 40,
@@ -567,8 +275,11 @@ const getStyles = (theme) => {
 		},
 		calendarItemDaysHeader: {
 			flexDirection: "row",
-			height: 40,
+			// height: 30,
+			// backgroundColor: theme.error,
+			marginBottom: 6,
 			justifyContent: "space-around",
+			alignItems: "center",
 		},
 		calendarItemDaysRow: {
 			flexDirection: "row",

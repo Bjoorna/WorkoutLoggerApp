@@ -229,6 +229,26 @@ export const writeWorkoutToCollection = async (workout) => {
 	}
 };
 
+export const getWorkoutOnDay = async (userID, dayStart, dayEnd) => {
+	try {
+		const workoutRef = collection(database, "workouts");
+		const q = query(
+			workoutRef,
+			where("owner", "==", userID),
+			where("date", ">=", dayStart),
+			where("date", "<=", dayEnd)
+		);
+		const querySnapshot = await getDocs(q);
+		if (!querySnapshot.empty) {
+			return querySnapshot.docs;
+		} else {
+			return null;
+		}
+	} catch (error) {
+		throw new Error(error);
+	}
+};
+
 export const writeDocumentToCollection = async (
 	document,
 	dbCollection,
@@ -302,5 +322,19 @@ export const loginWithEmailAndPassword = async (email, password) => {
 		console.log(error.message);
 		// TODO, return better errorsmessages
 		throw new Error(error);
+	}
+};
+
+// utils
+
+export const createTimeStampFromDate = (date) => {
+	if (date) {
+		return Timestamp.fromDate(date);
+	}
+};
+
+export const createTimeStampFromMillis = (millis) => {
+	if (millis) {
+		return Timestamp.fromMillis(millis);
 	}
 };
