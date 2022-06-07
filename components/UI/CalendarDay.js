@@ -4,17 +4,18 @@ import { View, StyleSheet, Pressable } from "react-native";
 import { useSelector } from "react-redux";
 
 import BodyText from "../Text/Body";
+import LabelText from "../Text/Label";
 
 import { Themes } from "../../shared/Theme";
 
 import * as firebase from "../../firebase/firebase";
-import { async } from "@firebase/util";
 
 const CalendarDay = ({ day }) => {
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
 	const userID = useSelector((state) => state.auth.userID);
 
 	const [hasWorkout, setHasWorkout] = useState(false);
+	const [workoutOnDay, setWorkoutOnDay] = useState([]);
 
 	const [styles, setStyles] = useState(
 		getStyles(useDarkMode ? Themes.dark : Themes.light)
@@ -26,13 +27,19 @@ const CalendarDay = ({ day }) => {
 	useEffect(() => {
 		const checkIfDayHasWorkout = async (day, dayStart, dayEnd) => {
 			if (userID && day) {
-				const workouts = [];
 				const findWorkouts = await firebase.getWorkoutOnDay(
 					userID,
 					dayStart,
 					dayEnd
 				);
 				if (findWorkouts) {
+					const workouts = [];
+					findWorkouts.forEach((doc) => {
+						console.log(day.date);
+						console.log(doc.data());
+						workouts.push(doc.data());
+					});
+					setWorkoutOnDay(workouts);
 					setHasWorkout(true);
 				}
 			} else if (!day) {
@@ -67,22 +74,7 @@ const CalendarDay = ({ day }) => {
 	}, [useDarkMode]);
 
 	const onDayPress = async () => {
-		// console.log("OnDay: ");
-		// console.log(day.date);
-		let nextDay = new Date(day.date);
-		nextDay.setUTCHours(23);
-		// console.log("NextDay: ");
-		// console.log(nextDay);
-		const dayStart = firebase.createTimeStampFromDate(day.date);
-		const dayEnd = firebase.createTimeStampFromDate(nextDay);
-		// console.log(lowLimit);
-		// console.log(highLimit);
-		const hasWorkout = await checkIfDayHasWorkout(day, dayStart, dayEnd);
 		if (hasWorkout) {
-			hasWorkout.forEach((doc) => {
-				console.log(doc.data());
-			});
-			setHasWorkout(true);
 		}
 	};
 
@@ -105,6 +97,16 @@ const CalendarDay = ({ day }) => {
 						: styles.calendarItemDay
 				}
 			>
+				{hasWorkout && workoutOnDay.length > 1 && (
+					<View style={styles.multipleBadge}>
+						<LabelText
+							style={{ color: currentTheme.onTertiary }}
+							large={false}
+						>
+							{workoutOnDay.length}
+						</LabelText>
+					</View>
+				)}
 				<BodyText
 					large={false}
 					style={
@@ -148,6 +150,18 @@ const getStyles = (theme) => {
 			justifyContent: "center",
 			alignItems: "center",
 			backgroundColor: theme.secondaryContainer,
+		},
+		multipleBadge: {
+			position: "absolute",
+			left: 30,
+			bottom: 30,
+
+			height: 16,
+			width: 16,
+			justifyContent: "center",
+			alignItems: "center",
+			borderRadius: 8,
+			backgroundColor: theme.tertiary,
 		},
 	});
 };

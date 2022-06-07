@@ -18,7 +18,6 @@ const CalendarMonth = ({ month }) => {
 	);
 
 	const [isLoading, setIsLoading] = useState(false);
-	const [onMonth, setOnMonth] = useState(null);
 
 	const [displayMonth, setDisplayMonth] = useState([]);
 
@@ -39,10 +38,7 @@ const CalendarMonth = ({ month }) => {
 	useEffect(() => {
 		if (month) {
 			setIsLoading(true);
-
-			console.log("monthSet");
-
-			setOnMonth(month);
+			// setOnMonth(month);
 			getMonthName(month[0].date);
 			createViewMonth(month);
 		} else {
@@ -56,7 +52,6 @@ const CalendarMonth = ({ month }) => {
 		}
 	}, [displayMonth]);
 
-	useEffect(() => {}, [onMonth]);
 
 	const createViewMonth = (month) => {
 		const monthView = [];
@@ -132,16 +127,6 @@ const CalendarMonth = ({ month }) => {
 
 	return (
 		<View style={styles.calendarItem}>
-			{/* {isLoading && (
-				<View style={styles.calendarItemHeader}>
-					<BodyText
-						large={true}
-						style={{ color: currentTheme.onSurface }}
-					>
-						{monthName}
-					</BodyText>
-				</View>
-			)} */}
 			<View style={styles.calendarItemHeader}>
 				<BodyText
 					large={true}
@@ -215,38 +200,6 @@ const CalendarMonth = ({ month }) => {
 											day={day}
 										/>
 									);
-									// if (day) {
-									// 	return (
-									// 		<View
-									// 			style={styles.calendarItemDay}
-									// 		>
-									// 			<BodyText
-									// 				large={false}
-									// 				style={{
-									// 					color: currentTheme.onSurfaceVariant,
-									// 				}}
-									// 			>
-									// 				{day.dayOfMonth}
-									// 			</BodyText>
-									// 		</View>
-									// 	);
-									// }else {
-									// 	return (
-									// 		<View
-									// 			style={styles.calendarItemDay}
-									// 		>
-									// 			<BodyText
-									// 				large={false}
-									// 				style={{
-									// 					color: currentTheme.onSurfaceVariant,
-									// 				}}
-									// 			>
-
-									// 			</BodyText>
-									// 		</View>
-									// 	);
-
-									// }
 								})}
 							</View>
 						);
