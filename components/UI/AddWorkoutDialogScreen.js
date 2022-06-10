@@ -9,9 +9,7 @@ import {
 	Keyboard,
 	SectionList,
 	FlatList,
-	StatusBar,
 	Platform,
-	BackHandler
 } from "react-native";
 import { useSelector } from "react-redux";
 import { Themes } from "../../shared/Theme";
@@ -34,6 +32,8 @@ import { Divider } from "react-native-paper";
 import Exercise from "../../models/Exercise";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import * as firebase from "../../firebase/firebase";
+
+import { hexToRGB } from "../../shared/utils/UtilFunctions";
 
 const windowWidth = Dimensions.get("screen").width;
 const textFieldWidth = Math.floor((windowWidth - 24 * 2 - 8) / 2);
@@ -116,7 +116,7 @@ const AddWorkoutDialogScreen = (props) => {
 	const [showExerciseModal, setShowExerciseModal] = useState(false);
 	const [showCloseDialogModal, setShowCloseDialogModal] = useState(false);
 	const [modalBackdropHex, setModalBackdropHex] = useState(
-		UtilFunctions.hexToRGB(currentTheme.surface)
+		hexToRGB(currentTheme.surface)
 	);
 
 	const repRef = useRef(null);

@@ -24,7 +24,7 @@ import TextButton from "../../components/Buttons/TextButton";
 import HeadlineText from "../../components/Text/Headline";
 import IconButton from "../../components/Buttons/IconButton";
 import { FilledTextField } from "rn-material-ui-textfield";
-import UtilFunctions from "../../shared/utils/UtilFunctions";
+import { hexToRGB } from "../../shared/utils/UtilFunctions";
 
 const RESET = "RESET";
 const ADD_VALUE = "ADD_VALUE";
@@ -78,7 +78,7 @@ const WeightCalculatorScreen = (props) => {
 		useDarkMode ? Themes.dark : Themes.light
 	);
 	const [scrimColor, setScrimColor] = useState(
-		UtilFunctions.hexToRGB(currentTheme.surface)
+		hexToRGB(currentTheme.surface)
 	);
 	useEffect(() => {
 		console.log("USERsettings from calculator");

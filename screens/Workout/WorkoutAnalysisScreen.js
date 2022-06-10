@@ -17,6 +17,8 @@ import { Themes } from "../../shared/Theme";
 import { useDispatch, useSelector } from "react-redux";
 import { ExerciseTypes } from "../../shared/utils/ExerciseTypes";
 
+import { hexToRGB } from "../../shared/utils/UtilFunctions";
+
 // TODO rework the hex-to-rgb on chart so that it doesnt call 3 times for one color code
 const WorkoutAnalysisScreen = (props) => {
 	const userID = useSelector((state) => state.auth.userID);
@@ -42,6 +44,13 @@ const WorkoutAnalysisScreen = (props) => {
 	);
 	const [currentTheme, setCurrentTheme] = useState(
 		useDarkMode ? Themes.dark : Themes.light
+	);
+
+	const [chartDotColorHexCode, setChartDotColorHexCode] = useState(
+		hexToRGB(currentTheme.tertiary)
+	);
+	const [chartSurfaceColorHexCode, setChartSurfaceColorHexCode] = useState(
+		hexToRGB(currentTheme.onSurface)
 	);
 
 	useEffect(() => {
@@ -81,6 +90,8 @@ const WorkoutAnalysisScreen = (props) => {
 	useEffect(() => {
 		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
 		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
+		setChartSurfaceColorHexCode(hexToRGB(currentTheme.onSurface));
+		setChartDotColorHexCode(hexToRGB(currentTheme.tertiary));
 	}, [useDarkMode]);
 
 	const loadExercise = (type) => {
@@ -149,9 +160,9 @@ const WorkoutAnalysisScreen = (props) => {
 				{
 					data: exerciseWeightArray,
 					color: (opacity = 1) =>
-						`rgba(${hexToRGB(currentTheme.tertiary)[0]}, ${
-							hexToRGB(currentTheme.tertiary)[1]
-						}, ${hexToRGB(currentTheme.tertiary)[2]}, ${opacity})`,
+						`rgba(${chartDotColorHexCode[0]}, ${
+							chartDotColorHexCode[1]
+						}, ${chartDotColorHexCode[2]}, ${opacity})`,
 					strokeWidth: 2,
 				},
 			],
@@ -160,25 +171,6 @@ const WorkoutAnalysisScreen = (props) => {
 		setChartDataObject(chartData);
 	};
 
-	const hexToRGB = (hex) => {
-		let r = 0,
-			g = 0,
-			b = 0;
-		// 3 digits
-		if (hex.length == 4) {
-			r = "0x" + hex[1] + hex[1];
-			g = "0x" + hex[2] + hex[2];
-			b = "0x" + hex[3] + hex[3];
-
-			// 6 digits
-		} else if (hex.length == 7) {
-			r = "0x" + hex[1] + hex[2];
-			g = "0x" + hex[3] + hex[4];
-			b = "0x" + hex[5] + hex[6];
-		}
-		return [+r, +g, +b];
-		// return "rgb("+ +r + "," + +g + "," + +b + ")";
-	};
 
 	const testClickPoint = (value, dataset, getColor) => {};
 
@@ -253,18 +245,20 @@ const WorkoutAnalysisScreen = (props) => {
 									decimalPlaces: 2, // optional, defaults to 2dp
 									color: (opacity = 1) =>
 										`rgba(${
-											hexToRGB(currentTheme.tertiary)[0]
+											chartDotColorHexCode[0]
 										}, ${
-											hexToRGB(currentTheme.tertiary)[1]
+											chartDotColorHexCode[1]
 										}, ${
-											hexToRGB(currentTheme.tertiary)[2]
+											chartDotColorHexCode[2]
 										}, ${opacity})`,
 									labelColor: (opacity = 1) =>
 										`rgba(${
-											hexToRGB(currentTheme.onSurface)[0]
+											chartSurfaceColorHexCode[0]
 										}, ${
-											hexToRGB(currentTheme.onSurface)[1]
-										}, ${hexToRGB(currentTheme.onSurface)[2]}, ${opacity})`,
+											chartSurfaceColorHexCode[1]
+										}, ${
+											chartSurfaceColorHexCode[2]
+										}, ${opacity})`,
 									style: {
 										borderRadius: 12,
 									},

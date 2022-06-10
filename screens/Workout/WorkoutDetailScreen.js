@@ -16,7 +16,7 @@ import LabelText from "../../components/Text/Label";
 import HeadlineText from "../../components/Text/Headline";
 import TextButton from "../../components/Buttons/TextButton";
 import IconButton from "../../components/Buttons/IconButton";
-import UtilFunctions from "../../shared/utils/UtilFunctions";
+import { hexToRGB } from "../../shared/utils/UtilFunctions";
 
 const WorkoutDetailScreen = (props) => {
 	const dispatch = useDispatch();
@@ -37,7 +37,7 @@ const WorkoutDetailScreen = (props) => {
 	const [summaryData, setSummaryData] = useState(null);
 	const [showModal, setShowModal] = useState(false);
 	const [modalBackdropHex, setModalBackdropHex] = useState(
-		UtilFunctions.hexToRGB(currentTheme.surface)
+		hexToRGB(currentTheme.surface)
 	);
 	useEffect(() => {
 		const onWorkout = workoutsRef.find(
@@ -46,7 +46,7 @@ const WorkoutDetailScreen = (props) => {
 		console.log("OnWorkoout: ");
 		console.log(onWorkout);
 		setWorkout(onWorkout);
-		console.log(UtilFunctions.hexToRGB(currentTheme.surface));
+		console.log(hexToRGB(currentTheme.surface));
 	}, []);
 
 	useEffect(() => {
@@ -67,7 +67,7 @@ const WorkoutDetailScreen = (props) => {
 	useEffect(() => {
 		setStyles(useDarkMode ? Themes.dark : Themes.light);
 		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
-		setModalBackdropHex(UtilFunctions.hexToRGB(currentTheme.surface));
+		setModalBackdropHex(hexToRGB(currentTheme.surface));
 	}, [useDarkMode]);
 
 	const calculateSummary = (exercises) => {
