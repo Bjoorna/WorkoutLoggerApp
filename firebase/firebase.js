@@ -316,7 +316,7 @@ export const loginWithEmailAndPassword = async (email, password) => {
 			password
 		);
 		return userCredentials.user;
-	} catch (e) {
+	} catch (error) {
 		const errorCode = error.code;
 		const errorMessage = error.message;
 		console.log(error.message);

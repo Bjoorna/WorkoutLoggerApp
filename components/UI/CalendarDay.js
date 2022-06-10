@@ -9,6 +9,7 @@ import LabelText from "../Text/Label";
 import { Themes } from "../../shared/Theme";
 
 import * as firebase from "../../firebase/firebase";
+import { useIsMounted } from "../../hooks/IsMountedHook";
 
 const CalendarDay = ({ day }) => {
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
@@ -16,7 +17,7 @@ const CalendarDay = ({ day }) => {
 
 	const [hasWorkout, setHasWorkout] = useState(false);
 	const [workoutOnDay, setWorkoutOnDay] = useState([]);
-
+	const [isMounted, setIsMounted] = useState(useIsMounted());
 	const [styles, setStyles] = useState(
 		getStyles(useDarkMode ? Themes.dark : Themes.light)
 	);
@@ -35,12 +36,17 @@ const CalendarDay = ({ day }) => {
 				if (findWorkouts) {
 					const workouts = [];
 					findWorkouts.forEach((doc) => {
-						console.log(day.date);
-						console.log(doc.data());
+						// console.log(day.date);
+						// console.log(doc.data());
 						workouts.push(doc.data());
 					});
-					setWorkoutOnDay(workouts);
-					setHasWorkout(true);
+					// return workouts;
+					// setWorkoutOnDay(workouts);
+					if (workouts.length > 0) {
+						setHasWorkout(true);
+					}
+				} else {
+					return null;
 				}
 			} else if (!day) {
 				console.log("NoDay");
@@ -49,20 +55,8 @@ const CalendarDay = ({ day }) => {
 		if (day) {
 			let nextDay = new Date(day.date);
 			nextDay.setUTCHours(23);
-			// console.log("NextDay: ");
-			// console.log(nextDay);
 			const dayStart = firebase.createTimeStampFromDate(day.date);
 			const dayEnd = firebase.createTimeStampFromDate(nextDay);
-			// console.log(lowLimit);
-			// console.log(highLimit);
-			// const hasWorkout = await checkIfDayHasWorkout(day, dayStart, dayEnd);
-
-			// if(hasWorkout){
-			// 	hasWorkout.forEach(doc=> {
-			// 		console.log(doc.data());
-			// 	});
-			// 	setHasWorkout(true);
-			// }
 
 			checkIfDayHasWorkout(day, dayStart, dayEnd);
 		}
@@ -77,15 +71,6 @@ const CalendarDay = ({ day }) => {
 		if (hasWorkout) {
 		}
 	};
-
-	// const checkIfDayHasWorkout = async (onDay, dayStart, dayEnd) => {
-	// 	if(userID && day){
-	// 		console.log(userID);
-	// 		return firebase.getWorkoutOnDay(userID, dayStart, dayEnd);
-	// 	}else if(!day){
-	// 		console.log("NoDay");
-	// 	}
-	// };
 
 	if (day) {
 		return (

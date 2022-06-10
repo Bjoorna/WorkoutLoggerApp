@@ -110,7 +110,7 @@ export const CalendarStackScreen = () => {
 				component={CalendarScreen}
 				options={{
 					...getDefaultStyleOptions(currentTheme),
-					headerShown: false,
+					// headerShown: false,
 				}}
 			/>
 		</CalendarStackNavigator.Navigator>

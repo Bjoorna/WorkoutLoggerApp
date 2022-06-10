@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View, StatusBar } from "react-native";
+import {
+	StyleSheet,
+	View,
+	StatusBar,
+	FlatList,
+	ActivityIndicator,
+} from "react-native";
 import { useSelector } from "react-redux";
 
 import { Themes } from "../shared/Theme";
@@ -40,7 +46,19 @@ const CalendarScreen = () => {
 	const [month, setMonth] = useState(null);
 	const [secondMonth, setSecondMonth] = useState(null);
 
+	const [monthArray, setMonthArray] = useState([]);
+
+	const [isLoading, setIsLoading] = useState(false);
+
 	useEffect(() => {
+		setIsLoading(true);
+		const thisYear = new Date().getUTCFullYear();
+		const arrayOfMonths = [];
+		for (let index = 0; index < 12; index++) {
+			const daysInMonth = getDaysInMonthOfYear(index, thisYear);
+			arrayOfMonths.push(daysInMonth);
+		}
+		setMonthArray(arrayOfMonths);
 		setMonth(getDaysInMonthOfYear(onMonth, onYear));
 		setSecondMonth(getDaysInMonthOfYear(onMonth + 1, onYear));
 	}, []);
@@ -49,6 +67,14 @@ const CalendarScreen = () => {
 		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
 		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
 	}, [useDarkMode]);
+
+	useEffect(() => {
+		// console.log(monthArray);
+		if (monthArray.length > 0) {
+			console.log(monthArray[0][0]);
+			setIsLoading(false);
+		}
+	}, [monthArray]);
 
 	const getDaysInMonthOfYear = (month, year) => {
 		let date = new Date(Date.UTC(year, month, 1));
@@ -95,16 +121,44 @@ const CalendarScreen = () => {
 	};
 
 	return (
-		<GestureRecognizer
-			onSwipeDown={() => changeOnMonth("down")}
-			onSwipeUp={() => changeOnMonth("up")}
-			style={styles.container}
-		>
-			<View style={styles.calendarContainer}>
-				<CalendarMonth month={month} />
-				<CalendarMonth month={secondMonth} />
-			</View>
-		</GestureRecognizer>
+		<View style={styles.container}>
+			{isLoading && (
+				<View
+					style={{
+						flex: 1,
+						justifyContent: "center",
+						alignItems: "center",
+					}}
+				>
+					<ActivityIndicator
+						size={"large"}
+						color={currentTheme.primary}
+					/>
+				</View>
+			)}
+			{!isLoading && (
+				<FlatList
+					style={styles.listStyle}
+					data={monthArray}
+					renderItem={(itemData) => (
+						<CalendarMonth month={itemData.item} />
+					)}
+					keyExtractor={(index) => Math.random()}
+				/>
+			)}
+			{/* <CalendarMonth month={month} />
+			<CalendarMonth month={secondMonth} /> */}
+		</View>
+		// <GestureRecognizer
+		// 	onSwipeDown={() => changeOnMonth("down")}
+		// 	onSwipeUp={() => changeOnMonth("up")}
+		// 	style={styles.container}
+		// >
+		// 	<View style={styles.calendarContainer}>
+		// 		<CalendarMonth month={month} />
+		// 		<CalendarMonth month={secondMonth} />
+		// 	</View>
+		// </GestureRecognizer>
 	);
 };
 
@@ -113,9 +167,7 @@ const getStyles = (theme) => {
 		container: {
 			flex: 1,
 			backgroundColor: theme.surface,
-			marginTop: StatusBar.currentHeight,
-
-			paddingHorizontal: 24,
+			// paddingHorizontal: 24,
 			paddingVertical: 12,
 		},
 		calendarContainer: {
@@ -124,6 +176,9 @@ const getStyles = (theme) => {
 			// height: 200,
 			// width: 200,
 			// backgroundColor: theme.error,
+		},
+		listStyle: {
+			paddingHorizontal: 24,
 		},
 		calendarItem: {
 			flex: 1,

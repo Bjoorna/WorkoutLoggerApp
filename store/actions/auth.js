@@ -61,6 +61,7 @@ export const login = (email, password) => {
 				password
 			);
 			console.log("User logged in");
+			console.log(user);
 			const userID = user.uid;
 			const userToken = user.stsTokenManager.accessToken;
 			console.log("Getting userData from server");

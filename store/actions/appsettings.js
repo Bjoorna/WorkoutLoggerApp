@@ -1,6 +1,7 @@
 export const SET_TAB_BAR_VALUE = "SET_TAB_BAR_VALUE";
 export const SET_USE_DARKMODE = "SET_USE_DARKMODE";
 export const SET_IS_SCROLLING = "SET_IS_SCROLLING";
+export const SET_MONDAY_FIRSTDAY = "SET_MONDAY_FIRSTDAY";
 
 export const toggleTabBar = (value) => {
 	const nextValue = !currentValue;

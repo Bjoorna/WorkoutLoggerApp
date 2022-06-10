@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet,ActivityIndicator } from "react-native";
 import { useSelector } from "react-redux";
 
 import BodyText from "../Text/Body";
@@ -9,6 +9,7 @@ import CalendarDay from "./CalendarDay";
 
 const CalendarMonth = ({ month }) => {
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
+	const isMondayFirstDayOfWeek = useSelector(state => state.appSettings.isMondayFirstDay);
 
 	const [styles, setStyles] = useState(
 		getStyles(useDarkMode ? Themes.dark : Themes.light)
@@ -24,6 +25,7 @@ const CalendarMonth = ({ month }) => {
 	const [monthName, setMonthName] = useState(null);
 
 	useEffect(() => {
+		setIsLoading(true);
 		if (month) {
 		} else {
 			console.log("no month yet");
@@ -37,6 +39,10 @@ const CalendarMonth = ({ month }) => {
 
 	useEffect(() => {
 		if (month) {
+			if (displayMonth.length > 0) {
+				console.log("Months is already set");
+				return;
+			}
 			setIsLoading(true);
 			// setOnMonth(month);
 			getMonthName(month[0].date);
@@ -51,7 +57,6 @@ const CalendarMonth = ({ month }) => {
 			setIsLoading(false);
 		}
 	}, [displayMonth]);
-
 
 	const createViewMonth = (month) => {
 		const monthView = [];
@@ -126,84 +131,93 @@ const CalendarMonth = ({ month }) => {
 	};
 
 	return (
-		<View style={styles.calendarItem}>
-			<View style={styles.calendarItemHeader}>
-				<BodyText
-					large={true}
-					style={{ color: currentTheme.onSurface }}
-				>
-					{monthName}
-				</BodyText>
-			</View>
-			<View style={styles.calendarItemDaysHeader}>
-			<BodyText
-					large={false}
-					style={{ color: currentTheme.onSurface }}
-				>
-					S
-				</BodyText>
-
-				<BodyText
-					large={false}
-					style={{ color: currentTheme.onSurface }}
-				>
-					M
-				</BodyText>
-				<BodyText
-					large={false}
-					style={{ color: currentTheme.onSurface }}
-				>
-					T
-				</BodyText>
-				<BodyText
-					large={false}
-					style={{ color: currentTheme.onSurface }}
-				>
-					W
-				</BodyText>
-				<BodyText
-					large={false}
-					style={{ color: currentTheme.onSurface }}
-				>
-					T
-				</BodyText>
-				<BodyText
-					large={false}
-					style={{ color: currentTheme.onSurface }}
-				>
-					F
-				</BodyText>
-				<BodyText
-					large={false}
-					style={{ color: currentTheme.onSurface }}
-				>
-					S
-				</BodyText>
-			</View>
-
+		<View style={{flex: 1}}>
+			{isLoading && (
+				<View>
+					<ActivityIndicator size={"small"} color ={currentTheme.primary} />
+				</View>
+			)}
 			{!isLoading && (
-				<View style={styles.calendarDaysContainer}>
-					{displayMonth.map((week) => {
-						return (
-							<View
-								key={Math.random()}
-								style={styles.calendarItemDaysRow}
-							>
-								{week.map((day) => {
-									return (
-										<CalendarDay
-											key={
-												day === null
-													? Math.random()
-													: day.date
-											}
-											day={day}
-										/>
-									);
-								})}
-							</View>
-						);
-					})}
+				<View style={styles.calendarItem}>
+					<View style={styles.calendarItemHeader}>
+						<BodyText
+							large={true}
+							style={{ color: currentTheme.onSurface }}
+						>
+							{monthName}
+						</BodyText>
+					</View>
+					<View style={styles.calendarItemDaysHeader}>
+						<BodyText
+							large={false}
+							style={{ color: currentTheme.onSurface }}
+						>
+							S
+						</BodyText>
+
+						<BodyText
+							large={false}
+							style={{ color: currentTheme.onSurface }}
+						>
+							M
+						</BodyText>
+						<BodyText
+							large={false}
+							style={{ color: currentTheme.onSurface }}
+						>
+							T
+						</BodyText>
+						<BodyText
+							large={false}
+							style={{ color: currentTheme.onSurface }}
+						>
+							W
+						</BodyText>
+						<BodyText
+							large={false}
+							style={{ color: currentTheme.onSurface }}
+						>
+							T
+						</BodyText>
+						<BodyText
+							large={false}
+							style={{ color: currentTheme.onSurface }}
+						>
+							F
+						</BodyText>
+						<BodyText
+							large={false}
+							style={{ color: currentTheme.onSurface }}
+						>
+							S
+						</BodyText>
+					</View>
+
+					{!isLoading && (
+						<View style={styles.calendarDaysContainer}>
+							{displayMonth.map((week) => {
+								return (
+									<View
+										key={Math.random()}
+										style={styles.calendarItemDaysRow}
+									>
+										{week.map((day) => {
+											return (
+												<CalendarDay
+													key={
+														day === null
+															? Math.random()
+															: day.date
+													}
+													day={day}
+												/>
+											);
+										})}
+									</View>
+								);
+							})}
+						</View>
+					)}
 				</View>
 			)}
 		</View>

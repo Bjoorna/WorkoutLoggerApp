@@ -6,18 +6,27 @@ import BodyText from "../../components/Text/Body";
 import * as UserActions from "../../store/actions/user";
 import { Themes } from "../../shared/Theme";
 import User from "../../models/User";
-import { SET_USE_DARKMODE } from "../../store/actions/appsettings";
+import {
+	SET_MONDAY_FIRSTDAY,
+	SET_USE_DARKMODE,
+} from "../../store/actions/appsettings";
 import CustomSwitch from "../../components/UI/CustomSwitch";
 import LabelText from "../../components/Text/Label";
 const UserSettingsScreen = (props) => {
 	const user = useSelector((state) => state.user.user);
 	const userID = useSelector((state) => state.auth.userID);
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
+	const isMondayFirstDay = useSelector(
+		(state) => state.appSettings.isMondayFirstDay
+	);
 	const dispatch = useDispatch();
 
 	// State for different settings
 	const [useMetricValue, setUseMetricValue] = useState(user.useMetric);
 	const [useDarkModeValue, setUseDarkModeValue] = useState(useDarkMode);
+
+	const [isMondayFirstDayValue, setIsMondayFirstDayValue] =
+		useState(isMondayFirstDay);
 
 	const [isSwitchDisabled, setIsSwitchDisabled] = useState(false);
 	const [updateUser, setUpdateUser] = useState(false);
@@ -102,6 +111,10 @@ const UserSettingsScreen = (props) => {
 		}
 	};
 
+	const onToggleMondayFirstDay = () => {
+		dispatch({ type: SET_MONDAY_FIRSTDAY, value: !isMondayFirstDayValue });
+	};
+
 	return (
 		<View style={styles.screen}>
 			<View style={styles.userSettingsList}>
@@ -160,6 +173,30 @@ const UserSettingsScreen = (props) => {
 						/>
 					</View>
 					<View style={styles.userSettingsItem}>
+						<View style={styles.userSettingsText}>
+							<BodyText
+								large={true}
+								style={{ color: currentTheme.onSurface }}
+							>
+								Monday first day in week?
+							</BodyText>
+							<LabelText
+								large={false}
+								style={{ color: currentTheme.onSurfaceVariant }}
+							>
+								If toggled, monday is set as first day of the
+								week, sunday if not toggled
+							</LabelText>
+						</View>
+
+						<CustomSwitch
+							isSwitchSelected={false}
+							isSwitchDisabled={false}
+							onSwitchPressed={onToggleMondayFirstDay}
+						/>
+					</View>
+
+					<View style={styles.userSettingsItem}>
 						<BodyText
 							large={true}
 							style={{ color: currentTheme.onSurface }}
@@ -169,7 +206,9 @@ const UserSettingsScreen = (props) => {
 						<CustomSwitch
 							isSwitchSelected={false}
 							isSwitchDisabled={false}
-							onSwitchPressed={() => {console.log("TestSwitch")}}
+							onSwitchPressed={() => {
+								console.log("TestSwitch");
+							}}
 						/>
 					</View>
 				</View>
