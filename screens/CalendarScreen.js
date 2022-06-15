@@ -15,23 +15,11 @@ import GestureRecognizer, {
 	swipeDirections,
 } from "react-native-swipe-gestures";
 
-class Year {}
-class Month {}
-class Week {
-	constructor(days) {
-		this.days = days;
-	}
-}
-class Day {
-	constructor(date, dayOfWeek, dayOfMonth) {
-		this.date = date;
-		this.dayOfWeek = dayOfWeek;
-		this.dayOfMonth = dayOfMonth;
-	}
-}
+import { createCalendar, Day } from "../shared/utils/UtilFunctions";
+
 
 const CalendarScreen = () => {
-	const [calendarMap, setCalendarMap] = useState();
+	const [calendarMap, setCalendarMap] = useState(null);
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
 
 	const [styles, setStyles] = useState(
@@ -43,8 +31,8 @@ const CalendarScreen = () => {
 
 	const [onMonth, setOnMonth] = useState(6);
 	const [onYear, setOnYear] = useState(2022);
-	const [month, setMonth] = useState(null);
-	const [secondMonth, setSecondMonth] = useState(null);
+	// const [month, setMonth] = useState(null);
+	// const [secondMonth, setSecondMonth] = useState(null);
 
 	const [monthArray, setMonthArray] = useState([]);
 
@@ -53,14 +41,16 @@ const CalendarScreen = () => {
 	useEffect(() => {
 		setIsLoading(true);
 		const thisYear = new Date().getUTCFullYear();
-		const arrayOfMonths = [];
-		for (let index = 0; index < 12; index++) {
-			const daysInMonth = getDaysInMonthOfYear(index, thisYear);
-			arrayOfMonths.push(daysInMonth);
-		}
-		setMonthArray(arrayOfMonths);
-		setMonth(getDaysInMonthOfYear(onMonth, onYear));
-		setSecondMonth(getDaysInMonthOfYear(onMonth + 1, onYear));
+		const calendar = createCalendar([thisYear]);
+		setCalendarMap(calendar);
+		// const arrayOfMonths = [];
+		// for (let index = 0; index < 12; index++) {
+		// 	const daysInMonth = getDaysInMonthOfYear(index, thisYear);
+		// 	arrayOfMonths.push(daysInMonth);
+		// }
+		// setMonthArray(arrayOfMonths);
+		// setMonth(getDaysInMonthOfYear(onMonth, onYear));
+		// setSecondMonth(getDaysInMonthOfYear(onMonth + 1, onYear));
 	}, []);
 
 	useEffect(() => {
@@ -69,17 +59,30 @@ const CalendarScreen = () => {
 	}, [useDarkMode]);
 
 	useEffect(() => {
-		// console.log(monthArray);
 		if (monthArray.length > 0) {
-			console.log(monthArray[0][0]);
 			setIsLoading(false);
 		}
 	}, [monthArray]);
 
+	useEffect(() => {
+		if (calendarMap) {
+			const calendarYears = calendarMap.keys();
+			// const monthsInCalendar = [];
+			// for (let year of calendarYears) {
+			// 	monthsInCalendar.push(calendarMap.get(year));
+			// }
+			// console.log(monthsInCalendar);
+			setMonthArray(calendarMap.get(2022));
+
+		}
+		// console.log(calendarMap);
+		// setIsLoading(false);
+	}, [calendarMap]);
+
 	const getDaysInMonthOfYear = (month, year) => {
 		let date = new Date(Date.UTC(year, month, 1));
-		const days = [];
 		const dayClassesArray = [];
+		const days = [];
 		while (date.getUTCMonth() === month) {
 			days.push(new Date(date));
 			const newDay = new Day(
@@ -93,32 +96,32 @@ const CalendarScreen = () => {
 		return dayClassesArray;
 	};
 
-	useEffect(() => {
-		setMonth(getDaysInMonthOfYear(onMonth, onYear));
-		setSecondMonth(getDaysInMonthOfYear(onMonth + 1, onYear));
-	}, [onMonth]);
+	// useEffect(() => {
+	// 	setMonth(getDaysInMonthOfYear(onMonth, onYear));
+	// 	setSecondMonth(getDaysInMonthOfYear(onMonth + 1, onYear));
+	// }, [onMonth]);
 
-	const changeOnMonth = (direction) => {
-		if (direction == "up") {
-			console.log("up");
-			const nextOnMonth = onMonth + 2;
-			if (nextOnMonth > 10) {
-				setOnMonth(0);
-				setOnYear(onYear + 1);
-			} else {
-				setOnMonth(nextOnMonth);
-			}
-		} else if (direction == "down") {
-			console.log("down");
-			const nextOnMonth = onMonth - 2;
-			if (nextOnMonth < 0) {
-				setOnMonth(10);
-				setOnYear(onYear - 1);
-			} else {
-				setOnMonth(nextOnMonth);
-			}
-		}
-	};
+	// const changeOnMonth = (direction) => {
+	// 	if (direction == "up") {
+	// 		console.log("up");
+	// 		const nextOnMonth = onMonth + 2;
+	// 		if (nextOnMonth > 10) {
+	// 			setOnMonth(0);
+	// 			setOnYear(onYear + 1);
+	// 		} else {
+	// 			setOnMonth(nextOnMonth);
+	// 		}
+	// 	} else if (direction == "down") {
+	// 		console.log("down");
+	// 		const nextOnMonth = onMonth - 2;
+	// 		if (nextOnMonth < 0) {
+	// 			setOnMonth(10);
+	// 			setOnYear(onYear - 1);
+	// 		} else {
+	// 			setOnMonth(nextOnMonth);
+	// 		}
+	// 	}
+	// };
 
 	return (
 		<View style={styles.container}>
@@ -141,9 +144,9 @@ const CalendarScreen = () => {
 					style={styles.listStyle}
 					data={monthArray}
 					renderItem={(itemData) => (
-						<CalendarMonth month={itemData.item} />
+						<CalendarMonth month={itemData.item.days} />
 					)}
-					keyExtractor={(index) => Math.random()}
+					keyExtractor={(item) => item.id}
 				/>
 			)}
 			{/* <CalendarMonth month={month} />

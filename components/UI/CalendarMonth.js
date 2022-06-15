@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet,ActivityIndicator } from "react-native";
+import { View, StyleSheet, ActivityIndicator } from "react-native";
 import { useSelector } from "react-redux";
 
 import BodyText from "../Text/Body";
@@ -9,7 +9,9 @@ import CalendarDay from "./CalendarDay";
 
 const CalendarMonth = ({ month }) => {
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
-	const isMondayFirstDayOfWeek = useSelector(state => state.appSettings.isMondayFirstDay);
+	const isMondayFirstDayOfWeek = useSelector(
+		(state) => state.appSettings.isMondayFirstDay
+	);
 
 	const [styles, setStyles] = useState(
 		getStyles(useDarkMode ? Themes.dark : Themes.light)
@@ -20,9 +22,9 @@ const CalendarMonth = ({ month }) => {
 
 	const [isLoading, setIsLoading] = useState(false);
 
-	const [displayMonth, setDisplayMonth] = useState([]);
+	const [displayMonth, setDisplayMonth] = useState(null);
 
-	const [monthName, setMonthName] = useState(null);
+	const [monthName, setMonthName] = useState();
 
 	useEffect(() => {
 		setIsLoading(true);
@@ -39,16 +41,14 @@ const CalendarMonth = ({ month }) => {
 
 	useEffect(() => {
 		if (month) {
-			if (displayMonth.length > 0) {
-				console.log("Months is already set");
-				return;
+			if (displayMonth == null) {
+				setIsLoading(true);
+				getMonthName(month[0].date);
+				createViewMonth(month);
+			} else {
+				console.log("Not creating viewMonth");
 			}
-			setIsLoading(true);
-			// setOnMonth(month);
-			getMonthName(month[0].date);
-			createViewMonth(month);
 		} else {
-			// console.log("no month yet");
 		}
 	}, [month]);
 
@@ -131,10 +131,13 @@ const CalendarMonth = ({ month }) => {
 	};
 
 	return (
-		<View style={{flex: 1}}>
+		<View style={{ flex: 1 }}>
 			{isLoading && (
 				<View>
-					<ActivityIndicator size={"small"} color ={currentTheme.primary} />
+					<ActivityIndicator
+						size={"small"}
+						color={currentTheme.primary}
+					/>
 				</View>
 			)}
 			{!isLoading && (
@@ -193,7 +196,7 @@ const CalendarMonth = ({ month }) => {
 						</BodyText>
 					</View>
 
-					{!isLoading && (
+					{displayMonth != null && (
 						<View style={styles.calendarDaysContainer}>
 							{displayMonth.map((week) => {
 								return (
@@ -203,11 +206,19 @@ const CalendarMonth = ({ month }) => {
 									>
 										{week.map((day) => {
 											return (
+												// <View style={styles.calendarItemDay}>
+												// 	<BodyText
+												// 		large={false}
+												// 		style={{
+												// 			color: currentTheme.onSurface,
+												// 		}}
+												// 	>3</BodyText>
+												// </View>
 												<CalendarDay
 													key={
 														day === null
 															? Math.random()
-															: day.date
+															: day.id
 													}
 													day={day}
 												/>

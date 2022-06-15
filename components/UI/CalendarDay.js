@@ -17,7 +17,7 @@ const CalendarDay = ({ day }) => {
 
 	const [hasWorkout, setHasWorkout] = useState(false);
 	const [workoutOnDay, setWorkoutOnDay] = useState([]);
-	const [isMounted, setIsMounted] = useState(useIsMounted());
+	const [thisDay, setThisDay] = useState(day);
 	const [styles, setStyles] = useState(
 		getStyles(useDarkMode ? Themes.dark : Themes.light)
 	);
@@ -36,14 +36,11 @@ const CalendarDay = ({ day }) => {
 				if (findWorkouts) {
 					const workouts = [];
 					findWorkouts.forEach((doc) => {
-						// console.log(day.date);
-						// console.log(doc.data());
 						workouts.push(doc.data());
 					});
-					// return workouts;
-					// setWorkoutOnDay(workouts);
 					if (workouts.length > 0) {
 						setHasWorkout(true);
+						setWorkoutOnDay(workouts);
 					}
 				} else {
 					return null;
@@ -52,15 +49,17 @@ const CalendarDay = ({ day }) => {
 				console.log("NoDay");
 			}
 		};
-		if (day) {
+
+		if (thisDay) {
 			let nextDay = new Date(day.date);
 			nextDay.setUTCHours(23);
 			const dayStart = firebase.createTimeStampFromDate(day.date);
 			const dayEnd = firebase.createTimeStampFromDate(nextDay);
 
-			checkIfDayHasWorkout(day, dayStart, dayEnd);
+			checkIfDayHasWorkout(thisDay, dayStart, dayEnd);
+		} else {
 		}
-	}, [day]);
+	}, []);
 
 	useEffect(() => {
 		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));

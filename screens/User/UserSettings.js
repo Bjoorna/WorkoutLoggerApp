@@ -12,6 +12,9 @@ import {
 } from "../../store/actions/appsettings";
 import CustomSwitch from "../../components/UI/CustomSwitch";
 import LabelText from "../../components/Text/Label";
+
+import { createCalendar, getCalendarFromStorage, saveCalendar } from "../../shared/utils/UtilFunctions";
+import FilledButton from "../../components/Buttons/FilledTonalButton";
 const UserSettingsScreen = (props) => {
 	const user = useSelector((state) => state.user.user);
 	const userID = useSelector((state) => state.auth.userID);
@@ -33,6 +36,8 @@ const UserSettingsScreen = (props) => {
 	const [isUpdating, setIsUpdating] = useState(false);
 	const [error, setError] = useState();
 
+	const [calendar, setCalendar] = useState(null);
+
 	const [styles, setStyles] = useState(getStyles(Themes.light));
 	const [currentTheme, setCurrentTheme] = useState(
 		useDarkMode ? Themes.dark : Themes.light
@@ -50,32 +55,10 @@ const UserSettingsScreen = (props) => {
 		setUseDarkModeValue(useDarkMode);
 	}, [useDarkMode]);
 
-	// useEffect(() => {
-	// 	if (!isUpdating) {
-	// 		return;
-	// 	}
-	// 	const updateUserSettings = async () => {
-	// 		const newUserData = { ...user };
-	// 		newUserData.useMetric = useMetricValue;
-	// 		setError(null);
-	// 		setIsSwitchDisabled(true);
-	// 		try {
-	// 			console.log("UseEffect in userSettings");
-	// 			await dispatch(UserActions.updateUser(userID, newUserData));
-	// 			setIsUpdating(false);
-	// 		} catch (error) {
-	// 			setError(error.message);
-	// 			setIsSwitchDisabled(false);
-	// 			setIsUpdating(false);
-	// 		}
-	// 	};
-	// 	updateUserSettings();
-	// }, [isUpdating]);
+	useEffect(() => {
+		console.log("Calendar set");
+	}, [calendar]);
 
-	// const setUpdateUserFlag = (event) => {
-	// 	console.log("ONCHANGE");
-	// 	setIsUpdating(true);
-	// };
 
 	useEffect(() => {
 		console.log("USER: ");
@@ -88,12 +71,6 @@ const UserSettingsScreen = (props) => {
 			Alert.alert("Error when updating user!", error, [{ text: "Okay" }]);
 		}
 	}, [error]);
-
-	// const toggleUseDarkMode = (value) => {
-	// 	console.log(value);
-	// 	dispatch({ type: SET_USE_DARKMODE, value: value });
-	// 	// setUseDarkModeValue(state => !state);
-	// };
 
 	const onToggleDarkMode = () => {
 		console.log("ontoggledarkmode");
@@ -114,6 +91,35 @@ const UserSettingsScreen = (props) => {
 	const onToggleMondayFirstDay = () => {
 		dispatch({ type: SET_MONDAY_FIRSTDAY, value: !isMondayFirstDayValue });
 	};
+
+	const onCreateCalendar = () => {
+		const newCalendar = createCalendar([2022]);
+		setCalendar(newCalendar);
+	};
+
+	const onSaveCalendar = async() => {
+		if (calendar) {
+			try {
+				await saveCalendar(calendar);
+
+			} catch (error) {
+				console.log(error)
+			}finally{
+				console.log("Saved calendar");
+			}
+		}
+	};
+
+	const onGetCalendar = async()=> {
+		try {
+			const calendar = await getCalendarFromStorage();
+			if(calendar){
+				console.log("Calendar gotten from storage");
+			}
+		} catch (error) {
+			
+		}
+	}
 
 	return (
 		<View style={styles.screen}>
@@ -195,7 +201,6 @@ const UserSettingsScreen = (props) => {
 							onSwitchPressed={onToggleMondayFirstDay}
 						/>
 					</View>
-
 					<View style={styles.userSettingsItem}>
 						<BodyText
 							large={true}
@@ -211,6 +216,49 @@ const UserSettingsScreen = (props) => {
 							}}
 						/>
 					</View>
+					<View style={styles.userSettingsItem}>
+						<View style={styles.userSettingsText}>
+							<BodyText
+								large={true}
+								style={{ color: currentTheme.onSurface }}
+							>
+								Calendar
+							</BodyText>
+						</View>
+
+						<FilledButton onButtonPress={onCreateCalendar}>
+							Calendar
+						</FilledButton>
+					</View>
+					<View style={styles.userSettingsItem}>
+						<View style={styles.userSettingsText}>
+							<BodyText
+								large={true}
+								style={{ color: currentTheme.onSurface }}
+							>
+								Save Calendar
+							</BodyText>
+						</View>
+
+						<FilledButton onButtonPress={onSaveCalendar}>
+							Save
+						</FilledButton>
+					</View>
+					<View style={styles.userSettingsItem}>
+						<View style={styles.userSettingsText}>
+							<BodyText
+								large={true}
+								style={{ color: currentTheme.onSurface }}
+							>
+								Get Calendar
+							</BodyText>
+						</View>
+
+						<FilledButton onButtonPress={onGetCalendar}>
+							Get
+						</FilledButton>
+					</View>
+
 				</View>
 				{/* <View style={styles.userSettingsItem}>
 					<BodyText large={true} style={styles.text}>
