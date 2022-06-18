@@ -199,7 +199,7 @@ const getStyles = (theme) => {
 		tabBarItemContainer: {
 			flex: 1,
 			flexDirection: "column",
-			backgroundColor: theme.surface,
+			backgroundColor: theme.surfaceE2,
 			alignItems: "center",
 		},
 		activeLabelContainer: {
@@ -216,7 +216,7 @@ const getStyles = (theme) => {
 			marginTop: 12,
 			marginBottom: 4,
 			borderRadius: 16,
-			backgroundColor: theme.surface,
+			backgroundColor: theme.surfaceE2,
 			justifyContent: "center",
 			alignItems: "center",
 		},

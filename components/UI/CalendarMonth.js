@@ -27,8 +27,8 @@ const CalendarMonth = ({ month }) => {
 	const [monthName, setMonthName] = useState();
 
 	useEffect(() => {
-		setIsLoading(true);
 		if (month) {
+			// console.log(month[16]);
 		} else {
 			console.log("no month yet");
 		}
@@ -40,16 +40,23 @@ const CalendarMonth = ({ month }) => {
 	}, [useDarkMode]);
 
 	useEffect(() => {
+		// console.log("Month changed");
 		if (month) {
-			if (displayMonth == null) {
-				setIsLoading(true);
-				getMonthName(month[0].date);
-				createViewMonth(month);
-			} else {
-				console.log("Not creating viewMonth");
-			}
-		} else {
+			// console.log(month[0].getDate);
+			getMonthName(month[0].getDate);
+			createViewMonth(month);
 		}
+		// if (month) {
+		// 	if (displayMonth == null) {
+		// 		setIsLoading(true);
+		// 		if(month[0].date){
+		// 			getMonthName(month[16].date);
+		// 		}
+		// 		createViewMonth(month);
+		// 	} else if(displayMonth.length > 0) {
+		// 	}
+		// } else {
+		// }
 	}, [month]);
 
 	useEffect(() => {
@@ -140,7 +147,7 @@ const CalendarMonth = ({ month }) => {
 					/>
 				</View>
 			)}
-			{!isLoading && (
+			{displayMonth != null && (
 				<View style={styles.calendarItem}>
 					<View style={styles.calendarItemHeader}>
 						<BodyText
@@ -198,10 +205,10 @@ const CalendarMonth = ({ month }) => {
 
 					{displayMonth != null && (
 						<View style={styles.calendarDaysContainer}>
-							{displayMonth.map((week) => {
+							{displayMonth.map((week, index) => {
 								return (
 									<View
-										key={Math.random()}
+										key={index}
 										style={styles.calendarItemDaysRow}
 									>
 										{week.map((day) => {

@@ -1,6 +1,6 @@
-import { async } from '@firebase/util';
-import Asyncstorage from '@react-native-async-storage/async-storage';
-import { nanoid } from 'nanoid';
+import { async } from "@firebase/util";
+import Asyncstorage from "@react-native-async-storage/async-storage";
+import { nanoid } from "nanoid";
 
 export const hexToRGB = (hex) => {
 	let r = 0,
@@ -41,7 +41,7 @@ export const convertMass = (value, fromPounds) => {
  * @param {Array<number>} years - An array of numbers, each being a year with 4 numbers;
  */
 
-export const createCalendar = (years) => {
+export const createCalendar = async (years) => {
 	const calendar = new Map();
 
 	for (let year of years) {
@@ -49,6 +49,20 @@ export const createCalendar = (years) => {
 		calendar.set(year, yearData);
 	}
 	return calendar;
+};
+
+export const addYearToCalendar = (calendar, yearToAdd) => {
+	console.log("YearTOAdd: " + yearToAdd);
+	const newMap = new Map(calendar);
+	if (newMap) {
+		console.log("Create new year");
+		const newYear = createYear(yearToAdd);
+		newMap.set(yearToAdd, newYear);
+
+		return newMap;
+	} else {
+		console.log("NoExitingCalendar");
+	}
 };
 
 export const createYear = (year) => {
@@ -67,60 +81,54 @@ export const createYear = (year) => {
 			arrayOfDays.push(newDay);
 			date.setUTCDate(date.getUTCDate() + 1);
 		}
-		const newMonth = new Month(nanoid(12),arrayOfDays);
+		const newMonth = new Month(nanoid(12), arrayOfDays);
 
 		months.push(newMonth);
-
-		// months.push(arrayOfDays);
 	}
 	return months;
 };
 
-export const createMonth = (month) => {
-	const arrayOfDays = [];
-};
+// export const saveCalendar = async (calendar) => {
+// 	const serializedCalendar = JSON.stringify(Array.from(calendar.entries()));
+// 	try{
+// 		return await(saveToAsyncStorage("calendar", serializedCalendar));
+// 	}catch(error){
 
-export const saveCalendar = async (calendar) => {
-	const serializedCalendar = JSON.stringify(Array.from(calendar.entries()));
-	try{
-		await(saveToAsyncStorage("calendar", serializedCalendar));
-	}catch(error){
+// 	}
+// 	// console.log(newJSON);
+// 	// const toMap = new Map(JSON.parse(newJSON));
+// 	// console.log(toMap);
+// };
 
-	}
-	// console.log(newJSON);
-	// const toMap = new Map(JSON.parse(newJSON));
-	// console.log(toMap);
-};
+// export const getCalendarFromStorage = async() => {
+// 	try {
+// 		const fromStorage = await getFromAsyncStorage("calendar");
+// 		if(fromStorage){
+// 			const calendarToMap = new Map(JSON.parse(fromStorage));
+// 			// console.log(calendarToMap);
+// 			return calendarToMap;
+// 		}else{return null}
+// 	} catch (error) {
+// 		console.log("Error");
+// 	}
+// }
 
-export const getCalendarFromStorage = async() => {
-	try {
-		const fromStorage = await getFromAsyncStorage("calendar");
-		if(fromStorage){
-			const calendarToMap = new Map(JSON.parse(fromStorage));
-			return calendarToMap;
-		}else{return null}
-	} catch (error) {
-		
-	}
-}
-
-
-export const saveToAsyncStorage = async(key, value) => {
+export const saveToAsyncStorage = async (key, value) => {
 	try {
 		await Asyncstorage.setItem(key, value);
 	} catch (error) {
 		console.log("Error on savetoasyncstorage");
 	}
-}
+};
 
-export const getFromAsyncStorage = async(key) => {
+export const getFromAsyncStorage = async (key) => {
 	try {
 		const value = await Asyncstorage.getItem(key);
-		return value != null ? value: null;
+		return value != null ? value : null;
 	} catch (error) {
 		console.log("Error when getting item");
 	}
-}
+};
 
 export class Day {
 	constructor(id, date, dayOfWeek, dayOfMonth) {
@@ -128,6 +136,10 @@ export class Day {
 		this.date = date;
 		this.dayOfWeek = dayOfWeek;
 		this.dayOfMonth = dayOfMonth;
+	}
+
+	get getDate() {
+		return this.date;
 	}
 }
 

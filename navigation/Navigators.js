@@ -49,8 +49,8 @@ export const AppTabNavigator = () => {
 			<TabNavigator.Screen
 				name="Workout"
 				initialParams={{
-					labelNameFocused: "fitness",
-					labelNameUnFocused: "fitness-outline",
+					labelNameFocused: "barbell",
+					labelNameUnFocused: "barbell-outline",
 				}}
 				component={WorkoutStackScreen}
 			/>
@@ -110,7 +110,8 @@ export const CalendarStackScreen = () => {
 				component={CalendarScreen}
 				options={{
 					...getDefaultStyleOptions(currentTheme),
-					// headerShown: false,
+					headerTitle: "Calendar",
+					headerShown: false
 				}}
 			/>
 		</CalendarStackNavigator.Navigator>

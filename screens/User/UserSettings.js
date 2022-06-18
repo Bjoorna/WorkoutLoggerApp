@@ -115,6 +115,9 @@ const UserSettingsScreen = (props) => {
 			const calendar = await getCalendarFromStorage();
 			if(calendar){
 				console.log("Calendar gotten from storage");
+				for(let t of calendar.keys()){
+					console.log(t);
+				}
 			}
 		} catch (error) {
 			
@@ -222,40 +225,12 @@ const UserSettingsScreen = (props) => {
 								large={true}
 								style={{ color: currentTheme.onSurface }}
 							>
-								Calendar
+								Dummy
 							</BodyText>
 						</View>
 
-						<FilledButton onButtonPress={onCreateCalendar}>
-							Calendar
-						</FilledButton>
-					</View>
-					<View style={styles.userSettingsItem}>
-						<View style={styles.userSettingsText}>
-							<BodyText
-								large={true}
-								style={{ color: currentTheme.onSurface }}
-							>
-								Save Calendar
-							</BodyText>
-						</View>
-
-						<FilledButton onButtonPress={onSaveCalendar}>
-							Save
-						</FilledButton>
-					</View>
-					<View style={styles.userSettingsItem}>
-						<View style={styles.userSettingsText}>
-							<BodyText
-								large={true}
-								style={{ color: currentTheme.onSurface }}
-							>
-								Get Calendar
-							</BodyText>
-						</View>
-
-						<FilledButton onButtonPress={onGetCalendar}>
-							Get
+						<FilledButton onButtonPress={() => console.log("dummy")}>
+							Dummy
 						</FilledButton>
 					</View>
 
