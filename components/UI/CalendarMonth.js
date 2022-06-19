@@ -26,6 +26,8 @@ const CalendarMonth = ({ month }) => {
 
 	const [monthName, setMonthName] = useState();
 
+	const [mondayFirst, setMondayFirst] = useState(isMondayFirstDayOfWeek);
+
 	useEffect(() => {
 		if (month) {
 			// console.log(month[16]);
@@ -38,6 +40,11 @@ const CalendarMonth = ({ month }) => {
 		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
 		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
 	}, [useDarkMode]);
+
+	useEffect(() => {
+
+		setMondayFirst(isMondayFirstDayOfWeek);
+	}, [isMondayFirstDayOfWeek]);
 
 	useEffect(() => {
 		// console.log("Month changed");
@@ -157,51 +164,99 @@ const CalendarMonth = ({ month }) => {
 							{monthName}
 						</BodyText>
 					</View>
-					<View style={styles.calendarItemDaysHeader}>
-						<BodyText
-							large={false}
-							style={{ color: currentTheme.onSurface }}
-						>
-							S
-						</BodyText>
+					{isMondayFirstDayOfWeek && (
+						<View style={styles.calendarItemDaysHeader}>
+							<BodyText
+								large={false}
+								style={{ color: currentTheme.onSurface }}
+							>
+								M
+							</BodyText>
+							<BodyText
+								large={false}
+								style={{ color: currentTheme.onSurface }}
+							>
+								T
+							</BodyText>
+							<BodyText
+								large={false}
+								style={{ color: currentTheme.onSurface }}
+							>
+								W
+							</BodyText>
+							<BodyText
+								large={false}
+								style={{ color: currentTheme.onSurface }}
+							>
+								T
+							</BodyText>
+							<BodyText
+								large={false}
+								style={{ color: currentTheme.onSurface }}
+							>
+								F
+							</BodyText>
+							<BodyText
+								large={false}
+								style={{ color: currentTheme.onSurface }}
+							>
+								S
+							</BodyText>
+							<BodyText
+								large={false}
+								style={{ color: currentTheme.onSurface }}
+							>
+								S
+							</BodyText>
+						</View>
+					)}
+					{!isMondayFirstDayOfWeek && (
+						<View style={styles.calendarItemDaysHeader}>
+							<BodyText
+								large={false}
+								style={{ color: currentTheme.onSurface }}
+							>
+								S
+							</BodyText>
 
-						<BodyText
-							large={false}
-							style={{ color: currentTheme.onSurface }}
-						>
-							M
-						</BodyText>
-						<BodyText
-							large={false}
-							style={{ color: currentTheme.onSurface }}
-						>
-							T
-						</BodyText>
-						<BodyText
-							large={false}
-							style={{ color: currentTheme.onSurface }}
-						>
-							W
-						</BodyText>
-						<BodyText
-							large={false}
-							style={{ color: currentTheme.onSurface }}
-						>
-							T
-						</BodyText>
-						<BodyText
-							large={false}
-							style={{ color: currentTheme.onSurface }}
-						>
-							F
-						</BodyText>
-						<BodyText
-							large={false}
-							style={{ color: currentTheme.onSurface }}
-						>
-							S
-						</BodyText>
-					</View>
+							<BodyText
+								large={false}
+								style={{ color: currentTheme.onSurface }}
+							>
+								M
+							</BodyText>
+							<BodyText
+								large={false}
+								style={{ color: currentTheme.onSurface }}
+							>
+								T
+							</BodyText>
+							<BodyText
+								large={false}
+								style={{ color: currentTheme.onSurface }}
+							>
+								W
+							</BodyText>
+							<BodyText
+								large={false}
+								style={{ color: currentTheme.onSurface }}
+							>
+								T
+							</BodyText>
+							<BodyText
+								large={false}
+								style={{ color: currentTheme.onSurface }}
+							>
+								F
+							</BodyText>
+							<BodyText
+								large={false}
+								style={{ color: currentTheme.onSurface }}
+							>
+								S
+							</BodyText>
+						</View>
+					)}
 
 					{displayMonth != null && (
 						<View style={styles.calendarDaysContainer}>

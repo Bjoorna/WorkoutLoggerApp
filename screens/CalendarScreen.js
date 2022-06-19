@@ -30,6 +30,7 @@ const CalendarScreen = (props) => {
 	const [styles, setStyles] = useState(
 		getStyles(useDarkMode ? Themes.dark : Themes.light)
 	);
+	
 	const [currentTheme, setCurrentTheme] = useState(
 		useDarkMode ? Themes.dark : Themes.light
 	);
@@ -59,22 +60,18 @@ const CalendarScreen = (props) => {
 		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
 	}, [useDarkMode]);
 
-	useEffect(() => {
-		if (monthArray.length > 0) {
-			// setIsLoading(false);
-		}
-	}, [monthArray]);
+	// useEffect(() => {
+	// 	if (monthArray.length > 0) {
+	// 	}
+	// }, [monthArray]);
 
 	useEffect(() => {
 		if (calendarMap) {
-			console.log(onYear);
 			if (calendarMap.has(onYear)) {
-				console.log("Calendar has year");
 				const newMonthArray = [...calendarMap.get(onYear)];
 
 				setMonthArray(newMonthArray);
 			} else {
-				console.log("Calendar does NOT have year");
 				const calendarWithAddedYear = addYearToCalendar(
 					calendarMap,
 					onYear
@@ -85,32 +82,13 @@ const CalendarScreen = (props) => {
 	}, [onYear]);
 
 	useEffect(() => {
-		console.log("Calendermap changed");
 		if (calendarMap) {
-			for (let key of calendarMap.keys()) {
-				console.log(key);
-			}
-
 			if (calendarMap.has(onYear)) {
 				const newMonthArray = [...calendarMap.get(onYear)];
-				console.log("NEwMOnthArray");
-				// console.log(newMonthArray);
 				setMonthArray(newMonthArray);
-			} else {
-				console.log("FUCKCKCUYC");
 			}
 		}
 	}, [calendarMap]);
-
-	const getCalendarWithNewYear = async (yearToAdd) => {
-		const newCalendar = await addYearToCalendar(yearToAdd);
-		if (newCalendar) {
-			for (let key of newCalendar.keys()) {
-				console.log(key);
-			}
-		}
-	};
-
 
 	const incrementOneYear = () => {
 		setOnYear((past) => past + 1);
@@ -119,24 +97,6 @@ const CalendarScreen = (props) => {
 	const decrementOneYear = () => {
 		setOnYear((past) => past - 1);
 	};
-
-	const testFunction = () => {
-		if (calendarMap) {
-			for (let key of calendarMap.keys()) {
-				console.log(key);
-			}
-		}
-	};
-
-	const addConstantYear = async () => {
-		const testCalendar = await addYearToCalendar(1994);
-		if (testCalendar) {
-			for (let key of testCalendar.keys()) {
-				console.log(key);
-			}
-		}
-	};
-
 
 	return (
 		<View style={styles.container}>
@@ -150,20 +110,6 @@ const CalendarScreen = (props) => {
 					</TitleText>
 				</View>
 				<View style={styles.headerButtons}>
-					{/* <IconButton
-						name="american-football-outline"
-						iconColor={currentTheme.onSurfaceVariant}
-						onPress={addConstantYear}
-						shouldVibrate={true}
-					/>
-
-					<IconButton
-						name="alert-circle-outline"
-						iconColor={currentTheme.onSurfaceVariant}
-						onPress={testFunction}
-						shouldVibrate={true}
-					/> */}
-
 					<IconButton
 						name="arrow-back"
 						iconColor={currentTheme.onSurfaceVariant}
@@ -213,9 +159,10 @@ const getStyles = (theme) => {
 		headerContainer: {
 			flexDirection: "row",
 			// paddingTop: StatusBar.currentHeight,
-			marginTop: StatusBar.currentHeight,
+			// marginTop: StatusBar.currentHeight,
+			paddingTop: StatusBar.currentHeight,
 			paddingHorizontal: 24,
-			height: 56,
+			height: 56 + StatusBar.currentHeight,
 			width: "100%",
 			backgroundColor: theme.surface,
 			alignItems: "center",

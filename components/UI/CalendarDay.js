@@ -25,6 +25,8 @@ const CalendarDay = ({ day }) => {
 		useDarkMode ? Themes.dark : Themes.light
 	);
 
+	const [isMounted, setIsMounted] = useState(true);
+
 	useEffect(() => {
 		const checkIfDayHasWorkout = async (day, dayStart, dayEnd) => {
 			if (userID && day) {
@@ -33,7 +35,7 @@ const CalendarDay = ({ day }) => {
 					dayStart,
 					dayEnd
 				);
-				if (findWorkouts) {
+				if (findWorkouts && isMounted) {
 					const workouts = [];
 					findWorkouts.forEach((doc) => {
 						workouts.push(doc.data());
@@ -45,10 +47,10 @@ const CalendarDay = ({ day }) => {
 				} else {
 					return null;
 				}
-			} else if (!day) {
-				console.log("NoDay");
-			}
+			} 
 		};
+
+		setIsMounted(true);
 
 		if (thisDay) {
 			let nextDay = new Date(day.date);
@@ -57,7 +59,10 @@ const CalendarDay = ({ day }) => {
 			const dayEnd = firebase.createTimeStampFromDate(nextDay);
 
 			checkIfDayHasWorkout(thisDay, dayStart, dayEnd);
-		} else {
+		} 
+
+		return () =>{
+			setIsMounted(false);
 		}
 	}, []);
 
