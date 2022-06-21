@@ -5,7 +5,7 @@ import "react-native-get-random-values";
 import React, { useState, useEffect } from "react";
 
 // react native
-import { StyleSheet, View, Dimensions } from "react-native";
+import { StyleSheet, View, Dimensions, Appearance } from "react-native";
 import { LogBox } from "react-native";
 LogBox.ignoreLogs(["Setting a timer"]);
 LogBox.ignoreLogs(["AsyncStorage has been"]);

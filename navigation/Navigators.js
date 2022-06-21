@@ -171,10 +171,11 @@ export const WorkoutStackScreen = () => {
 					name="WorkoutDetail"
 					component={WorkoutDetailScreen}
 					options={{
-						headerStyle: {
-							backgroundColor: currentTheme.surface,
-						},
-						headerTintColor: currentTheme.onSurface,
+						headerShown: false,
+						// headerStyle: {
+						// 	backgroundColor: currentTheme.surface,
+						// },
+						// headerTintColor: currentTheme.onSurface,
 						cardStyle: {
 							backgroundColor: currentTheme.surface,
 						},

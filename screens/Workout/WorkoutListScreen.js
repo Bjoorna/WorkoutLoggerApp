@@ -33,6 +33,7 @@ import {
 	SET_IS_SCROLLING,
 	SET_TAB_BAR_VALUE,
 } from "../../store/actions/appsettings";
+import { transformObjectToWorkout } from "../../shared/utils/UtilFunctions";
 
 if (
 	Platform.OS === "android" &&
@@ -62,6 +63,8 @@ const WorkoutListScreen = (props) => {
 	const [isScrolling, setIsScrolling] = useState(false);
 
 	const [showModal, setShowModal] = useState(false);
+
+	const [workoutJSON, setWorkoutJSON] = useState();
 
 	// BottomSheet stuff
 	const bottomSheetRef = useRef(null);
@@ -116,12 +119,51 @@ const WorkoutListScreen = (props) => {
 		}
 	}, [filterToggle]);
 
+	const serialize = () => {
+		if (workouts) {
+			console.log(workouts);
+			const serializedWorkout = JSON.stringify(workouts);
+			console.log(serializedWorkout);
+			setWorkoutJSON(serializedWorkout);
+		}
+	};
+
+	const deSerialize = () => {
+		if (workoutJSON) {
+			console.log(workoutJSON);
+			const deserializedWorkout = JSON.parse(workoutJSON);
+			console.log("Deserialized: ");
+			console.log(deserializedWorkout);
+			const newArray = [];
+			for (let wo of deserializedWorkout) {
+				const newWor = transformObjectToWorkout(wo);
+				newArray.push(newWor);
+			}
+			console.log(newArray);
+
+			// // const woTransform = transformObjectToWorkout(deserializedWorkout);
+			// console.log("Transform: ");
+			// console.log(newArray);
+		}
+	};
+
 	useLayoutEffect(() => {
 		if (isScrolling) {
 			props.navigation.setOptions({
 				headerStyle: { backgroundColor: currentTheme.surfaceE2 },
 				headerRight: () => (
 					<View style={{ flexDirection: "row" }}>
+						{/* <IconButton
+							name="arrow-down"
+							iconColor={currentTheme.onSurfaceVariant}
+							onPress={deSerialize}
+						/>
+						<IconButton
+							name="arrow-up"
+							iconColor={currentTheme.onSurfaceVariant}
+							onPress={serialize}
+						/> */}
+
 						<IconButton
 							onPress={() =>
 								props.navigation.navigate("Calculator")
@@ -144,6 +186,17 @@ const WorkoutListScreen = (props) => {
 				headerStyle: { backgroundColor: currentTheme.surface },
 				headerRight: () => (
 					<View style={{ flexDirection: "row" }}>
+						{/* <IconButton
+							name="arrow-down"
+							iconColor={currentTheme.onSurfaceVariant}
+							onPress={deSerialize}
+						/>
+						<IconButton
+							name="arrow-up"
+							iconColor={currentTheme.onSurfaceVariant}
+							onPress={serialize}
+						/> */}
+
 						<IconButton
 							onPress={() =>
 								props.navigation.navigate("Calculator")
@@ -222,7 +275,6 @@ const WorkoutListScreen = (props) => {
 					New Workout
 				</FabButton>
 			)}
-			{/* {showFilter && <FilterBox />} */}
 
 			<View style={styles.contentView}>
 				<FlatList

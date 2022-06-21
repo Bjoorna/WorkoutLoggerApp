@@ -1,6 +1,7 @@
 import { async } from "@firebase/util";
 import Asyncstorage from "@react-native-async-storage/async-storage";
 import { nanoid } from "nanoid";
+import Workout from "../../models/workout";
 
 export const hexToRGB = (hex) => {
 	let r = 0,
@@ -129,6 +130,15 @@ export const getFromAsyncStorage = async (key) => {
 		console.log("Error when getting item");
 	}
 };
+
+
+export const transformObjectToWorkout = (object) => {
+	const transformedWorkout = new Workout(object.exercises, object.date, object.complete, object.note, object.owner, object.id);
+	return transformedWorkout; 
+}
+
+
+
 
 export class Day {
 	constructor(id, date, dayOfWeek, dayOfMonth) {

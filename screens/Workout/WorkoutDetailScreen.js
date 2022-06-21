@@ -4,7 +4,14 @@ import React, {
 	useLayoutEffect,
 	useCallback,
 } from "react";
-import { View, StyleSheet, Modal, Pressable, ScrollView } from "react-native";
+import {
+	View,
+	StyleSheet,
+	Modal,
+	Pressable,
+	ScrollView,
+	StatusBar,
+} from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { useFocusEffect } from "@react-navigation/core";
 import { Themes } from "../../shared/Theme";
@@ -16,7 +23,9 @@ import LabelText from "../../components/Text/Label";
 import HeadlineText from "../../components/Text/Headline";
 import TextButton from "../../components/Buttons/TextButton";
 import IconButton from "../../components/Buttons/IconButton";
-import { hexToRGB } from "../../shared/utils/UtilFunctions";
+import { hexToRGB, transformObjectToWorkout } from "../../shared/utils/UtilFunctions";
+
+import Workout from "../../models/workout";
 
 const WorkoutDetailScreen = (props) => {
 	const dispatch = useDispatch();
@@ -39,23 +48,26 @@ const WorkoutDetailScreen = (props) => {
 	const [modalBackdropHex, setModalBackdropHex] = useState(
 		hexToRGB(currentTheme.surface)
 	);
+
+	const [workoutJSON, setWorkoutJSON] = useState();
+
 	useEffect(() => {
 		const onWorkout = workoutsRef.find(
 			(workout) => workout.id == workoutID
 		);
 		console.log("OnWorkoout: ");
-		console.log(onWorkout);
+		// console.log(onWorkout);
 		setWorkout(onWorkout);
-		console.log(hexToRGB(currentTheme.surface));
+		// console.log(hexToRGB(currentTheme.surface));
 	}, []);
 
 	useEffect(() => {
 		if (workout) {
 			const exerciseIDs = workout.exercises;
-			console.log(exerciseIDs);
+			// console.log(exerciseIDs);
 			const exerciseArray = [];
 			for (let id of exerciseIDs) {
-				console.log(id);
+				// console.log(id);
 				const exercise = exercisesRef[id];
 				exerciseArray.push(exercise);
 			}
@@ -121,6 +133,27 @@ const WorkoutDetailScreen = (props) => {
 
 	const showModalHandler = (value) => {
 		setShowModal(value);
+	};
+
+	const serialize = () => {
+		if (workout) {
+			console.log(workout);
+			const serializedWorkout = JSON.stringify(workout);
+			console.log(serializedWorkout);
+			setWorkoutJSON(serializedWorkout);
+		}
+	};
+
+	const deSerialize = () => {
+		if (workoutJSON) {
+			console.log(workoutJSON);
+			const deserializedWorkout = JSON.parse(workoutJSON);
+			console.log("Deserialized: ");
+			console.log(deserializedWorkout);
+			const woTransform = transformObjectToWorkout(deserializedWorkout);
+			console.log("Transform: ")
+			console.log(woTransform);
+		}
 	};
 
 	useFocusEffect(
@@ -189,6 +222,45 @@ const WorkoutDetailScreen = (props) => {
 					</Pressable>
 				</Pressable>
 			</Modal>
+			<View style={styles.appBarContainer}>
+				<View style={styles.appBarBackButton}>
+					<IconButton
+						name="arrow-back"
+						iconColor={currentTheme.onSurface}
+						onPress={() => props.navigation.goBack()}
+					/>
+				</View>
+				<View style={styles.appBarTitle}>
+					{workout && (
+						<TitleText
+							large={true}
+							style={{ color: currentTheme.onSurface }}
+						>
+							{new Date(
+								workout.date.seconds * 1000
+							).toDateString()}
+						</TitleText>
+					)}
+				</View>
+				<View style={styles.appBarTrailingIcons}>
+					<IconButton
+						name="arrow-down"
+						iconColor={currentTheme.onSurfaceVariant}
+						onPress={deSerialize}
+					/>
+					<IconButton
+						name="arrow-up"
+						iconColor={currentTheme.onSurfaceVariant}
+						onPress={serialize}
+					/>
+
+					<IconButton
+						name="trash-outline"
+						iconColor={currentTheme.onSurfaceVariant}
+						onPress={() => setShowModal(true)}
+					/>
+				</View>
+			</View>
 			<View style={styles.contentView}>
 				<View style={styles.overviewContainer}>
 					<TitleText large={false} style={styles.titleText}>
@@ -372,6 +444,22 @@ const getStyles = (theme) => {
 	return StyleSheet.create({
 		screen: {
 			flex: 1,
+		},
+		appBarContainer: {
+			flexDirection: "row",
+			paddingTop: StatusBar.currentHeight,
+			paddingHorizontal: 16,
+			height: 64 + StatusBar.currentHeight,
+			width: "100%",
+			backgroundColor: theme.surfaceE2,
+			alignItems: "center",
+		},
+		appBarBackButton: {
+			paddingRight: 16,
+		},
+		appBarTrailingIcons: {
+			marginLeft: "auto",
+			flexDirection: "row",
 		},
 		contentView: {
 			width: "100%",
