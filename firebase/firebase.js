@@ -143,7 +143,7 @@ export const getUserWorkouts = async (userID) => {
 			collection(database, "workouts"),
 			where("owner", "==", userID),
 			orderBy("date", "desc"),
-			limit(2)
+			// limit(2)
 		);
 		console.log(query);
 		// const q = query(

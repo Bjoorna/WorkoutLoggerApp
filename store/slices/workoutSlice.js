@@ -29,12 +29,17 @@ export const getWorkoutByUserID = createAsyncThunk(
 	}
 );
 
+/**
+ * 
+ */
 export const getExercisesInWorkout = createAsyncThunk(
 	"workout/getExercisesInWorkout",
 	async (requestPayload, thunkAPI) => {
-		const { userID, exercises } = requestPayload;
+		const { userID, exerciseIDs } = requestPayload;
+        // thunkAPI.getState();
+        
 		const exerciseRequest = await firebaseGetExercisesInWorkout(
-			exercises,
+			exerciseIDs,
 			userID
 		);
 		return exerciseRequest;
@@ -63,9 +68,12 @@ export const workoutSlice = createSlice({
 		// Exercises
 		builder.addCase(getExercisesInWorkout.fulfilled, (state, action) => {
 			const eData = action.payload;
-			eData.forEach((queryData) => {
-				const exercise = queryData.data();
-				console.log(exercise);
+			eData.forEach((doc) => {
+				const exercise = doc.data();
+                const exerciseID = doc.id;
+				exercise.date = exercise.date.seconds * 1000;
+                exercise.id = doc.id;
+                state.exercises[exerciseID] = exercise;
 			});
 		});
 	},

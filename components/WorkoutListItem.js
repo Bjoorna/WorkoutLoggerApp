@@ -18,6 +18,7 @@ import { useNavigation } from "@react-navigation/core";
 import { SET_TAB_BAR_VALUE } from "../store/actions/appsettings";
 import { SET_EXERCISES_FROM_WORKOUT } from "../store/actions/workout";
 import UtilFunctions from "../shared/utils/UtilFunctions";
+import { getExercisesInWorkout } from "../store/slices/workoutSlice";
 // const theme = Themes.dark;
 
 const ExerciseItem = (props) => {
@@ -98,13 +99,19 @@ const getExerciseStyles = (theme) => {
 // 	}
 // });
 
-const WorkoutListItem = (props) => {
+const WorkoutListItem = ({ workoutID, userID }) => {
 	const dispatch = useDispatch();
 	const navigation = useNavigation();
+	const workout = useSelector((state) => state.workout.workouts[workoutID]);
+	const exercisesInStore = useSelector((state) => state.workout.exercises);
+
 	const [exercises, setExercises] = useState([]);
-	const [isLoading, setIsLoading] = useState(true);
+	const [isLoading, setIsLoading] = useState(false);
+
+	const [dateObject, setDateObject] = useState(new Date(workout.date));
 
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
+
 	const [styles, setStyles] = useState(
 		getStyles(useDarkMode ? Themes.dark : Themes.light)
 	);
@@ -117,55 +124,30 @@ const WorkoutListItem = (props) => {
 		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
 	}, [useDarkMode]);
 
-	const date = new Date(props.workout.date);
-
-	const getExercises = async () => {
-		setIsLoading(true);
-		const exercises = await firebase.firebaseGetExercisesInWorkout(
-			props.workout.exercises,
-			props.userID
-		);
-
-		setIsLoading(false);
-		return exercises;
-	};
-
+	// fetch exercises 
 	useEffect(() => {
-		const fetchExercises = async () => {
-			const exercisesQuery = await getExercises();
-			const exercisesArray = [];
-			exercisesQuery.forEach((query) => {
-				const data = query.data();
-				const newExercise = new Exercise(
-					data.exercise,
-					data.weight,
-					data.reps,
-					data.sets,
-					data.rpe,
-					data.date,
-					data.owner,
-					props.workout.id,
-					query.id
-				);
-
-				exercisesArray.push(newExercise);
-			});
-			setExercises(exercisesArray);
-		};
-
-		fetchExercises();
-	}, [props.workout]);
-
-	useEffect(() => {
-		if (exercises.length < 1) {
-			return;
-		} else {
-			dispatch({
-				type: SET_EXERCISES_FROM_WORKOUT,
-				exercises: exercises,
-			});
+		if (workout) {
+			const requestPayload = {
+				userID: userID,
+				exerciseIDs: workout.exercises,
+			};
+			dispatch(getExercisesInWorkout(requestPayload));
 		}
-	}, [exercises]);
+	}, [workout]);
+
+	// when store is updated, get the exercises from store
+	useEffect(() => {
+		console.log("exercisesInStore updated: ");
+		const updatedArrayOfExercises = [];
+		// inefficient ?????
+		for (let exerciseID of workout.exercises) {
+			if (exercisesInStore[exerciseID]) {
+				updatedArrayOfExercises.push(exercisesInStore[exerciseID]);
+			}
+		}
+
+		setExercises(updatedArrayOfExercises);
+	}, [exercisesInStore]);
 
 	const navigateToDetailPage = () => {
 		// hide TabBar
@@ -183,7 +165,7 @@ const WorkoutListItem = (props) => {
 				<View style={styles.workoutItemLayout}>
 					<View style={styles.workoutItemHeader}>
 						<LabelText style={{ color: currentTheme.secondary }}>
-							{date.toISOString()}
+							{dateObject.toISOString()}
 						</LabelText>
 					</View>
 					<View style={styles.workoutItemExerciseContainer}>
@@ -197,7 +179,7 @@ const WorkoutListItem = (props) => {
 						)}
 						{!isLoading && (
 							<FlatList
-								keyExtractor={(item) => Math.random()} // TODO other method of generating id
+								keyExtractor={(item) => item.id}
 								horizontal={true}
 								data={exercises}
 								renderItem={(itemData) => (

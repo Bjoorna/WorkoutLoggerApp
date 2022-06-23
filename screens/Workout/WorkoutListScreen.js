@@ -197,7 +197,8 @@ const WorkoutListScreen = (props) => {
 
 	const onRefresh = useCallback(() => {
 		setRefreshing(true);
-		dispatch(WorkoutActions.getUserWorkouts(userID));
+		dispatch(getWorkoutByUserID(userID))
+		// dispatch(WorkoutActions.getUserWorkouts(userID));
 	}, []);
 
 	const toggle = () => {
@@ -223,9 +224,6 @@ const WorkoutListScreen = (props) => {
 		// props.navigation.navigate("AddWorkout");
 	};
 
-	const navigateToTestWorkout = () => {
-		props.navigation.navigate("TestAddWorkout");
-	};
 
 	return (
 		<View style={styles.container}>
@@ -270,7 +268,7 @@ const WorkoutListScreen = (props) => {
 					renderItem={(itemData) => (
 						<WorkoutListItem
 							userID={userID}
-							workout={itemData.item}
+							workoutID={itemData.item.id}
 						/>
 					)}
 				/>
