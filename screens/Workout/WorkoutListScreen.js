@@ -34,6 +34,7 @@ import {
 	SET_TAB_BAR_VALUE,
 } from "../../store/actions/appsettings";
 import { transformObjectToWorkout } from "../../shared/utils/UtilFunctions";
+import { getWorkoutByUserID } from "../../store/slices/workoutSlice";
 
 if (
 	Platform.OS === "android" &&
@@ -64,8 +65,6 @@ const WorkoutListScreen = (props) => {
 
 	const [showModal, setShowModal] = useState(false);
 
-	const [workoutJSON, setWorkoutJSON] = useState();
-
 	// BottomSheet stuff
 	const bottomSheetRef = useRef(null);
 	const snapPoints = useMemo(() => ["25%", "50%"], []);
@@ -86,14 +85,20 @@ const WorkoutListScreen = (props) => {
 	useEffect(() => {
 		console.log("Page is Loading");
 		setRefreshing(true);
-		dispatch(WorkoutActions.getUserWorkouts(userID));
-		dispatch({ type: SET_TAB_BAR_VALUE, value: false });
+		if (userID) {
+			dispatch(getWorkoutByUserID(userID));
+		}
+		// dispatch(WorkoutActions.getUserWorkouts(userID));
+		// dispatch({ type: SET_TAB_BAR_VALUE, value: false });
 	}, []);
 
 	useEffect(() => {
-		console.log("Page Loaded");
-		const newArray = [...reduxWorkoutRef];
-		setWorkouts(newArray);
+		console.log("workoutStore updated: ");
+		console.log(reduxWorkoutRef);
+		const arrayOfWorkouts = Object.values(reduxWorkoutRef);
+		console.log(arrayOfWorkouts);
+
+		setWorkouts(arrayOfWorkouts);
 		setRefreshing(false);
 	}, [reduxWorkoutRef]);
 
@@ -118,34 +123,6 @@ const WorkoutListScreen = (props) => {
 			bottomSheetRef.current.close();
 		}
 	}, [filterToggle]);
-
-	const serialize = () => {
-		if (workouts) {
-			console.log(workouts);
-			const serializedWorkout = JSON.stringify(workouts);
-			console.log(serializedWorkout);
-			setWorkoutJSON(serializedWorkout);
-		}
-	};
-
-	const deSerialize = () => {
-		if (workoutJSON) {
-			console.log(workoutJSON);
-			const deserializedWorkout = JSON.parse(workoutJSON);
-			console.log("Deserialized: ");
-			console.log(deserializedWorkout);
-			const newArray = [];
-			for (let wo of deserializedWorkout) {
-				const newWor = transformObjectToWorkout(wo);
-				newArray.push(newWor);
-			}
-			console.log(newArray);
-
-			// // const woTransform = transformObjectToWorkout(deserializedWorkout);
-			// console.log("Transform: ");
-			// console.log(newArray);
-		}
-	};
 
 	useLayoutEffect(() => {
 		if (isScrolling) {

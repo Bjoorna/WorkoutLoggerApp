@@ -25,7 +25,10 @@ import Input from "../../components/UI/Input";
 import { SafeAreaInsetsContext } from "react-native-safe-area-context";
 import Divider from "../../components/UI/Divider";
 import TextButton from "../../components/Buttons/TextButton";
+import { setUseDarkMode } from "../../store/slices/appSettingsSlice";
+import { loginUser } from "../../store/slices/authSlice";
 
+import { getFirebaseAuth, signOutUser } from "../../firebase/firebase";
 const FORM_INPUT_UPDATE = "FORM_INPUT_UPDATE";
 
 const formReducer = (state, action) => {
@@ -136,6 +139,36 @@ const AuthScreen = (props) => {
 		setPassword("123456");
 	};
 
+	const onSetLightMode = () => {
+		dispatch(setUseDarkMode(false));
+	}
+
+	const onSetDarkMode = () => {
+		dispatch(setUseDarkMode(true));
+	}
+
+	const testThunk = async()=> {
+		const email = "marcusbjorna@gmail.com";
+		const password = "123456";
+		const payload = {email: email, password: password};
+		// dispatch(loginUser(email, password));
+		try{
+			const testlogin = await dispatch(loginUser(payload)).unwrap();
+			// console.log(testlogin);
+		}catch(error){
+			console.log("Authscreen error: ")
+			console.log(error);
+		}
+	}
+
+	const onGetAuth = ()=> {
+		const testAuth = getFirebaseAuth();
+		console.log(testAuth.currentUser);
+	}
+
+	const onSignOut = () => {
+		signOutUser();
+	}
 	return (
 		<View
 			// behavior="padding"
@@ -148,7 +181,10 @@ const AuthScreen = (props) => {
 			>
 				{isLoading && (
 					<View style={styles.loadingSpinner}>
-						<ActivityIndicator size="large" color={currentTheme.primary} />
+						<ActivityIndicator
+							size="large"
+							color={currentTheme.primary}
+						/>
 					</View>
 				)}
 				{!isLoading && (
@@ -157,7 +193,9 @@ const AuthScreen = (props) => {
 							<View style={styles.authCardHeader}>
 								<HeadlineText
 									large={true}
-									style={{ color: currentTheme.onSurfaceVariant }}
+									style={{
+										color: currentTheme.onSurfaceVariant,
+									}}
 								>
 									Login
 								</HeadlineText>
@@ -248,6 +286,39 @@ const AuthScreen = (props) => {
 								</FilledButton> */}
 							</View>
 						</View>
+						<View
+							style={{
+								width: "100%",
+								height: 100,
+								marginTop: 50,
+								// backgroundColor: currentTheme.error,
+								paddingHorizontal: 24,
+								flexDirection :"row",
+								justifyContent: "space-around"
+							}}
+						>
+							<FilledButton onButtonPress={onSetDarkMode} >Dark</FilledButton>
+							<FilledButton onButtonPress={testThunk}>TestThunk</FilledButton>
+							<OutlineButton onButtonPress={onSetLightMode} >Light</OutlineButton>
+
+						</View>
+						<View
+							style={{
+								width: "100%",
+								height: 100,
+								marginTop: 50,
+								// backgroundColor: currentTheme.error,
+								paddingHorizontal: 24,
+								flexDirection :"row",
+								justifyContent: "space-around"
+							}}
+						>
+							<FilledButton onButtonPress={onGetAuth} >GetAuth</FilledButton>
+							<FilledButton onButtonPress={onSignOut} >SignOut</FilledButton>
+
+
+						</View>
+
 					</View>
 				)}
 			</Pressable>
@@ -314,6 +385,5 @@ const getStyles = (theme) => {
 		},
 	});
 };
-
 
 export default AuthScreen;

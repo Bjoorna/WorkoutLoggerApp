@@ -11,10 +11,11 @@ LogBox.ignoreLogs(["Setting a timer"]);
 LogBox.ignoreLogs(["AsyncStorage has been"]);
 
 // redux
-
 import { createStore, combineReducers, applyMiddleware } from "redux";
 import { Provider } from "react-redux";
 import ReduxThunk from "redux-thunk";
+
+import { configureStore, getDefaultMiddleware, Reducer } from "@reduxjs/toolkit";
 
 // Navigator
 import AppNavigator from "./navigation/AppNavigator";
@@ -29,22 +30,35 @@ import AppLoading from "expo-app-loading";
 import * as Font from "expo-font";
 
 // Reducers
-import authReducer from "./store/reducers/auth";
-import userReducer from "./store/reducers/user";
-import workoutReducer from "./store/reducers/workout";
-import appsettingsReducer from "./store/reducers/appsettings";
+// import authReducer from "./store/reducers/auth";
+// import userReducer from "./store/reducers/user";
+// import workoutReducer from "./store/reducers/workout";
+// import appsettingsReducer from "./store/reducers/appsettings";
 
 // react native paper
 import { Provider as PaperProvider } from "react-native-paper";
+import authReducer from "./store/slices/authSlice";
+import appSettingsReducer from "./store/slices/appSettingsSlice";
+import workoutReducer from './store/slices/workoutSlice'
 
-const rootReducer = combineReducers({
+// const rootReducer = combineReducers({
+// 	auth: authReducer,
+// 	user: userReducer,
+// 	workout: workoutReducer,
+// 	appSettings: appsettingsReducer,
+// });
+// const store = createStore(rootReducer, applyMiddleware(ReduxThunk));
+
+const reducer = {
 	auth: authReducer,
-	user: userReducer,
-	workout: workoutReducer,
-	appSettings: appsettingsReducer,
-});
-const store = createStore(rootReducer, applyMiddleware(ReduxThunk));
+	appSettings: appSettingsReducer,
+	workout: workoutReducer
+}
 
+const store = configureStore({
+	reducer: reducer,
+	middleware: (getDefaultMiddleware) => getDefaultMiddleware({serializableCheck: false})
+});
 const loadFonts = () => {
 	return Font.loadAsync({
 		"roboto-400": require("./assets/fonts/Roboto-Regular.ttf"),

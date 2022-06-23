@@ -29,6 +29,7 @@ import Workout from "../models/workout";
 
 import { nanoid } from "nanoid";
 import { async } from "@firebase/util";
+import { exp } from "react-native-reanimated";
 // APPSETUO
 const app = initializeApp(firebaseConfig.firebaseConfig);
 
@@ -144,6 +145,7 @@ export const getUserWorkouts = async (userID) => {
 			orderBy("date", "desc"),
 			limit(2)
 		);
+		console.log(query);
 		// const q = query(
 		// 	collection(database, "workouts"),
 		// 	where("owner", "==", userID),
@@ -191,7 +193,7 @@ export const getExercisesFilteredByExerciseType = async (
 	}
 };
 
-export const getExercisesInWorkout = async (exercises, userID) => {
+export const firebaseGetExercisesInWorkout = async (exercises, userID) => {
 	try {
 		const docRefs = exercises.map((exercise) =>
 			getDoc(doc(database, "exercises", exercise))
@@ -319,12 +321,19 @@ export const loginWithEmailAndPassword = async (email, password) => {
 	} catch (error) {
 		const errorCode = error.code;
 		const errorMessage = error.message;
-		console.log(error.message);
+		console.log(errorCode);
 		// TODO, return better errorsmessages
 		throw new Error(error);
 	}
 };
 
+export const signOutUser = async () => {
+	await signOut(auth);
+};
+
+export const getFirebaseAuth = () => {
+	return auth;
+};
 // utils
 
 export const createTimeStampFromDate = (date) => {
@@ -338,3 +347,9 @@ export const createTimeStampFromMillis = (millis) => {
 		return Timestamp.fromMillis(millis);
 	}
 };
+
+// export const millisFromTimestamp = (timestamp) => {
+// 	if(typeof timestamp == Timestamp){
+
+// 	}
+// };

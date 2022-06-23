@@ -4,7 +4,7 @@ import {
 	StyleSheet,
 	View,
 	ActivityIndicator,
-	Vibration
+	Vibration,
 } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 
@@ -22,7 +22,7 @@ import UtilFunctions from "../shared/utils/UtilFunctions";
 
 const ExerciseItem = (props) => {
 	const exercise = props.exercise;
-	const isMetric = useSelector(state => state.user.user.useMetric);
+	// const isMetric = useSelector(state => state.user.user.useMetric);
 	const [currentTheme, setCurrentTheme] = useState(props.currentTheme);
 	const [exerciseStyles, setExerciseStyles] = useState(
 		getExerciseStyles(currentTheme)
@@ -49,7 +49,8 @@ const ExerciseItem = (props) => {
 					{exercise.exercise}
 				</BodyText>
 				<LabelText style={{ color: currentTheme.onSecondaryContainer }}>
-					{isMetric ? exercise.weight : UtilFunctions.convertMass(exercise.weight, false)} {isMetric? "kg":"lbs"}
+					{/* {isMetric ? exercise.weight : UtilFunctions.convertMass(exercise.weight, false)} {isMetric? "kg":"lbs"} */}
+					{exercise.weight}kg
 				</LabelText>
 				<LabelText style={{ color: currentTheme.onSecondaryContainer }}>
 					{exercise.reps} reps
@@ -116,11 +117,11 @@ const WorkoutListItem = (props) => {
 		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
 	}, [useDarkMode]);
 
-	const date = new Date(props.workout.date.seconds * 1000);
+	const date = new Date(props.workout.date);
 
 	const getExercises = async () => {
 		setIsLoading(true);
-		const exercises = await firebase.getExercisesInWorkout(
+		const exercises = await firebase.firebaseGetExercisesInWorkout(
 			props.workout.exercises,
 			props.userID
 		);
@@ -155,7 +156,7 @@ const WorkoutListItem = (props) => {
 		fetchExercises();
 	}, [props.workout]);
 
-	useEffect(() => {		
+	useEffect(() => {
 		if (exercises.length < 1) {
 			return;
 		} else {
@@ -182,8 +183,7 @@ const WorkoutListItem = (props) => {
 				<View style={styles.workoutItemLayout}>
 					<View style={styles.workoutItemHeader}>
 						<LabelText style={{ color: currentTheme.secondary }}>
-							{date.toDateString()}
-							{/* {date.toISOString()} */}
+							{date.toISOString()}
 						</LabelText>
 					</View>
 					<View style={styles.workoutItemExerciseContainer}>
