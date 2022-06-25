@@ -9,8 +9,11 @@ import LabelText from "../Text/Label";
 /**
  *
  * @param {*} onPress - Function to be called when button is pressed
+ * @param {string} name - Icon name
  * @param {string} iconColor - Color for the icon
  * @param {boolean} shouldVibrate - If the device should vibrate on press
+ * @param {} style - style
+
  * @returns
  */
 

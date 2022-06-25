@@ -111,7 +111,7 @@ export const CalendarStackScreen = () => {
 				options={{
 					...getDefaultStyleOptions(currentTheme),
 					headerTitle: "Calendar",
-					headerShown: false
+					headerShown: false,
 				}}
 			/>
 		</CalendarStackNavigator.Navigator>
@@ -136,7 +136,7 @@ export const WorkoutStackScreen = () => {
 				<WorkoutStackNavigator.Screen
 					name="Workouts"
 					component={WorkoutListScreen}
-					options={{ ...getDefaultStyleOptions(currentTheme) }}
+					options={{ ...getDefaultStyleOptions(currentTheme), headerShown: false }}
 				/>
 				<WorkoutStackNavigator.Screen
 					name="Calculator"

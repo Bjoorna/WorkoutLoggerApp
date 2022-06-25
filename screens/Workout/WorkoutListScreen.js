@@ -29,13 +29,10 @@ import WorkoutListItem from "../../components/WorkoutListItem";
 import FilterSelect from "../../components/FilterSelect";
 import AddWorkoutDialogScreen from "../../components/UI/AddWorkoutDialogScreen";
 
-import {
-	SET_IS_SCROLLING,
-	SET_TAB_BAR_VALUE,
-} from "../../store/actions/appsettings";
 import { transformObjectToWorkout } from "../../shared/utils/UtilFunctions";
 import { getWorkoutByUserID } from "../../store/slices/workoutSlice";
 import { setHideTabBar } from "../../store/slices/appSettingsSlice";
+import TopAppBar from "../../components/UI/TopAppBarComponent";
 
 if (
 	Platform.OS === "android" &&
@@ -119,80 +116,80 @@ const WorkoutListScreen = (props) => {
 		}
 	}, [filterToggle]);
 
-	useLayoutEffect(() => {
-		if (isScrolling) {
-			props.navigation.setOptions({
-				headerStyle: { backgroundColor: currentTheme.surfaceE2 },
-				headerRight: () => (
-					<View style={{ flexDirection: "row" }}>
-						{/* <IconButton
-							name="arrow-down"
-							iconColor={currentTheme.onSurfaceVariant}
-							onPress={deSerialize}
-						/>
-						<IconButton
-							name="arrow-up"
-							iconColor={currentTheme.onSurfaceVariant}
-							onPress={serialize}
-						/> */}
+	// useLayoutEffect(() => {
+	// 	if (isScrolling) {
+	// 		props.navigation.setOptions({
+	// 			headerStyle: { backgroundColor: currentTheme.surfaceE2 },
+	// 			headerRight: () => (
+	// 				<View style={{ flexDirection: "row" }}>
+	// 					{/* <IconButton
+	// 						name="arrow-down"
+	// 						iconColor={currentTheme.onSurfaceVariant}
+	// 						onPress={deSerialize}
+	// 					/>
+	// 					<IconButton
+	// 						name="arrow-up"
+	// 						iconColor={currentTheme.onSurfaceVariant}
+	// 						onPress={serialize}
+	// 					/> */}
 
-						<IconButton
-							onPress={() =>
-								props.navigation.navigate("Calculator")
-							}
-							shouldVibrate={false}
-							iconColor={currentTheme.onSurfaceVariant}
-							name={"calculator"}
-						/>
-						<IconButton
-							name={filterToggle ? "close" : "filter"}
-							iconColor={currentTheme.onSurfaceVariant}
-							shouldVibrate={false}
-							onPress={toggle}
-						/>
-					</View>
-				),
-			});
-		} else {
-			props.navigation.setOptions({
-				headerStyle: { backgroundColor: currentTheme.surface },
-				headerRight: () => (
-					<View style={{ flexDirection: "row" }}>
-						{/* <IconButton
-							name="arrow-down"
-							iconColor={currentTheme.onSurfaceVariant}
-							onPress={deSerialize}
-						/>
-						<IconButton
-							name="arrow-up"
-							iconColor={currentTheme.onSurfaceVariant}
-							onPress={serialize}
-						/> */}
+	// 					<IconButton
+	// 						onPress={() =>
+	// 							props.navigation.navigate("Calculator")
+	// 						}
+	// 						shouldVibrate={false}
+	// 						iconColor={currentTheme.onSurfaceVariant}
+	// 						name={"calculator"}
+	// 					/>
+	// 					<IconButton
+	// 						name={filterToggle ? "close" : "filter"}
+	// 						iconColor={currentTheme.onSurfaceVariant}
+	// 						shouldVibrate={false}
+	// 						onPress={toggle}
+	// 					/>
+	// 				</View>
+	// 			),
+	// 		});
+	// 	} else {
+	// 		props.navigation.setOptions({
+	// 			headerStyle: { backgroundColor: currentTheme.surface },
+	// 			headerRight: () => (
+	// 				<View style={{ flexDirection: "row" }}>
+	// 					{/* <IconButton
+	// 						name="arrow-down"
+	// 						iconColor={currentTheme.onSurfaceVariant}
+	// 						onPress={deSerialize}
+	// 					/>
+	// 					<IconButton
+	// 						name="arrow-up"
+	// 						iconColor={currentTheme.onSurfaceVariant}
+	// 						onPress={serialize}
+	// 					/> */}
 
-						<IconButton
-							onPress={() =>
-								props.navigation.navigate("Calculator")
-							}
-							shouldVibrate={false}
-							iconColor={currentTheme.onSurfaceVariant}
-							name={"calculator"}
-						/>
+	// 					<IconButton
+	// 						onPress={() =>
+	// 							props.navigation.navigate("Calculator")
+	// 						}
+	// 						shouldVibrate={false}
+	// 						iconColor={currentTheme.onSurfaceVariant}
+	// 						name={"calculator"}
+	// 					/>
 
-						<IconButton
-							name={filterToggle ? "close" : "filter"}
-							iconColor={currentTheme.onSurfaceVariant}
-							shouldVibrate={false}
-							onPress={toggle}
-						/>
-					</View>
-				),
-			});
-		}
-	}, [props.navigation, filterToggle, isScrolling, currentTheme]);
+	// 					<IconButton
+	// 						name={filterToggle ? "close" : "filter"}
+	// 						iconColor={currentTheme.onSurfaceVariant}
+	// 						shouldVibrate={false}
+	// 						onPress={toggle}
+	// 					/>
+	// 				</View>
+	// 			),
+	// 		});
+	// 	}
+	// }, [props.navigation, filterToggle, isScrolling, currentTheme]);
 
 	const onRefresh = useCallback(() => {
 		setRefreshing(true);
-		dispatch(getWorkoutByUserID(userID))
+		dispatch(getWorkoutByUserID(userID));
 		// dispatch(WorkoutActions.getUserWorkouts(userID));
 	}, []);
 
@@ -219,7 +216,6 @@ const WorkoutListScreen = (props) => {
 		// props.navigation.navigate("AddWorkout");
 	};
 
-
 	return (
 		<View style={styles.container}>
 			<Modal
@@ -239,13 +235,45 @@ const WorkoutListScreen = (props) => {
 					style={{
 						...styles.fabButtonPlacement,
 						left: width - 160,
-						top: height - 200,
+						top: height - 100,
 					}}
 				>
 					New Workout
 				</FabButton>
 			)}
-
+			<TopAppBar
+				headlineText="Workouts"
+				navigationButton={
+					<IconButton
+						iconColor={currentTheme.onSurface}
+						name="arrow-back"
+						onPress={() => console.log("back")}
+					/>
+				}
+				trailingIcons={[
+					<IconButton
+						iconColor={currentTheme.onSurfaceVariant}
+						name="american-football-outline"
+						onPress={() => console.log("trailingIcon 1")}
+					/>,
+					<IconButton
+						iconColor={currentTheme.onSurfaceVariant}
+						name="contrast-outline"
+						onPress={() => console.log("trailingIcon 2")}
+					/>,
+					<IconButton
+						iconColor={currentTheme.onSurfaceVariant}
+						name="fast-food-outline"
+						onPress={() => console.log("trailingIcon 3")}
+					/>,
+					<IconButton
+						iconColor={currentTheme.onSurfaceVariant}
+						name="game-controller"
+						onPress={() => console.log("trailingIcon 4")}
+					/>,
+				
+				]}
+			/>
 			<View style={styles.contentView}>
 				<FlatList
 					style={styles.flatListStyle}
@@ -304,8 +332,9 @@ const getStyles = (theme) => {
 			backgroundColor: theme.surfaceE4,
 		},
 		contentView: {
+			flex: 1,
 			flexDirection: "column",
-			width: "100%",
+			// width: "100%",
 			// height: 300,
 			// alignItems: "center",
 			justifyContent: "center",
