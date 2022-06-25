@@ -15,6 +15,7 @@ import LabelText from "../../components/Text/Label";
 
 import { createCalendar, getCalendarFromStorage, saveCalendar } from "../../shared/utils/UtilFunctions";
 import FilledButton from "../../components/Buttons/FilledTonalButton";
+import { setUseDarkMode } from "../../store/slices/appSettingsSlice";
 const UserSettingsScreen = (props) => {
 	const user = useSelector((state) => state.user.user);
 	const userID = useSelector((state) => state.auth.userID);
@@ -74,7 +75,7 @@ const UserSettingsScreen = (props) => {
 
 	const onToggleDarkMode = () => {
 		console.log("ontoggledarkmode");
-		dispatch({ type: SET_USE_DARKMODE, value: !useDarkModeValue });
+		dispatch(setUseDarkMode(!useDarkModeValue));
 	};
 
 	const onToggleUseMetric = () => {

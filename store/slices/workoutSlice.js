@@ -76,15 +76,24 @@ export const getExercisesByType = createAsyncThunk(
 			exerciseTypes,
 			userID
 		);
-		return exercisesResponse;
+		if (exercisesResponse != null) {
+			return exercisesResponse;
+		} else {
+			return null;
+		}
 	}
+);
+
+export const getWorkoutsFilteredByExerciseType = createAsyncThunk(
+	"workout/getWorkoutsFilteredByExerciseType",
+	async (payload, thunkAPI) => {}
 );
 
 export const workoutSlice = createSlice({
 	name: "workout",
 	initialState,
 	reducers: {
-		resetFilteredExercises: state => state.filteredExercises = {}
+		resetFilteredExercises: (state) => (state.filteredExercises = {}),
 	},
 	extraReducers: (builder) => {
 		// Workouts
@@ -132,10 +141,13 @@ export const workoutSlice = createSlice({
 
 		builder.addCase(getExercisesByType.pending, (state) => {
 			state.filteredExercises = {};
-		})
+		});
+
 		builder.addCase(getExercisesByType.fulfilled, (state, action) => {
 			const snapshot = action.payload;
-			if(snapshot.size>0){
+			if (snapshot === null) {
+				state.filteredExercises = {};
+			} else {
 				snapshot.forEach((doc) => {
 					const exercise = doc.data();
 					console.log("exercise");
@@ -144,13 +156,11 @@ export const workoutSlice = createSlice({
 					console.log(exercise);
 					state.filteredExercises[exercise.id] = exercise;
 				});
-			}else{
-				state.filteredExercises = {};
 			}
 		});
 	},
 });
 
-export const {resetFilteredExercises} = workoutSlice.actions;
+export const { resetFilteredExercises } = workoutSlice.actions;
 
 export default workoutSlice.reducer;

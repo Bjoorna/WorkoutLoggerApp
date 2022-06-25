@@ -56,7 +56,7 @@ const WorkoutAnalysisScreen = (props) => {
 
 	useEffect(() => {
 		// componentdidmount
-		setIsLoading(true);
+		// setIsLoading(true);
 		createExerciseTypeArray();
 	}, []);
 
@@ -102,14 +102,21 @@ const WorkoutAnalysisScreen = (props) => {
 		setChartDotColorHexCode(hexToRGB(currentTheme.tertiary));
 	}, [useDarkMode]);
 
-	const loadExercise = (type) => {
+	const loadExercise = async (type) => {
 		setIsLoading(true);
 		setCurrentChartExercise(type);
 		// dispatch(WorkoutActions.getExerciseByType(userID, type));
 		console.log(type);
 		const typeArray = [];
 		typeArray.push(type);
-		dispatch(getExercisesByType({exerciseTypes: typeArray, userID: userID}))
+
+		
+		const thunkResult = await dispatch(getExercisesByType({exerciseTypes: typeArray, userID: userID})).unwrap();
+		// stop indicating that the app is loading if the query comes back empty 
+		if(thunkResult === null){
+			setChartDataObject(null);
+			setIsLoading(false);
+		}
 	};
 
 	// TODO make it so that when pressing a selected exercise, it is unselected
@@ -157,7 +164,7 @@ const WorkoutAnalysisScreen = (props) => {
 		const labelArray = [];
 		const exerciseWeightArray = [];
 		data.forEach((exercise) => {
-			const date = new Date(exercise.date.seconds * 1000);
+			const date = new Date(exercise.date);
 			const monthString = date.toDateString().split(" ")[1];
 			// const dateString = date.toDateString();
 			const dateString = date.getDate() + "" + monthString;
@@ -241,7 +248,7 @@ const WorkoutAnalysisScreen = (props) => {
 						{chartDataObject && (
 							<LineChart
 								data={chartDataObject}
-								width={Dimensions.get("window").width - 50} // from react-native
+								width={Dimensions.get("window").width - 50} 
 								height={220}
 								yAxisSuffix="kg"
 								yAxisInterval={1} // optional, defaults to 1

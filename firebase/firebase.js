@@ -25,11 +25,6 @@ import {
 } from "firebase/auth";
 
 import * as firebaseConfig from "./config";
-import Workout from "../models/workout";
-
-import { nanoid } from "nanoid";
-import { async } from "@firebase/util";
-import { exp } from "react-native-reanimated";
 // APPSETUO
 const app = initializeApp(firebaseConfig.firebaseConfig);
 
@@ -76,19 +71,19 @@ export const updateUserField = async (userID, updatedField) => {
 	}
 };
 
-export const firebaseGetUser = async(userID) => {
+export const firebaseGetUser = async (userID) => {
 	try {
 		const userDataRef = doc(database, "users", userID);
-		const userDocSnap = await getDoc(userDataRef); 
-		if( userDocSnap.exists){
+		const userDocSnap = await getDoc(userDataRef);
+		if (userDocSnap.exists) {
 			return userDocSnap.data();
-		}else {
+		} else {
 			console.log("User dont exists");
 		}
 	} catch (error) {
 		throw new Error(error);
 	}
-}
+};
 
 // workout
 
@@ -100,27 +95,26 @@ export const firebaseDeleteWorkout = async (workout) => {
 		await firebaseDeleteExercises(exerciseIDs);
 		await deleteDoc(workoutRef);
 		return;
-
 	} catch (error) {
 		console.log(error);
 		throw new Error(error);
 	}
 };
 
-export const firebaseDeleteExercises = async(exerciseIDs) => {
+export const firebaseDeleteExercises = async (exerciseIDs) => {
 	try {
 		const batch = writeBatch(database);
-		for(let id of exerciseIDs){
+		for (let id of exerciseIDs) {
 			const exerciseRef = doc(database, "exercises", id);
 			batch.delete(exerciseRef);
 		}
 		await batch.commit();
-		return; 
+		return;
 	} catch (error) {
 		console.log(error);
 		throw new Error(error);
 	}
-}
+};
 
 // export const deleteWorkout = async (userID, workout) => {
 // 	try {
@@ -227,39 +221,45 @@ export const firebaseWriteExercisesToDatabase = async (
 export const firebaseGetExercisesByTypes = async (exerciseTypes, userID) => {
 	try {
 		const exerciseCollection = collection(database, "exercises");
-		const exerciseQuery = query(exerciseCollection, where("owner", "==", userID), where("exercise", "in", exerciseTypes))
-		const docs = await getDocs(exerciseQuery);
-		return docs;
-
-	} catch (error) {
-		console.log(error);
-		throw new Error(error);
-	}
-}
-
-
-export const getExercisesFilteredByExerciseType = async (
-	userID,
-	exerciseArray
-) => {
-	try {
-		const exerciseRef = collection(database, "exercises");
-		console.log("FROM FIREBASE");
-		for (let e of exerciseArray) {
-			console.log(e);
-		}
-		const q = query(
-			exerciseRef,
+		const exerciseQuery = query(
+			exerciseCollection,
 			where("owner", "==", userID),
-			where("exercise", "in", exerciseArray)
+			where("exercise", "in", exerciseTypes)
 		);
-		const querySnapshot = await getDocs(q);
-		return querySnapshot;
+		const docs = await getDocs(exerciseQuery);
+		if (!docs.empty) {
+			return docs;
+		} else {
+			return null;
+		}
 	} catch (error) {
 		console.log(error);
 		throw new Error(error);
 	}
 };
+
+// export const getExercisesFilteredByExerciseType = async (
+// 	userID,
+// 	exerciseArray
+// ) => {
+// 	try {
+// 		const exerciseRef = collection(database, "exercises");
+// 		console.log("FROM FIREBASE");
+// 		for (let e of exerciseArray) {
+// 			console.log(e);
+// 		}
+// 		const q = query(
+// 			exerciseRef,
+// 			where("owner", "==", userID),
+// 			where("exercise", "in", exerciseArray)
+// 		);
+// 		const querySnapshot = await getDocs(q);
+// 		return querySnapshot;
+// 	} catch (error) {
+// 		console.log(error);
+// 		throw new Error(error);
+// 	}
+// };
 
 export const firebaseGetUserWorkouts = async (userID) => {
 	try {
@@ -282,19 +282,17 @@ export const firebaseGetUserWorkouts = async (userID) => {
 	}
 };
 
-export const getWorkoutsBasedOnWorkoutIDs = async (workoutIDs) => {
-	try {
-		const workoutRefs = workoutIDs.map((id) =>
-			getDoc(doc(database, "workouts", id))
-		);
-		const docSnaps = await Promise.all(workoutRefs);
-		return docSnaps;
-	} catch (error) {
-		throw new Error(error);
-	}
-};
-
-
+// export const getWorkoutsBasedOnWorkoutIDs = async (workoutIDs) => {
+// 	try {
+// 		const workoutRefs = workoutIDs.map((id) =>
+// 			getDoc(doc(database, "workouts", id))
+// 		);
+// 		const docSnaps = await Promise.all(workoutRefs);
+// 		return docSnaps;
+// 	} catch (error) {
+// 		throw new Error(error);
+// 	}
+// };
 
 export const firebaseGetExercisesInWorkout = async (exercises, userID) => {
 	try {
@@ -308,30 +306,30 @@ export const firebaseGetExercisesInWorkout = async (exercises, userID) => {
 	}
 };
 
-export const writeWorkoutToCollection = async (workout) => {
-	// try {
-	// 	const timestamp = Timestamp.fromMillis(workout.date);
-	// 	const newUUID = nanoid();
-	// 	const exerciseIDs = await writeExercisesToDatabase(
-	// 		workout.exercises,
-	// 		workout.owner,
-	// 		newUUID,
-	// 		timestamp
-	// 	);
-	// 	const newWorkout = {
-	// 		exercises: exerciseIDs,
-	// 		date: timestamp,
-	// 		complete: workout.complete,
-	// 		note: workout.note,
-	// 		owner: workout.owner,
-	// 	};
-	// 	const docRef = doc(database, "workouts", newUUID);
-	// 	return await setDoc(docRef, newWorkout);
-	// } catch (e) {
-	// 	console.log("From WriteWrokoutToCOllection");
-	// 	console.log(e);
-	// }
-};
+// export const writeWorkoutToCollection = async (workout) => {
+// 	// try {
+// 	// 	const timestamp = Timestamp.fromMillis(workout.date);
+// 	// 	const newUUID = nanoid();
+// 	// 	const exerciseIDs = await writeExercisesToDatabase(
+// 	// 		workout.exercises,
+// 	// 		workout.owner,
+// 	// 		newUUID,
+// 	// 		timestamp
+// 	// 	);
+// 	// 	const newWorkout = {
+// 	// 		exercises: exerciseIDs,
+// 	// 		date: timestamp,
+// 	// 		complete: workout.complete,
+// 	// 		note: workout.note,
+// 	// 		owner: workout.owner,
+// 	// 	};
+// 	// 	const docRef = doc(database, "workouts", newUUID);
+// 	// 	return await setDoc(docRef, newWorkout);
+// 	// } catch (e) {
+// 	// 	console.log("From WriteWrokoutToCOllection");
+// 	// 	console.log(e);
+// 	// }
+// };
 
 export const getWorkoutOnDay = async (userID, dayStart, dayEnd) => {
 	try {

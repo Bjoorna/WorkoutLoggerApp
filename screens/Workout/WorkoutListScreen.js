@@ -35,6 +35,7 @@ import {
 } from "../../store/actions/appsettings";
 import { transformObjectToWorkout } from "../../shared/utils/UtilFunctions";
 import { getWorkoutByUserID } from "../../store/slices/workoutSlice";
+import { setHideTabBar } from "../../store/slices/appSettingsSlice";
 
 if (
 	Platform.OS === "android" &&
@@ -70,7 +71,7 @@ const WorkoutListScreen = (props) => {
 	const snapPoints = useMemo(() => ["25%", "50%"], []);
 	const handleSheetChanges = useCallback((index) => {
 		if (index === -1) {
-			dispatch({ type: SET_TAB_BAR_VALUE, value: false });
+			dispatch(setHideTabBar(false));
 
 			if (!filterToggle) {
 				return;
@@ -88,13 +89,10 @@ const WorkoutListScreen = (props) => {
 		if (userID) {
 			dispatch(getWorkoutByUserID(userID));
 		}
-		// dispatch(WorkoutActions.getUserWorkouts(userID));
-		// dispatch({ type: SET_TAB_BAR_VALUE, value: false });
 	}, []);
 
 	useEffect(() => {
 		const arrayOfWorkouts = Object.values(reduxWorkoutRef);
-
 		setWorkouts(arrayOfWorkouts);
 		setRefreshing(false);
 	}, [reduxWorkoutRef]);
@@ -114,7 +112,7 @@ const WorkoutListScreen = (props) => {
 	useEffect(() => {
 		setShowFilter(filterToggle);
 		if (filterToggle) {
-			dispatch({ type: SET_TAB_BAR_VALUE, value: true });
+			dispatch(setHideTabBar(true));
 			// 	bottomSheetRef.current.snapToIndex(0);
 		} else {
 			bottomSheetRef.current.close();

@@ -31,7 +31,7 @@ const FilterSelect = (props) => {
 	const userID = useSelector((state) => state.auth.userID);
 	const dispatch = useDispatch();
 	const [exerciseTypes, setExerciseTypes] = useState([]);
-	const [error, setError] = useState();
+	const [error, setError] = useState(null);
 
 	const [exerciseFilterState, setExerciseFilterState] = useState([]);
 
