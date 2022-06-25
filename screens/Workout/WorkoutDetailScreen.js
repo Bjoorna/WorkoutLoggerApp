@@ -26,14 +26,17 @@ import IconButton from "../../components/Buttons/IconButton";
 import { hexToRGB, transformObjectToWorkout } from "../../shared/utils/UtilFunctions";
 
 import Workout from "../../models/workout";
+import { setHideTabBar } from "../../store/slices/appSettingsSlice";
+import { deleteWorkout } from "../../store/slices/workoutSlice";
 
 const WorkoutDetailScreen = (props) => {
 	const dispatch = useDispatch();
 	const workoutID = props.route.params.workoutID;
 	const userID = useSelector((state) => state.auth.userID);
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
-	const workoutsRef = useSelector((state) => state.workout.workouts);
-	const exercisesRef = useSelector((state) => state.workout.exercisesObject);
+	const reduxWorkoutRef = useSelector((state) => state.workout.workouts);
+	const reduxExercisesRef = useSelector((state) => state.workout.exercises);
+
 	const [styles, setStyles] = useState(
 		getStyles(useDarkMode ? Themes.dark : Themes.light)
 	);
@@ -49,26 +52,20 @@ const WorkoutDetailScreen = (props) => {
 		hexToRGB(currentTheme.surface)
 	);
 
-	const [workoutJSON, setWorkoutJSON] = useState();
 
 	useEffect(() => {
-		const onWorkout = workoutsRef.find(
-			(workout) => workout.id == workoutID
-		);
+		const onWorkout = reduxWorkoutRef[workoutID];
 		console.log("OnWorkoout: ");
-		// console.log(onWorkout);
+		console.log(onWorkout);
 		setWorkout(onWorkout);
-		// console.log(hexToRGB(currentTheme.surface));
 	}, []);
 
 	useEffect(() => {
 		if (workout) {
 			const exerciseIDs = workout.exercises;
-			// console.log(exerciseIDs);
 			const exerciseArray = [];
 			for (let id of exerciseIDs) {
-				// console.log(id);
-				const exercise = exercisesRef[id];
+				const exercise = reduxExercisesRef[id];
 				exerciseArray.push(exercise);
 			}
 			setExercises(exerciseArray);
@@ -99,33 +96,20 @@ const WorkoutDetailScreen = (props) => {
 		console.log("REPS: " + reps);
 		return 3;
 	};
-	// REAL
+
+	
 	useLayoutEffect(() => {
-		if (workout) {
-			props.navigation.setOptions({
-				headerRight: () => (
-					<View style={{ flexDirection: "row" }}>
-						<IconButton
-							name="trash"
-							onPress={() => showModalHandler(true)}
-						/>
-					</View>
-				),
-
-				title: new Date(workout.date.seconds * 1000).toDateString(),
-				headerStyle: { backgroundColor: currentTheme.surfaceE2 },
-			});
-		}
-
 		// BandAid to fix react rendering without the stylesheet on changes
 		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
 	}, [props.navigation, workout]);
 
-	const deleteWorkout = async () => {
+	const onDeleteWorkout = async () => {
 		if (workout) {
 			console.log(workout);
-			await firebase.deleteWorkout(userID, workout);
+
+			const workoutDeleted = await dispatch(deleteWorkout(workout)).unwrap();
 			console.log("workout and exercises deleted");
+			console.log(workoutDeleted);
 			showModalHandler(false);
 			props.navigation.goBack();
 		}
@@ -135,34 +119,10 @@ const WorkoutDetailScreen = (props) => {
 		setShowModal(value);
 	};
 
-	const serialize = () => {
-		if (workout) {
-			console.log(workout);
-			const serializedWorkout = JSON.stringify(workout);
-			console.log(serializedWorkout);
-			setWorkoutJSON(serializedWorkout);
-		}
-	};
-
-	const deSerialize = () => {
-		if (workoutJSON) {
-			console.log(workoutJSON);
-			const deserializedWorkout = JSON.parse(workoutJSON);
-			console.log("Deserialized: ");
-			console.log(deserializedWorkout);
-			const woTransform = transformObjectToWorkout(deserializedWorkout);
-			console.log("Transform: ")
-			console.log(woTransform);
-		}
-	};
-
 	useFocusEffect(
 		useCallback(() => {
 			const onCloseScreen = () => {
-				dispatch({
-					type: SET_TAB_BAR_VALUE,
-					value: false,
-				});
+				dispatch(setHideTabBar(false));
 			};
 			return () => onCloseScreen();
 		}, [props.navigation])
@@ -214,7 +174,7 @@ const WorkoutDetailScreen = (props) => {
 							<TextButton
 								textStyle={{ color: currentTheme.primary }}
 								disabled={false}
-								onButtonPress={() => deleteWorkout()}
+								onButtonPress={() => onDeleteWorkout()}
 							>
 								Delete
 							</TextButton>
@@ -237,23 +197,12 @@ const WorkoutDetailScreen = (props) => {
 							style={{ color: currentTheme.onSurface }}
 						>
 							{new Date(
-								workout.date.seconds * 1000
+								workout.date
 							).toDateString()}
 						</TitleText>
 					)}
 				</View>
 				<View style={styles.appBarTrailingIcons}>
-					<IconButton
-						name="arrow-down"
-						iconColor={currentTheme.onSurfaceVariant}
-						onPress={deSerialize}
-					/>
-					<IconButton
-						name="arrow-up"
-						iconColor={currentTheme.onSurfaceVariant}
-						onPress={serialize}
-					/>
-
 					<IconButton
 						name="trash-outline"
 						iconColor={currentTheme.onSurfaceVariant}

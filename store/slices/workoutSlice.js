@@ -2,7 +2,10 @@ import { async } from "@firebase/util";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 import {
+	firebaseDeleteWorkout,
 	firebaseGetExercisesInWorkout,
+	firebaseGetWorkoutByID,
+	firebaseSaveWorkout,
 	getUserWorkouts,
 	millisFromTimestamp,
 } from "../../firebase/firebase";
@@ -30,19 +33,39 @@ export const getWorkoutByUserID = createAsyncThunk(
 );
 
 /**
- * 
+ * takes an object with fields userID: string, and exerciseIDs: string[]
  */
 export const getExercisesInWorkout = createAsyncThunk(
 	"workout/getExercisesInWorkout",
 	async (requestPayload, thunkAPI) => {
 		const { userID, exerciseIDs } = requestPayload;
-        // thunkAPI.getState();
-        
+		// thunkAPI.getState();
+
 		const exerciseRequest = await firebaseGetExercisesInWorkout(
 			exerciseIDs,
 			userID
 		);
 		return exerciseRequest;
+	}
+);
+
+/**
+ * workoutPayload = {workout: workout, userID: string}
+ */
+export const saveWorkout = createAsyncThunk(
+	"workout/saveWorkout",
+	async (workoutPayload, thunkAPI) => {
+		const { workout, userID } = workoutPayload;
+		const newWorkoutID = await firebaseSaveWorkout(workout, userID);
+		return newWorkoutID;
+	}
+);
+
+export const deleteWorkout = createAsyncThunk(
+	"workout/deleteWorkout",
+	async (workoutToDelete, thunkAPI) => {
+		await firebaseDeleteWorkout(workoutToDelete);
+		return workoutToDelete.id;
 	}
 );
 
@@ -60,9 +83,44 @@ export const workoutSlice = createSlice({
 				const timeStampInMillis = workoutData.date.seconds * 1000;
 				console.log(timeStampInMillis);
 				workoutData.date = timeStampInMillis;
-                workoutData.id = workoutID;
+				workoutData.id = workoutID;
 				state.workouts[workoutID] = workoutData;
 			});
+		});
+
+		// TODO add getworkout that is saved
+		builder.addCase(saveWorkout.fulfilled, (state, action) => {
+			const newWorkoutID = action.payload;
+			console.log("Save workout fullfiled");
+			console.log(newWorkoutID);
+			// const newlySavedWorkout = await firebaseGetWorkoutByID(newWorkoutID);
+			// if(newlySavedWorkout){
+			// 	state.workouts[newWorkoutID] = newlySavedWorkout;
+			// }
+			// console.log(action);
+		});
+
+		builder.addCase(deleteWorkout.fulfilled, (state, action) => {
+			// console.log("State");
+			// console.log(state);
+			// console.log(action);
+			const deletedWorkoutID = action.payload;
+			const exerciseIDsToDelete =
+				state.workouts[deletedWorkoutID].exercises;
+			for (let exerciseID of exerciseIDsToDelete) {
+				delete state.exercises[exerciseID];
+			}
+			console.log("before");
+
+			// console.log(state.workouts);
+			const testDelete = delete state.workouts[deletedWorkoutID];
+			if (testDelete) {
+				console.log("Deleted from store");
+				console.log("after");
+				// console.log(state.workouts);
+			} else {
+				console.log("Not from store");
+			}
 		});
 
 		// Exercises
@@ -70,10 +128,10 @@ export const workoutSlice = createSlice({
 			const eData = action.payload;
 			eData.forEach((doc) => {
 				const exercise = doc.data();
-                const exerciseID = doc.id;
+				const exerciseID = doc.id;
 				exercise.date = exercise.date.seconds * 1000;
-                exercise.id = doc.id;
-                state.exercises[exerciseID] = exercise;
+				exercise.id = doc.id;
+				state.exercises[exerciseID] = exercise;
 			});
 		});
 	},

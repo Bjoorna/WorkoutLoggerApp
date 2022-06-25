@@ -76,6 +76,36 @@ export const updateUserField = async (userID, updatedField) => {
 	}
 };
 
+export const firebaseDeleteWorkout = async (workout) => {
+	try {
+		const workoutID = workout.id;
+		const exerciseIDs = workout.exercises;
+		const workoutRef = doc(database, "workouts", workoutID);
+		await firebaseDeleteExercises(exerciseIDs);
+		await deleteDoc(workoutRef);
+		return;
+
+	} catch (error) {
+		console.log(error);
+		throw new Error(error);
+	}
+};
+
+export const firebaseDeleteExercises = async(exerciseIDs) => {
+	try {
+		const batch = writeBatch(database);
+		for(let id of exerciseIDs){
+			const exerciseRef = doc(database, "exercises", id);
+			batch.delete(exerciseRef);
+		}
+		await batch.commit();
+		return; 
+	} catch (error) {
+		console.log(error);
+		throw new Error(error);
+	}
+}
+
 export const deleteWorkout = async (userID, workout) => {
 	try {
 		const workoutID = workout.id;
@@ -104,17 +134,59 @@ export const deleteExercise = async (userID, exerciseIDs) => {
 	}
 };
 
-export const writeExercisesToDatabase = async (
+export const firebaseSaveWorkout = async (workout, userID) => {
+	try {
+		const newWorkoutRef = doc(collection(database, "workouts"));
+		console.log("Firebasesaveworkout");
+		const newWorkoutID = newWorkoutRef.id;
+		const timestamp = Timestamp.fromMillis(workout.date);
+		const exerciseIDs = await firebaseWriteExercisesToDatabase(
+			workout.exercises,
+			newWorkoutID,
+			userID,
+			timestamp
+		);
+		const newWorkout = {
+			exercises: exerciseIDs ? [...exerciseIDs] : ["error"],
+			date: timestamp,
+			complete: workout.complete,
+			owner: userID,
+			note: workout.note,
+		};
+		console.log(newWorkout);
+
+		await setDoc(newWorkoutRef, newWorkout);
+		return newWorkoutID;
+	} catch (error) {
+		console.log(error);
+	}
+};
+
+export const firebaseGetWorkoutByID = async (workoutID) => {
+	try {
+		const docRef = doc(database, "workouts", workoutID);
+		const docSnap = await getDoc(docRef);
+		if (docSnap.exists) {
+			return docSnap.data();
+		}
+	} catch (error) {
+		console.log("FirebaseGetWorkoutByID");
+		console.log(error);
+	}
+};
+
+export const firebaseWriteExercisesToDatabase = async (
 	exercises,
-	userID,
 	workoutID,
+	userID,
 	timestamp
 ) => {
 	try {
 		const batch = writeBatch(database);
 		const arrayOfExerciseIDs = [];
 		for (let exercise of exercises) {
-			const exerciseID = nanoid();
+			const newExerciseRef = doc(collection(database, "exercises"));
+			const exerciseID = newExerciseRef.id;
 			const exerciseTransform = {
 				exercise: exercise.exercise,
 				weight: exercise.weight,
@@ -125,9 +197,8 @@ export const writeExercisesToDatabase = async (
 				owner: userID,
 				workoutID: workoutID,
 			};
-			const exerciseRef = doc(database, "exercises", exerciseID);
 			arrayOfExerciseIDs.push(exerciseID);
-			batch.set(exerciseRef, exerciseTransform);
+			batch.set(newExerciseRef, exerciseTransform);
 		}
 		await batch.commit();
 		return arrayOfExerciseIDs;
@@ -143,9 +214,8 @@ export const getUserWorkouts = async (userID) => {
 			collection(database, "workouts"),
 			where("owner", "==", userID),
 			orderBy("date", "desc"),
-			// limit(2)
+			limit(3)
 		);
-		console.log(query);
 		// const q = query(
 		// 	collection(database, "workouts"),
 		// 	where("owner", "==", userID),
@@ -206,29 +276,28 @@ export const firebaseGetExercisesInWorkout = async (exercises, userID) => {
 };
 
 export const writeWorkoutToCollection = async (workout) => {
-	try {
-		const timestamp = Timestamp.fromMillis(workout.date);
-		const newUUID = nanoid();
-		const exerciseIDs = await writeExercisesToDatabase(
-			workout.exercises,
-			workout.owner,
-			newUUID,
-			timestamp
-		);
-		const newWorkout = {
-			exercises: exerciseIDs,
-			date: timestamp,
-			complete: workout.complete,
-			note: workout.note,
-			owner: workout.owner,
-		};
-
-		const docRef = doc(database, "workouts", newUUID);
-		return await setDoc(docRef, newWorkout);
-	} catch (e) {
-		console.log("From WriteWrokoutToCOllection");
-		console.log(e);
-	}
+	// try {
+	// 	const timestamp = Timestamp.fromMillis(workout.date);
+	// 	const newUUID = nanoid();
+	// 	const exerciseIDs = await writeExercisesToDatabase(
+	// 		workout.exercises,
+	// 		workout.owner,
+	// 		newUUID,
+	// 		timestamp
+	// 	);
+	// 	const newWorkout = {
+	// 		exercises: exerciseIDs,
+	// 		date: timestamp,
+	// 		complete: workout.complete,
+	// 		note: workout.note,
+	// 		owner: workout.owner,
+	// 	};
+	// 	const docRef = doc(database, "workouts", newUUID);
+	// 	return await setDoc(docRef, newWorkout);
+	// } catch (e) {
+	// 	console.log("From WriteWrokoutToCOllection");
+	// 	console.log(e);
+	// }
 };
 
 export const getWorkoutOnDay = async (userID, dayStart, dayEnd) => {

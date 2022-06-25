@@ -56,6 +56,10 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
 		};
 	}, []);
 
+	useEffect(()=> {
+		console.log("HideTabBar: ", hideTabBar);
+	}, [hideTabBar])
+
 	useEffect(() => {
 		if (state.index == onTabIndex) {
 			return;

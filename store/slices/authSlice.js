@@ -41,8 +41,7 @@ export const authSlice = createSlice({
 			const user = action.payload;
 			const userID = user.uid;
 			const userToken = user.stsTokenManager.accessToken;
-			console.log(userToken);
-			console.log(action.payload);
+			// console.log(userToken);
 			state.token = userToken;
 			state.userID = userID;
 			// setLocalAuthState({token: userToken, userID: userID})

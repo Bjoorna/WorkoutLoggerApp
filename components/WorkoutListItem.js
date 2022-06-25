@@ -19,6 +19,7 @@ import { SET_TAB_BAR_VALUE } from "../store/actions/appsettings";
 import { SET_EXERCISES_FROM_WORKOUT } from "../store/actions/workout";
 import UtilFunctions from "../shared/utils/UtilFunctions";
 import { getExercisesInWorkout } from "../store/slices/workoutSlice";
+import { setHideTabBar, setUseDarkMode } from "../store/slices/appSettingsSlice";
 // const theme = Themes.dark;
 
 const ExerciseItem = (props) => {
@@ -106,9 +107,8 @@ const WorkoutListItem = ({ workoutID, userID }) => {
 	const exercisesInStore = useSelector((state) => state.workout.exercises);
 
 	const [exercises, setExercises] = useState([]);
-	const [isLoading, setIsLoading] = useState(false);
 
-	const [dateObject, setDateObject] = useState(new Date(workout.date));
+	const [dateObject, setDateObject] = useState(workout ? new Date(workout.date): new Date());
 
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
 
@@ -132,28 +132,34 @@ const WorkoutListItem = ({ workoutID, userID }) => {
 				exerciseIDs: workout.exercises,
 			};
 			dispatch(getExercisesInWorkout(requestPayload));
+		}else {
+			console.log("useffect on workout remove");
+			setDateObject(new Date());
 		}
+
 	}, [workout]);
 
 	// when store is updated, get the exercises from store
 	useEffect(() => {
-		console.log("exercisesInStore updated: ");
-		const updatedArrayOfExercises = [];
-		// inefficient ?????
-		for (let exerciseID of workout.exercises) {
-			if (exercisesInStore[exerciseID]) {
-				updatedArrayOfExercises.push(exercisesInStore[exerciseID]);
+		if(workout){
+			const updatedArrayOfExercises = [];
+			// inefficient ?????
+			for (let exerciseID of workout.exercises) {
+				if (exercisesInStore[exerciseID]) {
+					updatedArrayOfExercises.push(exercisesInStore[exerciseID]);
+				}
 			}
+	
+			setExercises(updatedArrayOfExercises);
+	
 		}
-
-		setExercises(updatedArrayOfExercises);
 	}, [exercisesInStore]);
 
 	const navigateToDetailPage = () => {
 		// hide TabBar
-		dispatch({ type: SET_TAB_BAR_VALUE, value: true });
+		dispatch(setHideTabBar(true));
 		Vibration.vibrate(50);
-		navigation.navigate("WorkoutDetail", { workoutID: props.workout.id });
+		navigation.navigate("WorkoutDetail", { workoutID: workout.id });
 	};
 
 	return (
@@ -169,15 +175,12 @@ const WorkoutListItem = ({ workoutID, userID }) => {
 						</LabelText>
 					</View>
 					<View style={styles.workoutItemExerciseContainer}>
-						{isLoading && (
-							<View>
+							{/* <View>
 								<ActivityIndicator
 									size="small"
 									color={currentTheme.primary}
 								/>
-							</View>
-						)}
-						{!isLoading && (
+							</View> */}
 							<FlatList
 								keyExtractor={(item) => item.id}
 								horizontal={true}
@@ -189,7 +192,6 @@ const WorkoutListItem = ({ workoutID, userID }) => {
 									/>
 								)}
 							/>
-						)}
 					</View>
 				</View>
 			</Pressable>

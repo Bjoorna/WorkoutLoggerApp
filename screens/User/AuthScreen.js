@@ -29,6 +29,7 @@ import { setUseDarkMode } from "../../store/slices/appSettingsSlice";
 import { loginUser } from "../../store/slices/authSlice";
 
 import { getFirebaseAuth, signOutUser } from "../../firebase/firebase";
+import { saveWorkout } from "../../store/slices/workoutSlice";
 const FORM_INPUT_UPDATE = "FORM_INPUT_UPDATE";
 
 const formReducer = (state, action) => {
@@ -164,6 +165,11 @@ const AuthScreen = (props) => {
 	const onGetAuth = ()=> {
 		const testAuth = getFirebaseAuth();
 		console.log(testAuth.currentUser);
+	}
+
+	const onTestIDGen = ()=> {
+
+		dispatch(saveWorkout("as"));
 	}
 
 	const onSignOut = () => {
@@ -314,6 +320,8 @@ const AuthScreen = (props) => {
 							}}
 						>
 							<FilledButton onButtonPress={onGetAuth} >GetAuth</FilledButton>
+							<FilledButton onButtonPress={onTestIDGen} >ID</FilledButton>
+
 							<FilledButton onButtonPress={onSignOut} >SignOut</FilledButton>
 
 

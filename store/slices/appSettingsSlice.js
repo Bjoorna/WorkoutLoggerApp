@@ -15,9 +15,13 @@ export const appSettingsSlice = createSlice({
 			console.log(action);
 			state.useDarkMode = action.payload;
 		},
+		setHideTabBar: (state, action) => {
+			
+			state.hideTabBar = action.payload;
+		}
 	},
 });
 
-export const { setUseDarkMode } = appSettingsSlice.actions;
+export const { setUseDarkMode, setHideTabBar } = appSettingsSlice.actions;
 
 export default appSettingsSlice.reducer;

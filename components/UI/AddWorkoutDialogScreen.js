@@ -11,7 +11,7 @@ import {
 	FlatList,
 	Platform,
 } from "react-native";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { Themes } from "../../shared/Theme";
 import BodyText from "../Text/Body";
 import IconButton from "../Buttons/IconButton";
@@ -34,6 +34,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import * as firebase from "../../firebase/firebase";
 
 import { hexToRGB } from "../../shared/utils/UtilFunctions";
+import { saveWorkout } from "../../store/slices/workoutSlice";
 
 const windowWidth = Dimensions.get("screen").width;
 const textFieldWidth = Math.floor((windowWidth - 24 * 2 - 8) / 2);
@@ -86,6 +87,7 @@ const baseExerciseState = {
 
 const AddWorkoutDialogScreen = (props) => {
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
+	const dispatch = useDispatch();
 	const [styles, setStyles] = useState(
 		getStyles(useDarkMode ? Themes.dark : Themes.light)
 	);
@@ -93,7 +95,7 @@ const AddWorkoutDialogScreen = (props) => {
 		useDarkMode ? Themes.dark : Themes.light
 	);
 	const userID = useSelector((state) => state.auth.userID);
-	const userData = useSelector((state) => state.user);
+	// const userData = useSelector((state) => state.user);
 
 	const [workoutState, dispatchWorkout] = useReducer(workoutReducer, {
 		workout: new Workout([], Date.now(), false, "", userID),
@@ -125,7 +127,7 @@ const AddWorkoutDialogScreen = (props) => {
 	const rpeRef = useRef(null);
 
 	useEffect(() => {
-		console.log(userData.user.useMetric);
+		// console.log(userData.user.useMetric);
 		if (Platform.OS === "android") {
 		}
 	}, []);
@@ -236,7 +238,7 @@ const AddWorkoutDialogScreen = (props) => {
 			"Note",
 			userID
 		);
-		await firebase.writeWorkoutToCollection(newWorkout);
+		dispatch(saveWorkout({workout: newWorkout, userID: userID}))
 		setIsLoading(false);
 		console.log("WorkoutSaved");
 		props.toggleModal();
