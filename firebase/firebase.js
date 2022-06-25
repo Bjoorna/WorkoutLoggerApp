@@ -76,6 +76,22 @@ export const updateUserField = async (userID, updatedField) => {
 	}
 };
 
+export const firebaseGetUser = async(userID) => {
+	try {
+		const userDataRef = doc(database, "users", userID);
+		const userDocSnap = await getDoc(userDataRef); 
+		if( userDocSnap.exists){
+			return userDocSnap.data();
+		}else {
+			console.log("User dont exists");
+		}
+	} catch (error) {
+		throw new Error(error);
+	}
+}
+
+// workout
+
 export const firebaseDeleteWorkout = async (workout) => {
 	try {
 		const workoutID = workout.id;

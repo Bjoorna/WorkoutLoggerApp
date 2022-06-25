@@ -29,7 +29,6 @@ import { setUseDarkMode } from "../../store/slices/appSettingsSlice";
 import { loginUser } from "../../store/slices/authSlice";
 
 import { getFirebaseAuth, signOutUser } from "../../firebase/firebase";
-import { saveWorkout } from "../../store/slices/workoutSlice";
 const FORM_INPUT_UPDATE = "FORM_INPUT_UPDATE";
 
 const formReducer = (state, action) => {
@@ -69,7 +68,6 @@ const AuthScreen = (props) => {
 	const authStatus = useSelector((state) => state.auth);
 
 	const dispatch = useDispatch();
-	const [isSignup, setIsSignup] = useState(false);
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
@@ -91,6 +89,9 @@ const AuthScreen = (props) => {
 	useEffect(() => {
 		console.log("Authstatus: ");
 		console.log(authStatus);
+		return () => {
+			setIsLoading(false);
+		}
 	}, []);
 
 	useEffect(() => {
@@ -103,18 +104,12 @@ const AuthScreen = (props) => {
 	}, [email, password]);
 
 	const authHandler = async () => {
-		let action;
-		if (isSignup) {
-			action = AuthActions.signup(email, password);
-		} else {
-			action = AuthActions.login(email, password);
-		}
 
 		setIsLoading(true);
 		setError(null);
 
 		try {
-			await dispatch(action);
+			dispatch(loginUser({email: email, password: password}));
 		} catch (e) {
 			console.log("AUTHSCREEN ERROR");
 			console.log(e);
@@ -148,28 +143,23 @@ const AuthScreen = (props) => {
 		dispatch(setUseDarkMode(true));
 	}
 
-	const testThunk = async()=> {
-		const email = "marcusbjorna@gmail.com";
-		const password = "123456";
-		const payload = {email: email, password: password};
-		// dispatch(loginUser(email, password));
-		try{
-			const testlogin = await dispatch(loginUser(payload)).unwrap();
-			// console.log(testlogin);
-		}catch(error){
-			console.log("Authscreen error: ")
-			console.log(error);
-		}
-	}
+	// const testThunk = async()=> {
+	// 	const email = "marcusbjorna@gmail.com";
+	// 	const password = "1234526";
+	// 	const payload = {email: email, password: password};
+	// 	// dispatch(loginUser(email, password));
+	// 	try{
+	// 		const testlogin = await dispatch(loginUser(payload)).unwrap();
+	// 		// console.log(testlogin);
+	// 	}catch(error){
+	// 		console.log("Authscreen error: ")
+	// 		console.log(error);
+	// 	}
+	// }
 
 	const onGetAuth = ()=> {
 		const testAuth = getFirebaseAuth();
 		console.log(testAuth.currentUser);
-	}
-
-	const onTestIDGen = ()=> {
-
-		dispatch(saveWorkout("as"));
 	}
 
 	const onSignOut = () => {
@@ -304,7 +294,7 @@ const AuthScreen = (props) => {
 							}}
 						>
 							<FilledButton onButtonPress={onSetDarkMode} >Dark</FilledButton>
-							<FilledButton onButtonPress={testThunk}>TestThunk</FilledButton>
+							{/* <FilledButton onButtonPress={testThunk}>TestThunk</FilledButton> */}
 							<OutlineButton onButtonPress={onSetLightMode} >Light</OutlineButton>
 
 						</View>
@@ -320,7 +310,6 @@ const AuthScreen = (props) => {
 							}}
 						>
 							<FilledButton onButtonPress={onGetAuth} >GetAuth</FilledButton>
-							<FilledButton onButtonPress={onTestIDGen} >ID</FilledButton>
 
 							<FilledButton onButtonPress={onSignOut} >SignOut</FilledButton>
 

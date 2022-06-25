@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { loginWithEmailAndPassword } from "../../firebase/firebase";
+import { getUserData } from "./userSlice";
 
 const initialState = {
 	token: null,
@@ -12,13 +13,14 @@ const initialState = {
 export const loginUser = createAsyncThunk(
 	"user/loginUser",
 	async (authCredentials, thunkAPI) => {
-		console.log("LoginUserThunk starting: ");
 		console.log(authCredentials.email);
 		console.log(authCredentials.password);
 
 		const response = await loginWithEmailAndPassword(authCredentials.email, authCredentials.password);
-		console.log("LoginUserThunk finished: ");
-		// console.log(response);
+		const userID = response.uid;
+
+		// we have logged in successfully, fetch userdata
+		thunkAPI.dispatch(getUserData(userID));
 		return response;
 	}
 );

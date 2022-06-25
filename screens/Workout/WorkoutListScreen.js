@@ -93,10 +93,7 @@ const WorkoutListScreen = (props) => {
 	}, []);
 
 	useEffect(() => {
-		console.log("workoutStore updated: ");
-		console.log(reduxWorkoutRef);
 		const arrayOfWorkouts = Object.values(reduxWorkoutRef);
-		console.log(arrayOfWorkouts);
 
 		setWorkouts(arrayOfWorkouts);
 		setRefreshing(false);

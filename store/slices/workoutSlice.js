@@ -1,13 +1,10 @@
-import { async } from "@firebase/util";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 import {
 	firebaseDeleteWorkout,
 	firebaseGetExercisesInWorkout,
-	firebaseGetWorkoutByID,
 	firebaseSaveWorkout,
 	getUserWorkouts,
-	millisFromTimestamp,
 } from "../../firebase/firebase";
 
 const initialState = {
@@ -81,7 +78,6 @@ export const workoutSlice = createSlice({
 				const workoutID = doc.id;
 				const workoutData = doc.data();
 				const timeStampInMillis = workoutData.date.seconds * 1000;
-				console.log(timeStampInMillis);
 				workoutData.date = timeStampInMillis;
 				workoutData.id = workoutID;
 				state.workouts[workoutID] = workoutData;
@@ -93,34 +89,18 @@ export const workoutSlice = createSlice({
 			const newWorkoutID = action.payload;
 			console.log("Save workout fullfiled");
 			console.log(newWorkoutID);
-			// const newlySavedWorkout = await firebaseGetWorkoutByID(newWorkoutID);
-			// if(newlySavedWorkout){
-			// 	state.workouts[newWorkoutID] = newlySavedWorkout;
-			// }
-			// console.log(action);
 		});
 
 		builder.addCase(deleteWorkout.fulfilled, (state, action) => {
-			// console.log("State");
-			// console.log(state);
-			// console.log(action);
 			const deletedWorkoutID = action.payload;
 			const exerciseIDsToDelete =
 				state.workouts[deletedWorkoutID].exercises;
 			for (let exerciseID of exerciseIDsToDelete) {
 				delete state.exercises[exerciseID];
 			}
-			console.log("before");
 
-			// console.log(state.workouts);
-			const testDelete = delete state.workouts[deletedWorkoutID];
-			if (testDelete) {
-				console.log("Deleted from store");
-				console.log("after");
-				// console.log(state.workouts);
-			} else {
-				console.log("Not from store");
-			}
+			delete state.workouts[deletedWorkoutID];
+		
 		});
 
 		// Exercises

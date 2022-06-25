@@ -40,6 +40,7 @@ import { Provider as PaperProvider } from "react-native-paper";
 import authReducer from "./store/slices/authSlice";
 import appSettingsReducer from "./store/slices/appSettingsSlice";
 import workoutReducer from './store/slices/workoutSlice'
+import userReducer from './store/slices/userSlice';
 
 // const rootReducer = combineReducers({
 // 	auth: authReducer,
@@ -52,7 +53,8 @@ import workoutReducer from './store/slices/workoutSlice'
 const reducer = {
 	auth: authReducer,
 	appSettings: appSettingsReducer,
-	workout: workoutReducer
+	workout: workoutReducer,
+	user: userReducer
 }
 
 const store = configureStore({

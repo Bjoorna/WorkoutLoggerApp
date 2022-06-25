@@ -23,7 +23,7 @@ import { hexToRGB } from "../../shared/utils/UtilFunctions";
 const WorkoutAnalysisScreen = (props) => {
 	const userID = useSelector((state) => state.auth.userID);
 	const exerciseStoreRef = useSelector(
-		(state) => state.workout.exercisesFilterArray
+		(state) => state.workout.exercises
 	);
 
 	const dispatch = useDispatch();
