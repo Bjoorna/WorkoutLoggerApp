@@ -4,18 +4,20 @@ import {
 	firebaseDeleteWorkout,
 	firebaseGetExercisesInWorkout,
 	firebaseSaveWorkout,
-	getUserWorkouts,
+	firebaseGetUserWorkouts,
+	firebaseGetExercisesByTypes,
 } from "../../firebase/firebase";
 
 const initialState = {
 	workouts: {},
 	exercises: {},
+	filteredExercises: {}, // set exercises that the user has filtered by here
 };
 
 export const getWorkoutByUserID = createAsyncThunk(
 	"workout/getUserWorkouts",
 	async (userID, thunkAPI) => {
-		const workoutResponse = await getUserWorkouts(userID);
+		const workoutResponse = await firebaseGetUserWorkouts(userID);
 		// if (workoutResponse.size > 0) {
 		//     console.log("more than one");
 		//     workoutResponse.forEach(doc => {
@@ -66,10 +68,24 @@ export const deleteWorkout = createAsyncThunk(
 	}
 );
 
+export const getExercisesByType = createAsyncThunk(
+	"workout/getExercisesByType",
+	async ({ exerciseTypes, userID }, thunkAPI) => {
+		console.log(exerciseTypes);
+		const exercisesResponse = await firebaseGetExercisesByTypes(
+			exerciseTypes,
+			userID
+		);
+		return exercisesResponse;
+	}
+);
+
 export const workoutSlice = createSlice({
 	name: "workout",
 	initialState,
-	reducers: {},
+	reducers: {
+		resetFilteredExercises: state => state.filteredExercises = {}
+	},
 	extraReducers: (builder) => {
 		// Workouts
 		builder.addCase(getWorkoutByUserID.fulfilled, (state, action) => {
@@ -100,7 +116,6 @@ export const workoutSlice = createSlice({
 			}
 
 			delete state.workouts[deletedWorkoutID];
-		
 		});
 
 		// Exercises
@@ -114,7 +129,28 @@ export const workoutSlice = createSlice({
 				state.exercises[exerciseID] = exercise;
 			});
 		});
+
+		builder.addCase(getExercisesByType.pending, (state) => {
+			state.filteredExercises = {};
+		})
+		builder.addCase(getExercisesByType.fulfilled, (state, action) => {
+			const snapshot = action.payload;
+			if(snapshot.size>0){
+				snapshot.forEach((doc) => {
+					const exercise = doc.data();
+					console.log("exercise");
+					exercise.date = exercise.date.seconds * 1000;
+					exercise.id = doc.id;
+					console.log(exercise);
+					state.filteredExercises[exercise.id] = exercise;
+				});
+			}else{
+				state.filteredExercises = {};
+			}
+		});
 	},
 });
+
+export const {resetFilteredExercises} = workoutSlice.actions;
 
 export default workoutSlice.reducer;

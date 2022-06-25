@@ -122,19 +122,19 @@ export const firebaseDeleteExercises = async(exerciseIDs) => {
 	}
 }
 
-export const deleteWorkout = async (userID, workout) => {
-	try {
-		const workoutID = workout.id;
-		const exerciseIDs = workout.exercises;
-		const docRef = doc(database, "workouts", workoutID);
-		console.log(workoutID);
-		console.log(userID);
-		const deletedDoc = await deleteDoc(docRef);
-		return await deleteExercise(userID, exerciseIDs);
-	} catch (error) {
-		throw new Error(error);
-	}
-};
+// export const deleteWorkout = async (userID, workout) => {
+// 	try {
+// 		const workoutID = workout.id;
+// 		const exerciseIDs = workout.exercises;
+// 		const docRef = doc(database, "workouts", workoutID);
+// 		console.log(workoutID);
+// 		console.log(userID);
+// 		const deletedDoc = await deleteDoc(docRef);
+// 		return await deleteExercise(userID, exerciseIDs);
+// 	} catch (error) {
+// 		throw new Error(error);
+// 	}
+// };
 
 export const deleteExercise = async (userID, exerciseIDs) => {
 	try {
@@ -224,7 +224,44 @@ export const firebaseWriteExercisesToDatabase = async (
 	}
 };
 
-export const getUserWorkouts = async (userID) => {
+export const firebaseGetExercisesByTypes = async (exerciseTypes, userID) => {
+	try {
+		const exerciseCollection = collection(database, "exercises");
+		const exerciseQuery = query(exerciseCollection, where("owner", "==", userID), where("exercise", "in", exerciseTypes))
+		const docs = await getDocs(exerciseQuery);
+		return docs;
+
+	} catch (error) {
+		console.log(error);
+		throw new Error(error);
+	}
+}
+
+
+export const getExercisesFilteredByExerciseType = async (
+	userID,
+	exerciseArray
+) => {
+	try {
+		const exerciseRef = collection(database, "exercises");
+		console.log("FROM FIREBASE");
+		for (let e of exerciseArray) {
+			console.log(e);
+		}
+		const q = query(
+			exerciseRef,
+			where("owner", "==", userID),
+			where("exercise", "in", exerciseArray)
+		);
+		const querySnapshot = await getDocs(q);
+		return querySnapshot;
+	} catch (error) {
+		console.log(error);
+		throw new Error(error);
+	}
+};
+
+export const firebaseGetUserWorkouts = async (userID) => {
 	try {
 		const q = query(
 			collection(database, "workouts"),
@@ -257,27 +294,7 @@ export const getWorkoutsBasedOnWorkoutIDs = async (workoutIDs) => {
 	}
 };
 
-export const getExercisesFilteredByExerciseType = async (
-	userID,
-	exerciseArray
-) => {
-	try {
-		const exerciseRef = collection(database, "exercises");
-		console.log("FROM FIREBASE");
-		for (let e of exerciseArray) {
-			console.log(e);
-		}
-		const q = query(
-			exerciseRef,
-			where("owner", "==", userID),
-			where("exercise", "in", exerciseArray)
-		);
-		const querySnapshot = await getDocs(q);
-		return querySnapshot;
-	} catch (error) {
-		throw new Error(error);
-	}
-};
+
 
 export const firebaseGetExercisesInWorkout = async (exercises, userID) => {
 	try {

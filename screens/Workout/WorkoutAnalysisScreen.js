@@ -18,12 +18,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { ExerciseTypes } from "../../shared/utils/ExerciseTypes";
 
 import { hexToRGB } from "../../shared/utils/UtilFunctions";
+import { getExercisesByType, resetFilteredExercises } from "../../store/slices/workoutSlice";
 
 // TODO rework the hex-to-rgb on chart so that it doesnt call 3 times for one color code
 const WorkoutAnalysisScreen = (props) => {
 	const userID = useSelector((state) => state.auth.userID);
 	const exerciseStoreRef = useSelector(
-		(state) => state.workout.exercises
+		(state) => state.workout.filteredExercises
 	);
 
 	const dispatch = useDispatch();
@@ -64,11 +65,17 @@ const WorkoutAnalysisScreen = (props) => {
 	}, [exerciseTypes]);
 
 	useEffect(() => {
-		setExercises(exerciseStoreRef);
-		if (exerciseStoreRef.length > 1) {
-			createChartData(exerciseStoreRef);
+		const newExerciseArray = Object.values(exerciseStoreRef);
+		if(newExerciseArray.length < 1){
+			return;
+		}
+		newExerciseArray.sort((a, b) => b-a);
+
+		setExercises(newExerciseArray);
+		if (newExerciseArray.length > 1) {
+			createChartData(newExerciseArray);
 			setOnlyOneExerciseRecorded(false);
-		} else if (exerciseStoreRef.length === 1) {
+		} else if (newExerciseArray.length === 1) {
 			setOnlyOneExerciseRecorded(true);
 			setChartDataObject(null);
 		} else {
@@ -83,6 +90,7 @@ const WorkoutAnalysisScreen = (props) => {
 			(exercise) => exercise.selected == true
 		);
 		if (selectedExercise) {
+			// dispatch(resetFilteredExercises());
 			loadExercise(selectedExercise.exercise);
 		}
 	}, [filterState]);
@@ -97,7 +105,11 @@ const WorkoutAnalysisScreen = (props) => {
 	const loadExercise = (type) => {
 		setIsLoading(true);
 		setCurrentChartExercise(type);
-		dispatch(WorkoutActions.getExerciseByType(userID, type));
+		// dispatch(WorkoutActions.getExerciseByType(userID, type));
+		console.log(type);
+		const typeArray = [];
+		typeArray.push(type);
+		dispatch(getExercisesByType({exerciseTypes: typeArray, userID: userID}))
 	};
 
 	// TODO make it so that when pressing a selected exercise, it is unselected
