@@ -3,7 +3,7 @@ import { View, FlatList, StyleSheet } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { FlatList as GestureFlatList } from "react-native-gesture-handler";
 
-import * as WorkoutActions from "../store/actions/workout";
+// import * as WorkoutActions from "../store/actions/workout";
 
 import TitleText from "./Text/Title";
 import OutlineButton from "./Buttons/OutlineButton";
@@ -70,18 +70,18 @@ const FilterSelect = (props) => {
 			.map((ex) => ex.exercise);
 		try {
 			if (exerciseFilter.length < 1) {
-				dispatch(WorkoutActions.getUserWorkouts(userID));
+				// dispatch(WorkoutActions.getUserWorkouts(userID));
 			} else {
 				console.log("Filter is: ");
 				for (let e of exerciseFilter) {
 					console.log(e);
 				}
-				dispatch(
-					WorkoutActions.getWorkoutFilteredByExerciseType(
-						userID,
-						exerciseFilter
-					)
-				);
+				// dispatch(
+				// 	WorkoutActions.getWorkoutFilteredByExerciseType(
+				// 		userID,
+				// 		exerciseFilter
+				// 	)
+				// );
 			}
 		} catch (error) {
 			console.log(error);

@@ -11,14 +11,14 @@ import DisplayText from "../../components/Text/Display";
 import { LineChart } from "react-native-chart-kit";
 import FilterChip from "../../components/UI/Chips/FilterChip";
 
-import * as WorkoutActions from "../../store/actions/workout";
+// import * as WorkoutActions from "../../store/actions/workout";
 
 import { Themes } from "../../shared/Theme";
 import { useDispatch, useSelector } from "react-redux";
 import { ExerciseTypes } from "../../shared/utils/ExerciseTypes";
 
 import { hexToRGB } from "../../shared/utils/UtilFunctions";
-import { getExercisesByType, resetFilteredExercises } from "../../store/slices/workoutSlice";
+import { getExercisesByType, resetFilteredExercises } from "../../redux/slices/workoutSlice";
 import TopAppBar from "../../components/UI/TopAppBarComponent";
 
 // TODO rework the hex-to-rgb on chart so that it doesnt call 3 times for one color code

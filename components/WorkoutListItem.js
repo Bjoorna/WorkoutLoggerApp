@@ -15,11 +15,9 @@ import Exercise from "../models/Exercise";
 import LabelText from "./Text/Label";
 import { FlatList } from "react-native-gesture-handler";
 import { useNavigation } from "@react-navigation/core";
-import { SET_TAB_BAR_VALUE } from "../store/actions/appsettings";
-import { SET_EXERCISES_FROM_WORKOUT } from "../store/actions/workout";
 import UtilFunctions from "../shared/utils/UtilFunctions";
-import { getExercisesInWorkout } from "../store/slices/workoutSlice";
-import { setHideTabBar, setUseDarkMode } from "../store/slices/appSettingsSlice";
+import { getExercisesInWorkout } from "../redux/slices/workoutSlice";
+import { setHideTabBar, setUseDarkMode } from "../redux/slices/appSettingsSlice";
 // const theme = Themes.dark;
 
 const ExerciseItem = (props) => {

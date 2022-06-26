@@ -16,7 +16,6 @@ import TextButton from "../../components/Buttons/TextButton";
 import TitleText from "../../components/Text/Title";
 import FilledButton from "../../components/Buttons/FilledButton";
 import { useDispatch, useSelector } from "react-redux";
-import * as AuthActions from "../../store/actions/auth";
 
 import User from "../../models/User";
 
@@ -53,7 +52,6 @@ const NewUserDetailScreen = (props) => {
 			console.log(userID);
 			try {
 				setError(null), setIsLoading(true);
-				await dispatch(AuthActions.initSaveUser(userID, newUser));
 			} catch (error) {
 				setError(error.message);
 				setIsLoading(false);

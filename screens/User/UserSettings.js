@@ -3,13 +3,9 @@ import { View, StyleSheet, Switch, Alert } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import BodyText from "../../components/Text/Body";
 
-import * as UserActions from "../../store/actions/user";
+// import * as UserActions from "../../redux/actions/user";
 import { Themes } from "../../shared/Theme";
 import User from "../../models/User";
-import {
-	SET_MONDAY_FIRSTDAY,
-	SET_USE_DARKMODE,
-} from "../../store/actions/appsettings";
 import CustomSwitch from "../../components/UI/CustomSwitch";
 import LabelText from "../../components/Text/Label";
 
@@ -19,7 +15,7 @@ import {
 	saveCalendar,
 } from "../../shared/utils/UtilFunctions";
 import FilledButton from "../../components/Buttons/FilledTonalButton";
-import { setUseDarkMode } from "../../store/slices/appSettingsSlice";
+import { setUseDarkMode } from "../../redux/slices/appSettingsSlice";
 import TopAppBar from "../../components/UI/TopAppBarComponent";
 import IconButton from "../../components/Buttons/IconButton";
 const UserSettingsScreen = (props) => {
@@ -88,7 +84,7 @@ const UserSettingsScreen = (props) => {
 
 		try {
 			const newField = { useMetric: !useMetricValue };
-			dispatch(UserActions.updateUserField(userID, newField));
+			// dispatch(UserActions.updateUserField(userID, newField));
 		} catch (error) {
 			setError(error.message);
 		}
@@ -96,35 +92,6 @@ const UserSettingsScreen = (props) => {
 
 	const onToggleMondayFirstDay = () => {
 		dispatch({ type: SET_MONDAY_FIRSTDAY, value: !isMondayFirstDayValue });
-	};
-
-	const onCreateCalendar = () => {
-		const newCalendar = createCalendar([2022]);
-		setCalendar(newCalendar);
-	};
-
-	const onSaveCalendar = async () => {
-		if (calendar) {
-			try {
-				await saveCalendar(calendar);
-			} catch (error) {
-				console.log(error);
-			} finally {
-				console.log("Saved calendar");
-			}
-		}
-	};
-
-	const onGetCalendar = async () => {
-		try {
-			const calendar = await getCalendarFromStorage();
-			if (calendar) {
-				console.log("Calendar gotten from storage");
-				for (let t of calendar.keys()) {
-					console.log(t);
-				}
-			}
-		} catch (error) {}
 	};
 
 	return (

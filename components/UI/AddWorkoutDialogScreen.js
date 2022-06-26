@@ -34,7 +34,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import * as firebase from "../../firebase/firebase";
 
 import { hexToRGB } from "../../shared/utils/UtilFunctions";
-import { saveWorkout } from "../../store/slices/workoutSlice";
+import { saveWorkout } from "../../redux/slices/workoutSlice";
 import TopAppBar from "./TopAppBarComponent";
 
 const windowWidth = Dimensions.get("screen").width;

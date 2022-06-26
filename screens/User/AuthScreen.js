@@ -10,7 +10,6 @@ import {
 	Pressable,
 	Keyboard,
 } from "react-native";
-import * as AuthActions from "../../store/actions/auth";
 import { useDispatch, useSelector } from "react-redux";
 
 import { TextInput } from "react-native-paper";
@@ -25,8 +24,8 @@ import Input from "../../components/UI/Input";
 import { SafeAreaInsetsContext } from "react-native-safe-area-context";
 import Divider from "../../components/UI/Divider";
 import TextButton from "../../components/Buttons/TextButton";
-import { setUseDarkMode } from "../../store/slices/appSettingsSlice";
-import { loginUser } from "../../store/slices/authSlice";
+import { setUseDarkMode } from "../../redux/slices/appSettingsSlice";
+import { loginUser } from "../../redux/slices/authSlice";
 
 import { getFirebaseAuth, signOutUser } from "../../firebase/firebase";
 const FORM_INPUT_UPDATE = "FORM_INPUT_UPDATE";
@@ -118,53 +117,12 @@ const AuthScreen = (props) => {
 		}
 	};
 
-	// const inputChangeHandler = useCallback(
-	// 	(inputIdentifier, inputValue, inputValidity) => {
-	// 		dispatchFormState({
-	// 			type: FORM_INPUT_UPDATE,
-	// 			value: inputValue,
-	// 			isValid: inputValidity,
-	// 			input: inputIdentifier,
-	// 		});
-	// 	},
-	// 	[dispatchFormState]
-	// );
 
 	const setTempLoginCreds = () => {
 		setEmail("marcusbjorna@gmail.com");
 		setPassword("123456");
 	};
 
-	const onSetLightMode = () => {
-		dispatch(setUseDarkMode(false));
-	}
-
-	const onSetDarkMode = () => {
-		dispatch(setUseDarkMode(true));
-	}
-
-	// const testThunk = async()=> {
-	// 	const email = "marcusbjorna@gmail.com";
-	// 	const password = "1234526";
-	// 	const payload = {email: email, password: password};
-	// 	// dispatch(loginUser(email, password));
-	// 	try{
-	// 		const testlogin = await dispatch(loginUser(payload)).unwrap();
-	// 		// console.log(testlogin);
-	// 	}catch(error){
-	// 		console.log("Authscreen error: ")
-	// 		console.log(error);
-	// 	}
-	// }
-
-	const onGetAuth = ()=> {
-		const testAuth = getFirebaseAuth();
-		console.log(testAuth.currentUser);
-	}
-
-	const onSignOut = () => {
-		signOutUser();
-	}
 	return (
 		<View
 			// behavior="padding"
@@ -261,61 +219,8 @@ const AuthScreen = (props) => {
 								>
 									Set TempCreds
 								</TextButton>
-								{/* <OutlineButton onButtonPress={() => setTempLoginCreds()}>SetCredsTEMP</OutlineButton>
-								<OutlineButton
-									onButtonPress={() => setIsSignup(!isSignup)}
-									style={{
-										//  width: 100,
-										marginHorizontal: 5,
-									}}
-								>
-									{isSignup ? "Login" : "Signup"}
-								</OutlineButton>
-								<FilledButton
-									style={{
-										// width: 100,
-										marginHorizontal: 5,
-									}}
-									onButtonPress={() => authHandler()}
-								>
-									{isSignup ? "Signup" : "Login"}
-								</FilledButton> */}
 							</View>
 						</View>
-						<View
-							style={{
-								width: "100%",
-								height: 100,
-								marginTop: 50,
-								// backgroundColor: currentTheme.error,
-								paddingHorizontal: 24,
-								flexDirection :"row",
-								justifyContent: "space-around"
-							}}
-						>
-							<FilledButton onButtonPress={onSetDarkMode} >Dark</FilledButton>
-							{/* <FilledButton onButtonPress={testThunk}>TestThunk</FilledButton> */}
-							<OutlineButton onButtonPress={onSetLightMode} >Light</OutlineButton>
-
-						</View>
-						<View
-							style={{
-								width: "100%",
-								height: 100,
-								marginTop: 50,
-								// backgroundColor: currentTheme.error,
-								paddingHorizontal: 24,
-								flexDirection :"row",
-								justifyContent: "space-around"
-							}}
-						>
-							<FilledButton onButtonPress={onGetAuth} >GetAuth</FilledButton>
-
-							<FilledButton onButtonPress={onSignOut} >SignOut</FilledButton>
-
-
-						</View>
-
 					</View>
 				)}
 			</Pressable>

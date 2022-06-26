@@ -23,15 +23,14 @@ import { Themes } from "../../shared/Theme";
 import { useSelector, useDispatch } from "react-redux";
 import BottomSheet from "@gorhom/bottom-sheet";
 
-import * as WorkoutActions from "../../store/actions/workout";
 import WorkoutListItem from "../../components/WorkoutListItem";
 
 import FilterSelect from "../../components/FilterSelect";
 import AddWorkoutDialogScreen from "../../components/UI/AddWorkoutDialogScreen";
 
 import { transformObjectToWorkout } from "../../shared/utils/UtilFunctions";
-import { getWorkoutByUserID } from "../../store/slices/workoutSlice";
-import { setHideTabBar } from "../../store/slices/appSettingsSlice";
+import { getWorkoutByUserID } from "../../redux/slices/workoutSlice";
+import { setHideTabBar } from "../../redux/slices/appSettingsSlice";
 import TopAppBar from "../../components/UI/TopAppBarComponent";
 
 if (

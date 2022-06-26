@@ -9,7 +9,7 @@ import {
 	Image,
 } from "react-native";
 
-import * as AuthActions from "../../store/actions/auth";
+// import * as AuthActions from "../../store/actions/auth";
 import { useDispatch, useSelector } from "react-redux";
 
 import DisplayText from "../../components/Text/Display";
@@ -54,7 +54,7 @@ const UserOverviewScreen = (props) => {
 	const dispatch = useDispatch();
 
 	const logoutUser = () => {
-		dispatch(AuthActions.logout());
+		// dispatch(AuthActions.logout());
 	};
 
 	const memoAgeValue = useMemo(() => calculateAge(user), [user]); // useMemo is probably unnecessary

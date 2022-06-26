@@ -35,10 +35,10 @@ import * as Font from "expo-font";
 
 // react native paper
 import { Provider as PaperProvider } from "react-native-paper";
-import authReducer from "./store/slices/authSlice";
-import appSettingsReducer from "./store/slices/appSettingsSlice";
-import workoutReducer from './store/slices/workoutSlice'
-import userReducer from './store/slices/userSlice';
+import authReducer from "./redux/slices/authSlice";
+import appSettingsReducer from "./redux/slices/appSettingsSlice";
+import workoutReducer from './redux/slices/workoutSlice'
+import userReducer from './redux/slices/userSlice';
 
 // const rootReducer = combineReducers({
 // 	auth: authReducer,

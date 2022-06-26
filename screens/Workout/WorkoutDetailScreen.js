@@ -15,8 +15,6 @@ import {
 import { useSelector, useDispatch } from "react-redux";
 import { useFocusEffect } from "@react-navigation/core";
 import { Themes } from "../../shared/Theme";
-import { SET_TAB_BAR_VALUE } from "../../store/actions/appsettings";
-import * as firebase from "../../firebase/firebase";
 import BodyText from "../../components/Text/Body";
 import TitleText from "../../components/Text/Title";
 import LabelText from "../../components/Text/Label";
@@ -26,8 +24,8 @@ import IconButton from "../../components/Buttons/IconButton";
 import { hexToRGB, transformObjectToWorkout } from "../../shared/utils/UtilFunctions";
 
 import Workout from "../../models/workout";
-import { setHideTabBar } from "../../store/slices/appSettingsSlice";
-import { deleteWorkout } from "../../store/slices/workoutSlice";
+import { setHideTabBar } from "../../redux/slices/appSettingsSlice";
+import { deleteWorkout } from "../../redux/slices/workoutSlice";
 
 const WorkoutDetailScreen = (props) => {
 	const dispatch = useDispatch();

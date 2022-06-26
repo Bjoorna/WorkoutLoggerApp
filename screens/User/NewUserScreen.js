@@ -17,7 +17,7 @@ import TextButton from "../../components/Buttons/TextButton";
 import { useDispatch, useSelector } from "react-redux";
 import FilledButton from "../../components/Buttons/FilledButton";
 import * as firebase from "../../firebase/firebase";
-import * as AuthActions from "../../store/actions/auth";
+// import * as AuthActions from "../../store/actions/auth";
 
 // const theme = Themes.dark;
 
@@ -80,7 +80,7 @@ const NewUserScreen = (props) => {
 		setError(null);
 
 		try {
-			await dispatch(AuthActions.createUser(newEmail, newPassword));
+			// await dispatch(AuthActions.createUser(newEmail, newPassword));
 		} catch (error) {
 			console.log(error);
 			setError(error.message);

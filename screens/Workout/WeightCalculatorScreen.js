@@ -25,7 +25,7 @@ import HeadlineText from "../../components/Text/Headline";
 import IconButton from "../../components/Buttons/IconButton";
 import { FilledTextField } from "rn-material-ui-textfield";
 import { hexToRGB } from "../../shared/utils/UtilFunctions";
-import { setHideTabBar } from "../../store/slices/appSettingsSlice";
+import { setHideTabBar } from "../../redux/slices/appSettingsSlice";
 import TopAppBar from "../../components/UI/TopAppBarComponent";
 
 import { useNavigation } from "@react-navigation/core";
