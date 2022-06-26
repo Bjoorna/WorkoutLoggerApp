@@ -138,15 +138,7 @@ export const WorkoutStackScreen = () => {
 					component={WorkoutListScreen}
 					options={{ ...getDefaultStyleOptions(currentTheme), headerShown: false }}
 				/>
-				<WorkoutStackNavigator.Screen
-					name="Calculator"
-					component={WeightCalculatorScreen}
-					options={{ headerShown: true }}
-					initialParams={{
-						labelNameFocused: "calculator",
-						labelNameUnFocused: "calculator-outline",
-					}}
-				/>
+				
 
 				<WorkoutStackNavigator.Screen
 					name="AddWorkout"
@@ -164,7 +156,7 @@ export const WorkoutStackScreen = () => {
 			<WorkoutStackNavigator.Group
 				screenOptions={{
 					presentation: "modal",
-					tabBarStyle: { display: "none" },
+					// tabBarStyle: { display: "none" },
 				}}
 			>
 				<WorkoutStackNavigator.Screen
@@ -179,6 +171,15 @@ export const WorkoutStackScreen = () => {
 						cardStyle: {
 							backgroundColor: currentTheme.surface,
 						},
+					}}
+				/>
+				<WorkoutStackNavigator.Screen
+					name="Calculator"
+					component={WeightCalculatorScreen}
+					options={{ headerShown: false }}
+					initialParams={{
+						labelNameFocused: "calculator",
+						labelNameUnFocused: "calculator-outline",
 					}}
 				/>
 			</WorkoutStackNavigator.Group>
@@ -203,7 +204,8 @@ export const UserStackScreen = () => {
 					component={UserOverviewScreen}
 					options={{
 						...getDefaultStyleOptions(currentTheme),
-						headerTitle: "User",
+						// headerTitle: "User",
+						headerShown: false,
 						presentation: "card",
 					}}
 				/>
@@ -213,7 +215,8 @@ export const UserStackScreen = () => {
 					options={{
 						...getDefaultStyleOptions(currentTheme),
 						presentation: "card",
-						headerTitle: "Settings",
+						// headerTitle: "Settings",
+						headerShown: false
 					}}
 				/>
 			</UserStackNavigator.Group>

@@ -1,3 +1,4 @@
+import { nanoid } from "@reduxjs/toolkit";
 import React, { useState, useEffect } from "react";
 
 import { StyleSheet, View, StatusBar } from "react-native";
@@ -11,12 +12,13 @@ import TitleText from "../Text/Title";
  * 
  * @param {string} headlineText Text to show in headline
  * @param {} navigationButton Optional <IconButton /> component 
- * @param {} trailingIcons Optional Array of <IconButton /> components. Max 4 
+ * @param {} trailingIcons Optional Array of ButtonComponents. Max 4 
+ * @param {} backgroundColor Set backgroundcolor if one wants something other than surface
+ * @param {} optionalStyle pass a style object E.g to change padding if layout is wrong
 
- * @returns 
  */
 
-const TopAppBar = ({ headlineText, navigationButton, trailingIcons }) => {
+const TopAppBar = ({ headlineText, navigationButton, trailingIcons, backgroundColor, optionalStyle }) => {
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
 	const [styles, setStyles] = useState(
 		getStyles(useDarkMode ? Themes.dark : Themes.light)
@@ -31,7 +33,7 @@ const TopAppBar = ({ headlineText, navigationButton, trailingIcons }) => {
 	}, [useDarkMode]);
 
 	return (
-		<View style={styles.topAppBarContainer}>
+		<View style={{...styles.topAppBarContainer, ...optionalStyle, backgroundColor: backgroundColor}}>
 			{navigationButton && (
 				<View style={styles.topAppBarNavigationIcon}>
 					{navigationButton}
@@ -44,7 +46,7 @@ const TopAppBar = ({ headlineText, navigationButton, trailingIcons }) => {
 				<View style={styles.topAppBarTrailingIconsContainer}>
 					{trailingIcons.map((trailingIcon, index) => (
 						<View
-							key={trailingIcon.name}
+							key={nanoid()}
 							style={styles.topAppBarTrailingIcon}
 						>
 							{trailingIcon}

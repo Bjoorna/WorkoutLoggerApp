@@ -13,7 +13,7 @@ import {
 	Modal,
 	ScrollView,
 } from "react-native";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import RPEMap from "../../shared/utils/RPEMap";
 import { Themes } from "../../shared/Theme";
 import BodyText from "../../components/Text/Body";
@@ -25,6 +25,10 @@ import HeadlineText from "../../components/Text/Headline";
 import IconButton from "../../components/Buttons/IconButton";
 import { FilledTextField } from "rn-material-ui-textfield";
 import { hexToRGB } from "../../shared/utils/UtilFunctions";
+import { setHideTabBar } from "../../store/slices/appSettingsSlice";
+import TopAppBar from "../../components/UI/TopAppBarComponent";
+
+import { useNavigation } from "@react-navigation/core";
 
 const RESET = "RESET";
 const ADD_VALUE = "ADD_VALUE";
@@ -51,6 +55,9 @@ const baseState = {
 };
 
 const WeightCalculatorScreen = (props) => {
+	const dispatch = useDispatch();
+	const navigation = useNavigation();
+
 	const rpeCalc = new RPEMap();
 	const [calculatorState, dispatchCalculator] = useReducer(
 		calculatorReducer,
@@ -84,6 +91,10 @@ const WeightCalculatorScreen = (props) => {
 		console.log("USERsettings from calculator");
 		console.log(userSettings);
 		console.log(useMetric);
+
+		return () => {
+			dispatch(setHideTabBar(false));
+		};
 	}, []);
 	useEffect(() => {
 		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
@@ -131,24 +142,6 @@ const WeightCalculatorScreen = (props) => {
 			setCalcWeight(0);
 		}
 	};
-
-	useLayoutEffect(() => {
-		props.navigation.setOptions({
-			headerStyle: {
-				backgroundColor: currentTheme.surface,
-			},
-			headerTintColor: currentTheme.onSurface,
-			headerRight: () => (
-				<View style={{ flexDirection: "row" }}>
-					<IconButton
-						name="information-circle"
-						iconColor={currentTheme.onSurfaceVariant}
-						onPress={() => setModalVisible(true)}
-					/>
-				</View>
-			),
-		});
-	}, [props.navigation, currentTheme]);
 
 	const onValueEntered = (ref, type) => {
 		const value = ref.current.value();
@@ -201,6 +194,16 @@ const WeightCalculatorScreen = (props) => {
 
 	return (
 		<Pressable onPress={handleContainerPress} style={styles.container}>
+			<TopAppBar
+				headlineText={"Calculator"}
+				navigationButton={
+					<IconButton
+						name="arrow-back"
+						iconColor={currentTheme.onSurface}
+						onPress={() => navigation.goBack()}
+					/>
+				}
+			/>
 			<Modal
 				visible={modalVisible}
 				transparent={true}

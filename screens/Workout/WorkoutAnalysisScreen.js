@@ -19,6 +19,7 @@ import { ExerciseTypes } from "../../shared/utils/ExerciseTypes";
 
 import { hexToRGB } from "../../shared/utils/UtilFunctions";
 import { getExercisesByType, resetFilteredExercises } from "../../store/slices/workoutSlice";
+import TopAppBar from "../../components/UI/TopAppBarComponent";
 
 // TODO rework the hex-to-rgb on chart so that it doesnt call 3 times for one color code
 const WorkoutAnalysisScreen = (props) => {
@@ -195,6 +196,7 @@ const WorkoutAnalysisScreen = (props) => {
 
 	return (
 		<View style={styles.container}>
+			<TopAppBar headlineText="Analysis" />
 			<View style={styles.contentView}>
 				{isLoading && (
 					<ActivityIndicator
@@ -325,7 +327,7 @@ const WorkoutAnalysisScreen = (props) => {
 const getStyles = (theme) => {
 	return StyleSheet.create({
 		container: {
-			paddingTop: StatusBar.currentHeight,
+			// paddingTop: StatusBar.currentHeight,
 			flex: 1,
 			backgroundColor: theme.surface,
 			alignItems: "center",

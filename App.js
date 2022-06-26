@@ -11,9 +11,7 @@ LogBox.ignoreLogs(["Setting a timer"]);
 LogBox.ignoreLogs(["AsyncStorage has been"]);
 
 // redux
-import { createStore, combineReducers, applyMiddleware } from "redux";
-import { Provider } from "react-redux";
-import ReduxThunk from "redux-thunk";
+import { Provider, useSelector } from "react-redux";
 
 import { configureStore, getDefaultMiddleware, Reducer } from "@reduxjs/toolkit";
 
@@ -71,12 +69,13 @@ const loadFonts = () => {
 export default function App() {
 	const [fontLoaded, setFontLoaded] = useState(false);
 	// const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
-	// const [styles, setStyles] = useState(
-	// 	getStyles(useDarkMode ? Themes.dark : Themes.light)
+	const [styles, setStyles] = useState(
+		getStyles(Themes.dark)
+	);
+	
+	// const [currentTheme, setCurrentTheme] = useState(
+	// 	useDarkMode ? Themes.dark : Themes.light
 	// );
-	// // const [currentTheme, setCurrentTheme] = useState(
-	// // 	useDarkMode ? Themes.dark : Themes.light
-	// // );
 
 	// useEffect(() => {
 	// 	setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
@@ -105,9 +104,11 @@ export default function App() {
 	);
 }
 
-const styles = StyleSheet.create({
+const getStyles = theme => {
+ return StyleSheet.create({
 	baseScreen: {
 		flex: 1,
 		backgroundColor: theme.surface,
 	},
 });
+}

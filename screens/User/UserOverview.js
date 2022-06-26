@@ -19,6 +19,7 @@ import OutlineButton from "../../components/Buttons/OutlineButton";
 import IconButton from "../../components/Buttons/IconButton";
 
 import { Themes } from "../../shared/Theme";
+import TopAppBar from "../../components/UI/TopAppBarComponent";
 
 function calculateAge(user) {
 	const now = new Date();
@@ -38,7 +39,9 @@ const UserOverviewScreen = (props) => {
 	const userID = useSelector((state) => state.auth.userID);
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
 
-	const [styles, setStyles] = useState(getStyles(useDarkMode ? Themes.dark : Themes.light));
+	const [styles, setStyles] = useState(
+		getStyles(useDarkMode ? Themes.dark : Themes.light)
+	);
 	const [currentTheme, setCurrentTheme] = useState(
 		useDarkMode ? Themes.dark : Themes.light
 	);
@@ -48,28 +51,28 @@ const UserOverviewScreen = (props) => {
 		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
 	}, [useDarkMode]);
 
-
 	const dispatch = useDispatch();
 
 	const logoutUser = () => {
 		dispatch(AuthActions.logout());
 	};
 
-	useLayoutEffect(() => {
-		props.navigation.setOptions({
-			headerRight: () => (
-				<View style={{ flexDirection: "row" }}>
-					<IconButton name="pencil" onPress={() => console.log("Edit")} />
-					<IconButton name="settings"  onPress={() => props.navigation.navigate("UserSettings")} />
-				</View>
-			),
-		});
-	}, [props.navigation]);
-
 	const memoAgeValue = useMemo(() => calculateAge(user), [user]); // useMemo is probably unnecessary
 
 	return (
 		<SafeAreaView style={styles.safeView}>
+			<TopAppBar
+				headlineText="User"
+				trailingIcons={[
+					<IconButton
+						name="settings-outline"
+						iconColor={currentTheme.onSurfaceVariant}
+						onPress={() =>
+							props.navigation.navigate("UserSettings")
+						}
+					/>,
+				]}
+			/>
 			<View style={styles.userHeaderContainer}>
 				<DisplayText style={styles.headerText}>{user.name}</DisplayText>
 				<Image
@@ -157,6 +160,5 @@ const getStyles = (theme) => {
 		},
 	});
 };
-
 
 export default UserOverviewScreen;

@@ -13,9 +13,15 @@ import {
 import CustomSwitch from "../../components/UI/CustomSwitch";
 import LabelText from "../../components/Text/Label";
 
-import { createCalendar, getCalendarFromStorage, saveCalendar } from "../../shared/utils/UtilFunctions";
+import {
+	createCalendar,
+	getCalendarFromStorage,
+	saveCalendar,
+} from "../../shared/utils/UtilFunctions";
 import FilledButton from "../../components/Buttons/FilledTonalButton";
 import { setUseDarkMode } from "../../store/slices/appSettingsSlice";
+import TopAppBar from "../../components/UI/TopAppBarComponent";
+import IconButton from "../../components/Buttons/IconButton";
 const UserSettingsScreen = (props) => {
 	const user = useSelector((state) => state.user.user);
 	const userID = useSelector((state) => state.auth.userID);
@@ -60,7 +66,6 @@ const UserSettingsScreen = (props) => {
 		console.log("Calendar set");
 	}, [calendar]);
 
-
 	useEffect(() => {
 		console.log("USER: ");
 		console.log(user);
@@ -98,35 +103,42 @@ const UserSettingsScreen = (props) => {
 		setCalendar(newCalendar);
 	};
 
-	const onSaveCalendar = async() => {
+	const onSaveCalendar = async () => {
 		if (calendar) {
 			try {
 				await saveCalendar(calendar);
-
 			} catch (error) {
-				console.log(error)
-			}finally{
+				console.log(error);
+			} finally {
 				console.log("Saved calendar");
 			}
 		}
 	};
 
-	const onGetCalendar = async()=> {
+	const onGetCalendar = async () => {
 		try {
 			const calendar = await getCalendarFromStorage();
-			if(calendar){
+			if (calendar) {
 				console.log("Calendar gotten from storage");
-				for(let t of calendar.keys()){
+				for (let t of calendar.keys()) {
 					console.log(t);
 				}
 			}
-		} catch (error) {
-			
-		}
-	}
+		} catch (error) {}
+	};
 
 	return (
 		<View style={styles.screen}>
+			<TopAppBar
+				headlineText="Settings"
+				navigationButton={
+					<IconButton
+						name="arrow-back"
+						iconColor={currentTheme.onSurface}
+						onPress={() => props.navigation.goBack()}
+					/>
+				}
+			/>
 			<View style={styles.userSettingsList}>
 				<View style={styles.userSettingsSection}>
 					<View style={styles.userSettingsHeader}>
@@ -230,11 +242,12 @@ const UserSettingsScreen = (props) => {
 							</BodyText>
 						</View>
 
-						<FilledButton onButtonPress={() => console.log("dummy")}>
+						<FilledButton
+							onButtonPress={() => console.log("dummy")}
+						>
 							Dummy
 						</FilledButton>
 					</View>
-
 				</View>
 				{/* <View style={styles.userSettingsItem}>
 					<BodyText large={true} style={styles.text}>

@@ -22,6 +22,7 @@ import {
 	Day,
 } from "../shared/utils/UtilFunctions";
 import IconButton from "../components/Buttons/IconButton";
+import TopAppBar from "../components/UI/TopAppBarComponent";
 
 const CalendarScreen = (props) => {
 	const [calendarMap, setCalendarMap] = useState(new Map());
@@ -30,7 +31,7 @@ const CalendarScreen = (props) => {
 	const [styles, setStyles] = useState(
 		getStyles(useDarkMode ? Themes.dark : Themes.light)
 	);
-	
+
 	const [currentTheme, setCurrentTheme] = useState(
 		useDarkMode ? Themes.dark : Themes.light
 	);
@@ -100,31 +101,23 @@ const CalendarScreen = (props) => {
 
 	return (
 		<View style={styles.container}>
-			<View style={styles.headerContainer}>
-				<View style={styles.headerTitle}>
-					<TitleText
-						large={true}
-						style={{ color: currentTheme.onSurface }}
-					>
-						Calendar
-					</TitleText>
-				</View>
-				<View style={styles.headerButtons}>
+			<TopAppBar
+				headlineText="Calendar"
+				trailingIcons={[
 					<IconButton
 						name="arrow-back"
 						iconColor={currentTheme.onSurfaceVariant}
 						onPress={decrementOneYear}
 						shouldVibrate={true}
-					/>
-
+					/>,
 					<IconButton
 						name="arrow-forward"
 						iconColor={currentTheme.onSurfaceVariant}
 						onPress={incrementOneYear}
 						shouldVibrate={true}
-					/>
-				</View>
-			</View>
+					/>,
+				]}
+			/>
 			{isLoading && (
 				<View
 					style={{

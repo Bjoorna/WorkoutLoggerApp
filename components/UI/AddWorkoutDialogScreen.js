@@ -35,6 +35,7 @@ import * as firebase from "../../firebase/firebase";
 
 import { hexToRGB } from "../../shared/utils/UtilFunctions";
 import { saveWorkout } from "../../store/slices/workoutSlice";
+import TopAppBar from "./TopAppBarComponent";
 
 const windowWidth = Dimensions.get("screen").width;
 const textFieldWidth = Math.floor((windowWidth - 24 * 2 - 8) / 2);
@@ -238,7 +239,7 @@ const AddWorkoutDialogScreen = (props) => {
 			"Note",
 			userID
 		);
-		dispatch(saveWorkout({workout: newWorkout, userID: userID}))
+		dispatch(saveWorkout({ workout: newWorkout, userID: userID }));
 		setIsLoading(false);
 		console.log("WorkoutSaved");
 		props.toggleModal();
@@ -402,7 +403,28 @@ const AddWorkoutDialogScreen = (props) => {
 				</Pressable>
 			</Modal>
 
-			<View style={styles.headerContainer}>
+			<TopAppBar
+				headlineText="New Workout"
+				navigationButton={
+					<IconButton
+						name="close"
+						onPress={() => setShowCloseDialogModal(true)}
+						iconColor={currentTheme.onSurface}
+					/>
+				}
+				trailingIcons={[
+					<TextButton
+					onButtonPress={onSaveWorkout}
+						disabled={
+							workoutState.workout.exercises.length === 0
+								? true
+								: false
+						}
+					>Save</TextButton>,
+				]}
+				optionalStyle={{paddingTop: 0, height: 64}}
+			/>
+			{/* <View style={styles.headerContainer}>
 				<View style={styles.headerBackButton}>
 					<IconButton
 						name="close"
@@ -429,7 +451,7 @@ const AddWorkoutDialogScreen = (props) => {
 						Save
 					</TextButton>
 				</View>
-			</View>
+			</View> */}
 			{isLoading && (
 				<View style={styles.loadingSpinner}>
 					<ActivityIndicator
@@ -470,9 +492,7 @@ const AddWorkoutDialogScreen = (props) => {
 								<IconButton
 									style={{ marginLeft: "auto" }}
 									name="caret-down"
-									onPress={() =>
-										setShowExerciseModal(true)
-									}
+									onPress={() => setShowExerciseModal(true)}
 								/>
 							)}
 						</Pressable>
@@ -497,9 +517,7 @@ const AddWorkoutDialogScreen = (props) => {
 								style={{ marginLeft: "auto" }}
 								name="caret-down"
 								// iconColor={currentTheme.primary}
-								onPress={() =>
-									setDatePickerModalVisible(true)
-								}
+								onPress={() => setDatePickerModalVisible(true)}
 							/>
 						</Pressable>
 					</View>
@@ -712,21 +730,23 @@ const getStyles = (theme) => {
 			flex: 1,
 			backgroundColor: theme.surface,
 			maxWidth: 560,
+			// marginTop: 100
+			// alignItems: "center"
 		},
-		headerContainer: {
-			flexDirection: "row",
-			width: "100%",
-			height: 56,
-			backgroundColor: theme.surface,
-			alignItems: "center",
-		},
-		headerBackButton: {
-			marginHorizontal: 16,
-		},
-		headerSaveButton: {
-			marginLeft: "auto",
-			marginRight: 24,
-		},
+		// headerContainer: {
+		// 	flexDirection: "row",
+		// 	width: "100%",
+		// 	height: 56,
+		// 	backgroundColor: theme.surface,
+		// 	alignItems: "center",
+		// },
+		// headerBackButton: {
+		// 	marginHorizontal: 16,
+		// },
+		// headerSaveButton: {
+		// 	marginLeft: "auto",
+		// 	marginRight: 24,
+		// },
 		contentContainer: {
 			flex: 1,
 			// width: "100%"
