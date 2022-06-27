@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk, createAction } from "@reduxjs/toolkit";
 import { loginWithEmailAndPassword } from "../../firebase/firebase";
 import { getUserData } from "./userSlice";
 
@@ -24,6 +24,8 @@ export const loginUser = createAsyncThunk(
 		return response;
 	}
 );
+
+export const logoutUser = createAction("auth/logoutUser");
 
 export const authSlice = createSlice({
 	name: "auth",
@@ -52,10 +54,15 @@ export const authSlice = createSlice({
 			console.log("LoginUser REJECTED");
 			console.log(test);
 		});
-
+		builder.addCase(logoutUser, (state, action) => {
+			console.log(action);
+			console.log(state);
+			state.token = null;
+			state.userID = null;
+		})
 	},
 });
 
-export const { setLocalAuthState } = authSlice.actions;
+export const {  } = authSlice.actions;
 
 export default authSlice.reducer;

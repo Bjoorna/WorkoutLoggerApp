@@ -1,58 +1,31 @@
-import React, { useCallback, useEffect, useReducer, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
-	ScrollView,
 	StyleSheet,
 	View,
 	ActivityIndicator,
 	Alert,
-	KeyboardAvoidingView,
-	Platform,
 	Pressable,
 	Keyboard,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 
-import { TextInput } from "react-native-paper";
+import { TextInput as PaperInput, HelperText } from "react-native-paper";
 
 import { Themes } from "../../shared/Theme";
-// const theme = Themes.dark;
 
-import HeadlineText from "../../components/Text/Headline";
-import FilledButton from "../../components/Buttons/FilledButton";
 import OutlineButton from "../../components/Buttons/OutlineButton";
-import Input from "../../components/UI/Input";
-import { SafeAreaInsetsContext } from "react-native-safe-area-context";
-import Divider from "../../components/UI/Divider";
-import TextButton from "../../components/Buttons/TextButton";
-import { setUseDarkMode } from "../../redux/slices/appSettingsSlice";
 import { loginUser } from "../../redux/slices/authSlice";
 
-import { getFirebaseAuth, signOutUser } from "../../firebase/firebase";
-const FORM_INPUT_UPDATE = "FORM_INPUT_UPDATE";
+import TopAppBar from "../../components/UI/TopAppBarComponent";
+import IconButton from "../../components/Buttons/IconButton";
+import { setUseDarkMode } from "../../redux/slices/appSettingsSlice";
+import validator from "validator";
+import FilledButton from "../../components/Buttons/FilledButton";
+import HeadlineText from "../../components/Text/Headline";
 
-const formReducer = (state, action) => {
-	if (action.type === FORM_INPUT_UPDATE) {
-		const updatedFormValue = {
-			...state.formValues,
-			[action.input]: action.value,
-		};
-		const updatedFormValueValid = {
-			...state.isFormValuesValid,
-			[action.input]: action.isValid,
-		};
-		let updatedFormIsValid = true;
-		for (const key in updatedFormValueValid) {
-			updatedFormIsValid =
-				updatedFormIsValid && updatedFormValueValid[key];
-		}
-		return {
-			isFormValid: updatedFormIsValid,
-			isFormValuesValid: updatedFormValueValid,
-			formValues: updatedFormValue,
-		};
-	}
-	return state;
-};
+const passwordRegEx = new RegExp(
+	/^((?=\S*?[A-Z])(?=\S*?[a-z])(?=\S*?[0-9]).{6,})\S$/
+);
 
 const AuthScreen = (props) => {
 	// Themes
@@ -67,16 +40,25 @@ const AuthScreen = (props) => {
 	const authStatus = useSelector((state) => state.auth);
 
 	const dispatch = useDispatch();
-	const [email, setEmail] = useState("");
-	const [password, setPassword] = useState("");
+	const [email, setEmail] = useState({
+		value: "",
+		isValid: false,
+		showError: false,
+	});
+	const [password, setPassword] = useState({
+		value: "",
+		isValid: false,
+		showError: false,
+	});
+	const [isFormValid, setIsFormValid] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState();
-	const [formState, dispatchFormState] = useReducer(formReducer, {
-		formValues: {
-			email: "",
-			password: "",
-		},
-	});
+
+	useEffect(() => {
+		return () => {
+			setIsLoading(false);
+		};
+	}, []);
 
 	// error handling
 	useEffect(() => {
@@ -86,145 +68,190 @@ const AuthScreen = (props) => {
 	}, [error]);
 
 	useEffect(() => {
-		console.log("Authstatus: ");
-		console.log(authStatus);
-		return () => {
-			setIsLoading(false);
-		}
-	}, []);
-
-	useEffect(() => {
 		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
 		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
 	}, [useDarkMode]);
 
 	useEffect(() => {
-		dispatchFormState({ type: FORM_INPUT_UPDATE });
+		// console.log(email);
+		setIsFormValid(email.isValid && password.isValid);
 	}, [email, password]);
-
-	const authHandler = async () => {
-
-		setIsLoading(true);
-		setError(null);
-
-		try {
-			dispatch(loginUser({email: email, password: password}));
-		} catch (e) {
-			console.log("AUTHSCREEN ERROR");
-			console.log(e);
-			setError(e.message);
-			setIsLoading(false);
-		}
-	};
-
 
 	const setTempLoginCreds = () => {
 		setEmail("marcusbjorna@gmail.com");
-		setPassword("123456");
+		setPassword("Password1");
+	};
+
+	const emailValidator = (email) => {
+		return validator.isEmail(email);
+	};
+
+	const passwordValidator = (password) => {
+		return passwordRegEx.test(password);
+	};
+
+	const onEmailEndEditing = (event) => {
+		const emailCandidate = event.nativeEvent.text;
+		if (emailCandidate.length < 1) {
+			setEmail({ value: "", isValid: false, showError: false });
+		} else {
+			const emailIsValid = emailValidator(emailCandidate);
+
+			setEmail({
+				value: emailCandidate,
+				isValid: emailIsValid,
+				showError: !emailIsValid,
+			});
+		}
+	};
+
+	const onPasswordEndEditing = (event) => {
+		const passwordCandidate = event.nativeEvent.text;
+		if (passwordCandidate.length < 1) {
+			setPassword({ value: "", isValid: false, showError: false });
+		} else {
+			const passwordIsValid = passwordValidator(passwordCandidate);
+			setPassword({
+				value: passwordCandidate,
+				isValid: passwordIsValid,
+				showError: !passwordIsValid,
+			});
+		}
+	};
+
+	const onSubmitLogin = async () => {
+		setIsLoading(true);
+		dispatch(loginUser({ email: email.value, password: password.value }));
 	};
 
 	return (
-		<View
-			// behavior="padding"
-			// keyboardVerticalOffset={1}
-			style={styles.screen}
-		>
-			<Pressable
-				style={styles.pressable}
-				onPress={() => Keyboard.dismiss()}
-			>
-				{isLoading && (
-					<View style={styles.loadingSpinner}>
-						<ActivityIndicator
-							size="large"
-							color={currentTheme.primary}
-						/>
-					</View>
-				)}
-				{!isLoading && (
-					<View style={styles.authScreenContent}>
-						<View style={styles.authCardContainer}>
-							<View style={styles.authCardHeader}>
-								<HeadlineText
-									large={true}
-									style={{
-										color: currentTheme.onSurfaceVariant,
-									}}
-								>
-									Login
-								</HeadlineText>
-							</View>
-							<View style={styles.authCardContent}>
-								<TextInput
-									style={styles.authTextInput}
-									outlineColor={currentTheme.outline}
-									activeOutlineColor={
-										currentTheme.onPrimaryContainer
-									}
-									selectionColor={currentTheme.secondary}
-									mode="outlined"
-									label="Email"
-									email
-									theme={{
-										colors: {
-											text: currentTheme.onPrimaryContainer,
-											placeholder: currentTheme.onSurface,
-										},
-									}}
-									onChangeText={(text) => setEmail(text)}
-								/>
-								<TextInput
-									style={styles.authTextInput}
-									outlineColor={currentTheme.outline}
-									activeOutlineColor={
-										currentTheme.onPrimaryContainer
-									}
-									selectionColor={currentTheme.secondary}
-									mode="outlined"
-									label="Password"
-									keyboardType="default"
-									secureTextEntry
-									theme={{
-										colors: {
-											text: currentTheme.onPrimaryContainer,
-											placeholder: currentTheme.onSurface,
-										},
-									}}
-									onChangeText={(text) => setPassword(text)}
-								/>
-							</View>
-
-							<View style={styles.authCardButtonRow}>
-								<FilledButton
-									onButtonPress={() => {
-										authHandler();
-									}}
-									style={{ width: "100%", marginBottom: 10 }}
-								>
-									Login
-								</FilledButton>
-								<TextButton
-									onButtonPress={() => {
-										props.navigation.navigate(
-											"NewUserScreen"
-										);
-									}}
-									style={{ width: "100%" }}
-								>
-									Create new user
-								</TextButton>
-								<TextButton
-									style={{ width: "100%" }}
-									onButtonPress={() => setTempLoginCreds()}
-								>
-									Set TempCreds
-								</TextButton>
-							</View>
+		<Pressable style={styles.screen} onPress={() => Keyboard.dismiss()}>
+			{isLoading && (
+				<View style={styles.loadingSpinner}>
+					<ActivityIndicator
+						size="large"
+						color={currentTheme.primary}
+					/>
+				</View>
+			)}
+			{!isLoading && (
+				<View style={styles.authScreenContent}>
+					<TopAppBar
+						headlineText="Welcome"
+						trailingIcons={[
+							<OutlineButton>Create New User</OutlineButton>,
+							,
+							<IconButton
+								name="sunny-outline"
+								onPress={() =>
+									dispatch(setUseDarkMode(!useDarkMode))
+								}
+							/>,
+						]}
+					/>
+					<View style={styles.inputContainer}>
+						<View>
+							<HeadlineText
+								large={true}
+								style={{ color: currentTheme.onSurface }}
+							>
+								Login
+							</HeadlineText>
+						</View>
+						<View style={styles.emailInput}>
+							<PaperInput
+								style={{
+									backgroundColor: currentTheme.surface,
+								}}
+								activeOutlineColor={
+									email.showError
+										? currentTheme.error
+										: currentTheme.primary
+								}
+								outlineColor={
+									email.showError
+										? currentTheme.error
+										: currentTheme.outline
+								}
+								theme={{
+									colors: {
+										text: email.showError
+											? currentTheme.error
+											: currentTheme.onSurface,
+										placeholder: email.showError
+											? currentTheme.error
+											: currentTheme.onSurface,
+									},
+								}}
+								mode="outlined"
+								label="Email"
+								email
+								onEndEditing={(event) =>
+									onEmailEndEditing(event)
+								}
+							/>
+							<HelperText
+								style={{ color: currentTheme.error }}
+								visible={email.showError}
+								type="error"
+							>
+								Email might not be valid.
+							</HelperText>
+						</View>
+						<View style={styles.passwordInput}>
+							<PaperInput
+								mode="outlined"
+								style={{
+									backgroundColor: currentTheme.surface,
+								}}
+								activeOutlineColor={
+									password.showError
+										? currentTheme.error
+										: currentTheme.primary
+								}
+								outlineColor={
+									password.showError
+										? currentTheme.error
+										: currentTheme.outline
+								}
+								theme={{
+									colors: {
+										text: password.showError
+											? currentTheme.error
+											: currentTheme.onSurface,
+										placeholder: password.showError
+											? currentTheme.error
+											: currentTheme.onSurface,
+									},
+								}}
+								label="Password"
+								secureTextEntry={true}
+								keyboardType="default"
+								onEndEditing={(event) =>
+									onPasswordEndEditing(event)
+								}
+							/>
+							<HelperText
+								style={{ color: currentTheme.error }}
+								visible={password.showError}
+								type="error"
+							>
+								Password must contain at least 6 characters, one
+								number, one uppercase and one lowercase letter
+							</HelperText>
+						</View>
+						<View>
+							<FilledButton
+								onButtonPress={onSubmitLogin}
+								disabled={!isFormValid}
+							>
+								Login
+							</FilledButton>
 						</View>
 					</View>
-				)}
-			</Pressable>
-		</View>
+				</View>
+			)}
+		</Pressable>
 	);
 };
 
@@ -234,15 +261,18 @@ const getStyles = (theme) => {
 			flex: 1,
 			backgroundColor: theme.surface,
 		},
-		pressable: {
-			flex: 1,
-		},
 		authScreenContent: {
 			flex: 1,
-			height: "100%",
-			width: "100%",
-			paddingTop: 100,
 			alignItems: "center",
+		},
+		inputContainer: {
+			marginTop: 100,
+			width: "100%",
+			justifyContent: "center",
+			paddingHorizontal: 24,
+		},
+		emailInput: {
+			// marginBottom: 10,
 		},
 		loadingSpinner: {
 			flex: 1,

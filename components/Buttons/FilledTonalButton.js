@@ -6,7 +6,7 @@ import { Themes } from "../../shared/Theme";
 import LabelText from "../Text/Label";
 
 // TODO style onPress to conform to material standards
-const FilledButton = (props) => {
+const FilledTonalButton = (props) => {
 	// Themes
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
 	const [styles, setStyles] = useState(
@@ -92,4 +92,4 @@ const getStyles = (theme) => {
 	});
 };
 
-export default FilledButton;
+export default FilledTonalButton;

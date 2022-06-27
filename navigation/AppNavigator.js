@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { AppTabNavigator, AuthStackScreen, CreateUserStackScreen } from "./Navigators";
@@ -9,13 +9,18 @@ import { useSelector } from "react-redux";
 const theme = Themes.dark;
 
 const AppNavigator = (props) => {
-	const isUserAuthenticated = useSelector((state) => !!state.auth.token);
-	const isNewUserCreation = useSelector(
-		(state) => state.auth.newUserCreation
-	);
+	const reduxState = useSelector((state) => state.auth);
+	const [isUserAuthenticated, setIsUserAuthenticated] = useState(false);
+	const [isNewUserCreation, setS] = useState(false)
+	// const [isUserAuthenticated, setIsUserAuthenticated] = useState(!!reduxState.token);
+	// const isNewUserCreation = useSelector(
+	// 	(state) => state.auth.newUserCreation
+	// );
 
 	useEffect(() => {
-	}, [isUserAuthenticated, isNewUserCreation]);
+		console.log(reduxState);
+		setIsUserAuthenticated(reduxState.token);
+	}, [reduxState]);
 
 	return (
 		<NavigationContainer

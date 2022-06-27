@@ -20,6 +20,7 @@ import IconButton from "../../components/Buttons/IconButton";
 
 import { Themes } from "../../shared/Theme";
 import TopAppBar from "../../components/UI/TopAppBarComponent";
+import { logoutUser } from "../../redux/slices/authSlice";
 
 function calculateAge(user) {
 	const now = new Date();
@@ -53,8 +54,8 @@ const UserOverviewScreen = (props) => {
 
 	const dispatch = useDispatch();
 
-	const logoutUser = () => {
-		// dispatch(AuthActions.logout());
+	const onLogoutUser = () => {
+		dispatch(logoutUser());
 	};
 
 	const memoAgeValue = useMemo(() => calculateAge(user), [user]); // useMemo is probably unnecessary
@@ -112,7 +113,7 @@ const UserOverviewScreen = (props) => {
 			</OutlineButton> */}
 			<OutlineButton
 				style={{ marginTop: 20 }}
-				onButtonPress={() => logoutUser()}
+				onButtonPress={onLogoutUser}
 			>
 				Logout
 			</OutlineButton>

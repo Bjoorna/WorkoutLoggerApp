@@ -240,7 +240,7 @@ export const AuthStackScreen = () => {
 				component={AuthScreen}
 				options={{
 					...getDefaultStyleOptions(currentTheme),
-					headerTitle: "Authentication",
+					headerShown: false
 				}}
 			/>
 			<AuthStackNavigator.Screen

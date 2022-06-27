@@ -39,6 +39,7 @@ import authReducer from "./redux/slices/authSlice";
 import appSettingsReducer from "./redux/slices/appSettingsSlice";
 import workoutReducer from './redux/slices/workoutSlice'
 import userReducer from './redux/slices/userSlice';
+// import store from "./redux/store/store";
 
 // const rootReducer = combineReducers({
 // 	auth: authReducer,
@@ -54,7 +55,7 @@ const reducer = {
 	workout: workoutReducer,
 	user: userReducer
 }
-
+// const store = store;
 const store = configureStore({
 	reducer: reducer,
 	middleware: (getDefaultMiddleware) => getDefaultMiddleware({serializableCheck: false})

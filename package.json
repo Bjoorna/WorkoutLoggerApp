@@ -46,7 +46,9 @@
     "react-redux": "^7.2.6",
     "redux": "^4.1.2",
     "redux-thunk": "^2.4.1",
-    "rn-material-ui-textfield": "^1.0.6"
+    "rn-material-ui-textfield": "^1.0.6",
+    "validate.js": "^0.13.1",
+    "validator": "^13.7.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
