@@ -18,7 +18,11 @@ const initialState = {
 export const userSlice = createSlice({
 	name: "user",
 	initialState,
-	reducers: {},
+	reducers: {
+		setUser(state, action)  {
+			state.user = action.payload;
+		}
+	},
 	extraReducers: (builder) => {
 		builder.addCase(getUserData.fulfilled, (state, action) => {
 			console.log("UserSlice getuserdata fulfilled");
@@ -33,5 +37,7 @@ export const userSlice = createSlice({
 		});
 	},
 });
+
+export const {setUser} = userSlice.actions;
 
 export default userSlice.reducer;

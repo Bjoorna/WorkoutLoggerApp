@@ -11,7 +11,7 @@ const theme = Themes.dark;
 const AppNavigator = (props) => {
 	const reduxState = useSelector((state) => state.auth);
 	const [isUserAuthenticated, setIsUserAuthenticated] = useState(false);
-	const [isNewUserCreation, setS] = useState(false)
+	const [isNewUserCreation, setIsNewUserCreation] = useState(false)
 	// const [isUserAuthenticated, setIsUserAuthenticated] = useState(!!reduxState.token);
 	// const isNewUserCreation = useSelector(
 	// 	(state) => state.auth.newUserCreation
@@ -20,6 +20,7 @@ const AppNavigator = (props) => {
 	useEffect(() => {
 		console.log(reduxState);
 		setIsUserAuthenticated(reduxState.token);
+		setIsNewUserCreation(reduxState.newUserCreation);
 	}, [reduxState]);
 
 	return (

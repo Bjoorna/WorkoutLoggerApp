@@ -24,7 +24,7 @@ import { logoutUser } from "../../redux/slices/authSlice";
 
 function calculateAge(user) {
 	const now = new Date();
-	const bd = new Date(user.dob.seconds * 1000);
+	const bd = new Date(user.birthday.seconds * 1000);
 	let age = now.getFullYear() - bd.getFullYear();
 
 	const month = now.getMonth() - bd.getMonth();
@@ -96,7 +96,7 @@ const UserOverviewScreen = (props) => {
 						Weight
 					</LabelText>
 					<HeadlineText style={styles.infoText} large={true}>
-						{user.weight ? user.weight : "N/A"}
+						{user.weight ? Math.round(user.weight) : "N/A"}
 					</HeadlineText>
 				</View>
 				<View style={styles.infoItem}>
@@ -104,7 +104,7 @@ const UserOverviewScreen = (props) => {
 						Age
 					</LabelText>
 					<HeadlineText style={styles.infoText} large={true}>
-						{user.dob ? memoAgeValue : "N/A"}
+						{user.birthday ? memoAgeValue : "N/A"}
 					</HeadlineText>
 				</View>
 			</View>

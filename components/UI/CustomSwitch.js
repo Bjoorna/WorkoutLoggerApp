@@ -8,9 +8,7 @@ import { Themes } from "../../shared/Theme";
  * @param {boolean} isSwitchSelected - Set an initial selectedvalue for the switch
  * @param {boolean} isSwitchDisabled - Set if the switch should be disabled
  * @param {} onSwitchPress - Pass reference to the function that should be called when the switch is pressed
- * @returns
  */
-
 const CustomSwitch = ({
 	isSwitchSelected,
 	isSwitchDisabled,
@@ -60,7 +58,6 @@ const CustomSwitch = ({
 		setIsSelected(!isSelected);
 	};
 
-
 	const animateThumb = (toTrackValue, toHeightValue, toWidthValue) => {
 		Animated.parallel([
 			Animated.spring(thumbAnim, {
@@ -75,7 +72,6 @@ const CustomSwitch = ({
 			// 	toValue: toWidthValue,
 			// 	useNativeDriver: false,
 			// }),
-
 		]).start();
 	};
 
@@ -91,7 +87,7 @@ const CustomSwitch = ({
 			<Animated.View
 				style={[
 					isSelected ? styles.thumbSelected : styles.thumbUnSelected,
-					{ marginLeft: thumbAnim},
+					{ marginLeft: thumbAnim },
 				]}
 			></Animated.View>
 		</Pressable>

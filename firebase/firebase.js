@@ -25,6 +25,7 @@ import {
 } from "firebase/auth";
 
 import * as firebaseConfig from "./config";
+import { async } from "validate.js";
 // APPSETUO
 const app = initializeApp(firebaseConfig.firebaseConfig);
 
@@ -33,22 +34,32 @@ const database = getFirestore(app);
 
 // userFunctions
 
-export const saveUserToCollection = async (user, userID) => {
+// export const saveUserToCollection = async (user, userID) => {
+// 	try {
+// 		const docRef = doc(database, "users", userID);
+// 		const userTransform = {
+// 			name: user.name,
+// 			dob: user.dob,
+// 			weight: user.weight,
+// 			height: user.height,
+// 			useMetric: user.useMetric,
+// 			profileImageURI: user.profileImageURI,
+// 		};
+// 		return await setDoc(docRef, userTransform, { merge: true });
+// 	} catch (error) {
+// 		throw new Error(error);
+// 	}
+// };
+
+export const firebaseInitSaveUserData = async (userData, userID) => {
 	try {
 		const docRef = doc(database, "users", userID);
-		const userTransform = {
-			name: user.name,
-			dob: user.dob,
-			weight: user.weight,
-			height: user.height,
-			useMetric: user.useMetric,
-			profileImageURI: user.profileImageURI,
-		};
-		return await setDoc(docRef, userTransform, { merge: true });
+		// no need to merge since the document wont exist
+		await setDoc(docRef, userData);
 	} catch (error) {
-		throw new Error(error);
+		throw new Error(error.code);
 	}
-};
+}
 
 export const updateUser = async (userID, newUserState) => {
 	const userRef = doc(database, "users", userID);
@@ -393,7 +404,10 @@ export const getDocumentFromCollection = async (docID, collectionName) => {
 // AUTHENTICATION
 const auth = getAuth();
 
-export const signUpNewUserWithEmailAndPassword = async (email, password) => {
+export const firebaseCreateUserWithEmailAndPassword = async (
+	email,
+	password
+) => {
 	try {
 		const userCredentials = await createUserWithEmailAndPassword(
 			auth,
@@ -402,15 +416,15 @@ export const signUpNewUserWithEmailAndPassword = async (email, password) => {
 		);
 		return userCredentials.user;
 	} catch (error) {
-		const errorCode = error.code;
-		const errorMessage = error.message;
-		console.log(error.message);
+		// console.log(error);
+		// console.log(error.message);
+		// console.log(error.code);
 		// TODO, return better errorsmessages
-		throw new Error(error);
+		throw new Error(error.code);
 	}
 };
 
-export const loginWithEmailAndPassword = async (email, password) => {
+export const firebaseLoginWithEmailAndPassword = async (email, password) => {
 	try {
 		const userCredentials = await signInWithEmailAndPassword(
 			auth,

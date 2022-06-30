@@ -37,6 +37,20 @@ export const convertMass = (value, fromPounds) => {
 	}
 };
 
+export const convertImperialHeightToMetric = ({ feet, inch }) => {
+	const inchToCentimeters = Math.round(inch * 2.54);
+	const feetToCentimeters = Math.round(feet * 30.48);
+
+	const finalCentimeters = feetToCentimeters + inchToCentimeters;
+	console.log(finalCentimeters);
+	return finalCentimeters;
+};
+
+export const convertMetricHeightToImperial = (cm) => {
+	const inches = Math.round(cm / 2.54);
+	return { feet: Math.floor(inches / 12), inches: inches % 12 };
+};
+
 /**
  *
  * @param {Array<number>} years - An array of numbers, each being a year with 4 numbers;
@@ -131,14 +145,17 @@ export const getFromAsyncStorage = async (key) => {
 	}
 };
 
-
 export const transformObjectToWorkout = (object) => {
-	const transformedWorkout = new Workout(object.exercises, object.date, object.complete, object.note, object.owner, object.id);
-	return transformedWorkout; 
-}
-
-
-
+	const transformedWorkout = new Workout(
+		object.exercises,
+		object.date,
+		object.complete,
+		object.note,
+		object.owner,
+		object.id
+	);
+	return transformedWorkout;
+};
 
 export class Day {
 	constructor(id, date, dayOfWeek, dayOfMonth) {

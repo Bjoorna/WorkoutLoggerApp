@@ -136,9 +136,11 @@ export const WorkoutStackScreen = () => {
 				<WorkoutStackNavigator.Screen
 					name="Workouts"
 					component={WorkoutListScreen}
-					options={{ ...getDefaultStyleOptions(currentTheme), headerShown: false }}
+					options={{
+						...getDefaultStyleOptions(currentTheme),
+						headerShown: false,
+					}}
 				/>
-				
 
 				<WorkoutStackNavigator.Screen
 					name="AddWorkout"
@@ -216,7 +218,7 @@ export const UserStackScreen = () => {
 						...getDefaultStyleOptions(currentTheme),
 						presentation: "card",
 						// headerTitle: "Settings",
-						headerShown: false
+						headerShown: false,
 					}}
 				/>
 			</UserStackNavigator.Group>
@@ -240,7 +242,7 @@ export const AuthStackScreen = () => {
 				component={AuthScreen}
 				options={{
 					...getDefaultStyleOptions(currentTheme),
-					headerShown: false
+					headerShown: false,
 				}}
 			/>
 			<AuthStackNavigator.Screen
@@ -248,7 +250,7 @@ export const AuthStackScreen = () => {
 				component={NewUserScreen}
 				options={{
 					...getDefaultStyleOptions(currentTheme),
-					headerTitle: "Create New User",
+					headerShown: false,
 				}}
 			/>
 		</AuthStackNavigator.Navigator>
@@ -271,7 +273,7 @@ export const CreateUserStackScreen = () => {
 				component={NewUserDetailScreen}
 				options={{
 					...getDefaultStyleOptions(currentTheme),
-					headerTitle: "Enter Personal Details",
+					headerShown: false
 				}}
 			/>
 		</CreateUserStackNavigator.Navigator>

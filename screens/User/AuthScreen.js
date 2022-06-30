@@ -139,7 +139,7 @@ const AuthScreen = (props) => {
 					<TopAppBar
 						headlineText="Welcome"
 						trailingIcons={[
-							<OutlineButton>Create New User</OutlineButton>,
+							<OutlineButton onButtonPress={() => props.navigation.navigate("NewUserScreen")}>Create New User</OutlineButton>,
 							,
 							<IconButton
 								name="sunny-outline"
@@ -280,40 +280,6 @@ const getStyles = (theme) => {
 			width: "100%",
 			justifyContent: "center",
 			alignItems: "center",
-		},
-		authCardContainer: {
-			width: "90%",
-			// height: 200,
-			paddingHorizontal: 16,
-			paddingBottom: 12,
-			borderRadius: 12,
-			backgroundColor: theme.surfaceVariant,
-		},
-		authCardHeader: {
-			paddingVertical: 10,
-		},
-		authCardContent: {
-			// marginTop: 20,
-			// flexDirection: "row",
-			// justifyContent: "flex-end"
-		},
-		authCardDivider: {
-			borderStyle: "solid",
-			width: "100%",
-			height: 2,
-			borderTopWidth: 1,
-			borderTopColor: theme.outline,
-			marginVertical: 3,
-		},
-		authCardButtonRow: {
-			marginTop: 10,
-			flexDirection: "column",
-			alignItems: "center",
-			// justifyContent: "flex-end",
-		},
-		authTextInput: {
-			paddingVertical: 5,
-			backgroundColor: theme.surfaceVariant,
 		},
 	});
 };
