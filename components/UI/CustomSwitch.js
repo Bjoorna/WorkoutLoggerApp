@@ -42,6 +42,10 @@ const CustomSwitch = ({
 	}, []);
 
 	useEffect(() => {
+		setIsSelected(isSwitchSelected);
+	}, [isSwitchSelected]);
+	
+	useEffect(() => {
 		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
 	}, [useDarkMode]);
 

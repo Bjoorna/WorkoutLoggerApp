@@ -21,6 +21,7 @@ import IconButton from "../../components/Buttons/IconButton";
 import { Themes } from "../../shared/Theme";
 import TopAppBar from "../../components/UI/TopAppBarComponent";
 import { logoutUser } from "../../redux/slices/authSlice";
+import { setHideTabBar } from "../../redux/slices/appSettingsSlice";
 
 function calculateAge(user) {
 	const now = new Date();
@@ -58,6 +59,10 @@ const UserOverviewScreen = (props) => {
 		dispatch(logoutUser());
 	};
 
+	const onNavigateToSettings = () => {
+		dispatch(setHideTabBar(true));
+		props.navigation.navigate("UserSettings");
+	};
 
 	return (
 		<SafeAreaView style={styles.safeView}>
@@ -67,9 +72,7 @@ const UserOverviewScreen = (props) => {
 					<IconButton
 						name="settings-outline"
 						iconColor={currentTheme.onSurfaceVariant}
-						onPress={() =>
-							props.navigation.navigate("UserSettings")
-						}
+						onPress={onNavigateToSettings}
 					/>,
 				]}
 			/>

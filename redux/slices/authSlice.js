@@ -21,17 +21,16 @@ export const loginUser = createAsyncThunk(
 		try {
 			console.log(authCredentials.email);
 			console.log(authCredentials.password);
-	
+
 			const response = await firebaseLoginWithEmailAndPassword(
 				authCredentials.email,
 				authCredentials.password
 			);
 			const userID = response.uid;
-	
+
 			// we have logged in successfully, fetch userdata
 			thunkAPI.dispatch(getUserData(userID));
 			return response;
-	
 		} catch (error) {
 			return thunkAPI.rejectWithValue(error);
 		}
@@ -57,41 +56,26 @@ export const createUserWithEmailAndPassword = createAsyncThunk(
 
 export const initalUserInfoSave = createAsyncThunk(
 	"user/initialUserInfoSave",
-	async ({userInfo}, thunkAPI) => {
+	async ({ userInfo }, thunkAPI) => {
 		const userObject = {
 			name: userInfo.name,
 			birthday: userInfo.birthday,
 			height: userInfo.height > 0 ? userInfo.height : null,
 			weight: userInfo.weight > 0 ? userInfo.weight : null,
 			useDarkMode: userInfo.useDarkMode,
-			useMetric: userInfo.useMetric
-		}
+			useMetric: userInfo.useMetric,
+		};
 		try {
 			const userID = thunkAPI.getState().auth.userID;
 			console.log(userID);
 			const userSave = await firebaseInitSaveUserData(userObject, userID);
-			thunkAPI.dispatch(getUserData(userID));
-			return userSave
+			thunkAPI.dispatch(getUserData());
+			return userSave;
 		} catch (error) {
-			return thunkAPI.rejectWithValue(error)
+			return thunkAPI.rejectWithValue(error);
 		}
 	}
 );
-
-// export const DEVLoginAndCreateUser = createAsyncThunk(
-// 	"user/devLoginAndCreateUser",
-// 	async (authCredentials, thunkAPI) => {
-// 		try {
-// 			const user = await firebaseLoginWithEmailAndPassword(
-// 				authCredentials.email,
-// 				authCredentials.password
-// 			);
-// 			return user;
-// 		} catch (error) {
-// 			return thunkAPI.rejectWithValue(error);
-// 		}
-// 	}
-// );
 
 export const logoutUser = createAction("auth/logoutUser");
 
@@ -109,13 +93,11 @@ export const authSlice = createSlice({
 			const user = action.payload;
 			const userID = user.uid;
 			const userToken = user.stsTokenManager.accessToken;
-			// console.log(userToken);
 			state.token = userToken;
 			state.userID = userID;
-			// setLocalAuthState({token: userToken, userID: userID})
 		});
 		builder.addCase(loginUser.rejected, (state, action) => {
-			if(action.payload){
+			if (action.payload) {
 				state.error = action.payload;
 			}
 		});
@@ -142,7 +124,6 @@ export const authSlice = createSlice({
 			createUserWithEmailAndPassword.rejected,
 			(state, action) => {
 				console.log("Create new user Rejected");
-				// console.log(action);
 				if (action.payload) {
 					console.log(action.payload);
 					state.error = action.payload;
@@ -150,28 +131,16 @@ export const authSlice = createSlice({
 			}
 		);
 
-		builder.addCase(initalUserInfoSave.fulfilled, (state,action) => {
-			state.newUserCreation = false
-		})
+		builder.addCase(initalUserInfoSave.fulfilled, (state, action) => {
+			state.newUserCreation = false;
+		});
 
 		builder.addCase(initalUserInfoSave.rejected, (state, action) => {
-			if(action.payload){
+			if (action.payload) {
 				console.log(action.payload);
 				state.error = action.payload;
 			}
-		})
-
-		// builder.addCase(DEVLoginAndCreateUser.fulfilled, (state, action) => {
-		// 	const user = action.payload;
-		// 	if (user) {
-		// 		state.userID = user.uid;
-		// 		const userToken = user.stsTokenManager.accessToken;
-		// 		state.token = userToken;
-		// 		state.newUserCreation = true;
-		// 	}
-		// });
-
-
+		});
 	},
 });
 

@@ -82,6 +82,16 @@ export const firebaseInitSaveUserData = async (userData, userID) => {
 // 	}
 // };
 
+export const firebaseUpdateUserField = async(userID, test) => {
+	try {
+		const userDocRef = doc(database, "users" , userID);
+		await updateDoc(userDocRef, test);
+		return; 
+	} catch (error) {
+		throw new Error(error.code);
+	}
+}
+
 export const firebaseGetUser = async (userID) => {
 	try {
 		const userDataRef = doc(database, "users", userID);
@@ -282,11 +292,6 @@ export const firebaseGetUserWorkouts = async (userID) => {
 			orderBy("date", "desc"),
 			limit(3)
 		);
-		// const q = query(
-		// 	collection(database, "workouts"),
-		// 	where("owner", "==", userID),
-		// 	orderBy("date", "desc")
-		// );
 		const querySnapshot = await getDocs(q);
 		return querySnapshot;
 	} catch (error) {
@@ -418,10 +423,6 @@ export const firebaseCreateUserWithEmailAndPassword = async (
 		);
 		return userCredentials.user;
 	} catch (error) {
-		// console.log(error);
-		// console.log(error.message);
-		// console.log(error.code);
-		// TODO, return better errorsmessages
 		throw new Error(error.code);
 	}
 };
@@ -435,10 +436,6 @@ export const firebaseLoginWithEmailAndPassword = async (email, password) => {
 		);
 		return userCredentials.user;
 	} catch (error) {
-		// const errorCode = error.code;
-		// const errorMessage = error.message;
-		// console.log(errorCode);
-		// TODO, return better errorsmessages
 		throw new Error(error.code);
 	}
 };
@@ -463,9 +460,3 @@ export const createTimeStampFromMillis = (millis) => {
 		return Timestamp.fromMillis(millis);
 	}
 };
-
-// export const millisFromTimestamp = (timestamp) => {
-// 	if(typeof timestamp == Timestamp){
-
-// 	}
-// };

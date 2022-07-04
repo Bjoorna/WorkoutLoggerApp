@@ -5,21 +5,16 @@ import BodyText from "../../components/Text/Body";
 
 // import * as UserActions from "../../redux/actions/user";
 import { Themes } from "../../shared/Theme";
-import User from "../../models/User";
 import CustomSwitch from "../../components/UI/CustomSwitch";
 import LabelText from "../../components/Text/Label";
 
-import {
-	createCalendar,
-	getCalendarFromStorage,
-	saveCalendar,
-} from "../../shared/utils/UtilFunctions";
 import FilledButton from "../../components/Buttons/FilledTonalButton";
-import { setUseDarkMode } from "../../redux/slices/appSettingsSlice";
+import { setHideTabBar, setUseDarkMode } from "../../redux/slices/appSettingsSlice";
 import TopAppBar from "../../components/UI/TopAppBarComponent";
 import IconButton from "../../components/Buttons/IconButton";
+import { getUserData, updateUserField } from "../../redux/slices/userSlice";
 const UserSettingsScreen = (props) => {
-	const user = useSelector((state) => state.user.user);
+	const userStoreRef = useSelector((state) => state.user);
 	const userID = useSelector((state) => state.auth.userID);
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
 	const isMondayFirstDay = useSelector(
@@ -28,29 +23,41 @@ const UserSettingsScreen = (props) => {
 	const dispatch = useDispatch();
 
 	// State for different settings
+	const [user, setUser] = useState(userStoreRef.user);
 	const [useMetricValue, setUseMetricValue] = useState(user.useMetric);
 	const [useDarkModeValue, setUseDarkModeValue] = useState(useDarkMode);
 
 	const [isMondayFirstDayValue, setIsMondayFirstDayValue] =
 		useState(isMondayFirstDay);
 
-	const [isSwitchDisabled, setIsSwitchDisabled] = useState(false);
-	const [updateUser, setUpdateUser] = useState(false);
-	const [isUpdating, setIsUpdating] = useState(false);
-	const [error, setError] = useState();
-
-	const [calendar, setCalendar] = useState(null);
 
 	const [styles, setStyles] = useState(getStyles(Themes.light));
 	const [currentTheme, setCurrentTheme] = useState(
 		useDarkMode ? Themes.dark : Themes.light
 	);
 
+	useEffect(() => {
+		return () => {
+			dispatch(setHideTabBar(false));
+		} 
+	}, [])
+
 	// initialize userSettingsValues
 	useEffect(() => {
+		setUseDarkMode(user.useDarkMode);
 		setUseMetricValue(user.useMetric);
-		setIsSwitchDisabled(false);
 	}, [user]);
+
+	useEffect(()=> {
+		const storeError = userStoreRef.error;
+		if(storeError != null){
+			console.log("errorHandling");
+			console.log(storeError);
+		}
+		if(userStoreRef.user) {
+			setUser(userStoreRef.user);
+		}
+	}, [userStoreRef])
 
 	useEffect(() => {
 		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
@@ -58,41 +65,28 @@ const UserSettingsScreen = (props) => {
 		setUseDarkModeValue(useDarkMode);
 	}, [useDarkMode]);
 
-	useEffect(() => {
-		console.log("Calendar set");
-	}, [calendar]);
-
-	useEffect(() => {
-		console.log("USER: ");
-		console.log(user);
-		setUseMetricValue(user.useMetric);
-	}, [user]);
-
-	useEffect(() => {
-		if (error) {
-			Alert.alert("Error when updating user!", error, [{ text: "Okay" }]);
-		}
-	}, [error]);
-
 	const onToggleDarkMode = () => {
-		console.log("ontoggledarkmode");
-		dispatch(setUseDarkMode(!useDarkModeValue));
+		const newValue = !useDarkModeValue;
+		dispatch(setUseDarkMode(newValue));
+		dispatch(updateUserField({useDarkMode: newValue}));
 	};
 
 	const onToggleUseMetric = () => {
-		console.log("ontoggleuseMetric");
-
 		try {
-			const newField = { useMetric: !useMetricValue };
-			// dispatch(UserActions.updateUserField(userID, newField));
+			const updateData = {useMetric: !useMetricValue}
+			dispatch(updateUserField(updateData));
 		} catch (error) {
-			setError(error.message);
+			console.log(error);
 		}
 	};
 
 	const onToggleMondayFirstDay = () => {
 		dispatch({ type: SET_MONDAY_FIRSTDAY, value: !isMondayFirstDayValue });
 	};
+
+	const testGetUser = () => {
+		dispatch(getUserData())
+	}
 
 	return (
 		<View style={styles.screen}>
@@ -129,7 +123,7 @@ const UserSettingsScreen = (props) => {
 								style={{ color: currentTheme.onSurfaceVariant }}
 							>
 								Display units in metric or imperial. Affects
-								units like weight and height.
+								length and weight units
 							</LabelText>
 						</View>
 						<CustomSwitch
@@ -156,7 +150,7 @@ const UserSettingsScreen = (props) => {
 							Dark Mode
 						</BodyText>
 						<CustomSwitch
-							isSwitchSelected={useDarkMode}
+							isSwitchSelected={useDarkModeValue}
 							isSwitchDisabled={false}
 							onSwitchPressed={onToggleDarkMode}
 						/>
@@ -215,6 +209,23 @@ const UserSettingsScreen = (props) => {
 							Dummy
 						</FilledButton>
 					</View>
+					<View style={styles.userSettingsItem}>
+						<View style={styles.userSettingsText}>
+							<BodyText
+								large={true}
+								style={{ color: currentTheme.onSurface }}
+							>
+								GetUser
+							</BodyText>
+						</View>
+
+						<FilledButton
+							onButtonPress={testGetUser}
+						>
+							Get
+						</FilledButton>
+					</View>
+
 				</View>
 				{/* <View style={styles.userSettingsItem}>
 					<BodyText large={true} style={styles.text}>

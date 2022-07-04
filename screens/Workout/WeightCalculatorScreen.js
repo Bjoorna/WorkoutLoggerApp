@@ -96,6 +96,7 @@ const WeightCalculatorScreen = (props) => {
 			dispatch(setHideTabBar(false));
 		};
 	}, []);
+	
 	useEffect(() => {
 		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
 		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
