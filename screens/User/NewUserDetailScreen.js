@@ -145,11 +145,14 @@ const NewUserDetailScreen = (props) => {
 	};
 
 	const onHeightEndEditing = (event) => {
-		userInfoDispatch({ type: SET_HEIGHT, height: event.nativeEvent.text });
+		const textToNumber = Number(event.nativeEvent.text);
+		userInfoDispatch({ type: SET_HEIGHT, height: textToNumber });
 	};
 
 	const onWeightEndEditing = (event) => {
-		userInfoDispatch({ type: SET_WEIGHT, weight: event.nativeEvent.text });
+		const textToNumber = Number(event.nativeEvent.text);
+
+		userInfoDispatch({ type: SET_WEIGHT, weight: textToNumber });
 	};
 
 	const onSetBirthDate = (event, date) => {

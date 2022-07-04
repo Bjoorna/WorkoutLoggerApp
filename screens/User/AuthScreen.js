@@ -9,12 +9,16 @@ import {
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 
-import { TextInput as PaperInput, HelperText } from "react-native-paper";
+import {
+	TextInput as PaperInput,
+	HelperText,
+	Snackbar,
+} from "react-native-paper";
 
 import { Themes } from "../../shared/Theme";
 
 import OutlineButton from "../../components/Buttons/OutlineButton";
-import { loginUser } from "../../redux/slices/authSlice";
+import { clearErrorState, loginUser } from "../../redux/slices/authSlice";
 
 import TopAppBar from "../../components/UI/TopAppBarComponent";
 import IconButton from "../../components/Buttons/IconButton";
@@ -52,7 +56,9 @@ const AuthScreen = (props) => {
 	});
 	const [isFormValid, setIsFormValid] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
-	const [error, setError] = useState();
+	// const [error, setError] = useState();
+	const [snackBarVisible, setIsSnackBarVisible] = useState(false);
+	const [snackBarText, setSnackBarText] = useState("");
 
 	useEffect(() => {
 		return () => {
@@ -60,12 +66,20 @@ const AuthScreen = (props) => {
 		};
 	}, []);
 
-	// error handling
 	useEffect(() => {
-		if (error) {
-			Alert.alert("Error on AuthAttempt", error, [{ text: "Dismiss" }]);
+		if (authStatus.error) {
+			const errorMessage = authStatus.error.message;
+			let errorText = "Error on login";
+			if (errorMessage == "auth/email-already-in-use") {
+				errorText = "Wrong email or password";
+			} else if (errorMessage == "auth/user-not-found") {
+				errorText = "User not found";
+			}
+			setSnackBarText(errorText);
+			setIsLoading(false);
+			setIsSnackBarVisible(true);
 		}
-	}, [error]);
+	}, [authStatus]);
 
 	useEffect(() => {
 		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
@@ -124,6 +138,13 @@ const AuthScreen = (props) => {
 		dispatch(loginUser({ email: email.value, password: password.value }));
 	};
 
+	const onSnackBarDismissed = () => {
+		// clear error state in store
+		dispatch(clearErrorState());
+		setIsSnackBarVisible(false);
+		setSnackBarText("");
+	};
+
 	return (
 		<Pressable style={styles.screen} onPress={() => Keyboard.dismiss()}>
 			{isLoading && (
@@ -136,10 +157,36 @@ const AuthScreen = (props) => {
 			)}
 			{!isLoading && (
 				<View style={styles.authScreenContent}>
+					<Snackbar
+						style={{
+							backgroundColor: currentTheme.secondaryContainer,
+							borderRadius: 24,
+							marginBottom: 50,
+							elevation: 0,
+							color: currentTheme.error,
+						}}
+						visible={snackBarVisible}
+						onDismiss={onSnackBarDismissed}
+						theme={{
+							colors: {
+								surface: currentTheme.onSecondaryContainer,
+							},
+						}}
+						duration={4000}
+					>
+						{snackBarText}
+					</Snackbar>
+
 					<TopAppBar
 						headlineText="Welcome"
 						trailingIcons={[
-							<OutlineButton onButtonPress={() => props.navigation.navigate("NewUserScreen")}>Create New User</OutlineButton>,
+							<OutlineButton
+								onButtonPress={() =>
+									props.navigation.navigate("NewUserScreen")
+								}
+							>
+								Create New User
+							</OutlineButton>,
 							,
 							<IconButton
 								name="sunny-outline"

@@ -61,26 +61,26 @@ export const firebaseInitSaveUserData = async (userData, userID) => {
 	}
 }
 
-export const updateUser = async (userID, newUserState) => {
-	const userRef = doc(database, "users", userID);
-	try {
-		console.log("userState from firebase function");
-		console.log(newUserState);
-		return await updateDoc(userRef, { ...newUserState });
-	} catch (error) {
-		throw new Error(error);
-	}
-};
+// export const updateUser = async (userID, newUserState) => {
+// 	const userRef = doc(database, "users", userID);
+// 	try {
+// 		console.log("userState from firebase function");
+// 		console.log(newUserState);
+// 		return await updateDoc(userRef, { ...newUserState });
+// 	} catch (error) {
+// 		throw new Error(error);
+// 	}
+// };
 
-export const updateUserField = async (userID, updatedField) => {
-	const userRef = doc(database, "users", userID);
-	try {
-		console.log("UpdateUserField");
-		return await updateDoc(userRef, updatedField);
-	} catch (error) {
-		throw new Error(error);
-	}
-};
+// export const updateUserField = async (userID, updatedField) => {
+// 	const userRef = doc(database, "users", userID);
+// 	try {
+// 		console.log("UpdateUserField");
+// 		return await updateDoc(userRef, updatedField);
+// 	} catch (error) {
+// 		throw new Error(error);
+// 	}
+// };
 
 export const firebaseGetUser = async (userID) => {
 	try {
@@ -141,19 +141,19 @@ export const firebaseDeleteExercises = async (exerciseIDs) => {
 // 	}
 // };
 
-export const deleteExercise = async (userID, exerciseIDs) => {
-	try {
-		const batch = writeBatch(database);
-		for (let exerciseID of exerciseIDs) {
-			const exerciseRef = doc(database, "exercises", exerciseID);
-			console.log(exerciseID);
-			batch.delete(exerciseRef);
-		}
-		return await batch.commit();
-	} catch (error) {
-		throw new Error(error);
-	}
-};
+// export const deleteExercise = async (userID, exerciseIDs) => {
+// 	try {
+// 		const batch = writeBatch(database);
+// 		for (let exerciseID of exerciseIDs) {
+// 			const exerciseRef = doc(database, "exercises", exerciseID);
+// 			console.log(exerciseID);
+// 			batch.delete(exerciseRef);
+// 		}
+// 		return await batch.commit();
+// 	} catch (error) {
+// 		throw new Error(error);
+// 	}
+// };
 
 export const firebaseSaveWorkout = async (workout, userID) => {
 	try {
@@ -180,6 +180,7 @@ export const firebaseSaveWorkout = async (workout, userID) => {
 		return newWorkoutID;
 	} catch (error) {
 		console.log(error);
+		throw new Error(error);
 	}
 };
 
@@ -193,6 +194,7 @@ export const firebaseGetWorkoutByID = async (workoutID) => {
 	} catch (error) {
 		console.log("FirebaseGetWorkoutByID");
 		console.log(error);
+		throw new Error(error);
 	}
 };
 
@@ -362,44 +364,44 @@ export const getWorkoutOnDay = async (userID, dayStart, dayEnd) => {
 	}
 };
 
-export const writeDocumentToCollection = async (
-	document,
-	dbCollection,
-	optionalID = "",
-	shouldMerge = true
-) => {
-	console.log("doc: " + document);
-	if (optionalID !== "") {
-		try {
-			const docRef = doc(database, dbCollection, optionalID);
-			return await setDoc(docRef, document, { merge: shouldMerge });
-		} catch (e) {
-			console.log("From WriteDocumentToCOllection");
-			console.log(e);
-		}
-	} else {
-		try {
-			return await addDoc(collection(database, dbCollection), document);
-		} catch (e) {
-			console.log("From WriteDocumentToCOllection, with no specified ID");
-			console.log(e);
-		}
-	}
-};
+// export const writeDocumentToCollection = async (
+// 	document,
+// 	dbCollection,
+// 	optionalID = "",
+// 	shouldMerge = true
+// ) => {
+// 	console.log("doc: " + document);
+// 	if (optionalID !== "") {
+// 		try {
+// 			const docRef = doc(database, dbCollection, optionalID);
+// 			return await setDoc(docRef, document, { merge: shouldMerge });
+// 		} catch (e) {
+// 			console.log("From WriteDocumentToCOllection");
+// 			console.log(e);
+// 		}
+// 	} else {
+// 		try {
+// 			return await addDoc(collection(database, dbCollection), document);
+// 		} catch (e) {
+// 			console.log("From WriteDocumentToCOllection, with no specified ID");
+// 			console.log(e);
+// 		}
+// 	}
+// };
 
-export const getDocumentFromCollection = async (docID, collectionName) => {
-	console.log(docID, collectionName);
-	const docRef = doc(database, collectionName, docID);
-	const docSnap = await getDoc(docRef);
+// export const getDocumentFromCollection = async (docID, collectionName) => {
+// 	console.log(docID, collectionName);
+// 	const docRef = doc(database, collectionName, docID);
+// 	const docSnap = await getDoc(docRef);
 
-	if (docSnap.exists()) {
-		// console.log("Document Data: ");
-		// console.log( docSnap.data());
-		return docSnap.data();
-	} else {
-		console.log("No such document");
-	}
-};
+// 	if (docSnap.exists()) {
+// 		// console.log("Document Data: ");
+// 		// console.log( docSnap.data());
+// 		return docSnap.data();
+// 	} else {
+// 		console.log("No such document");
+// 	}
+// };
 
 // AUTHENTICATION
 const auth = getAuth();
@@ -433,11 +435,11 @@ export const firebaseLoginWithEmailAndPassword = async (email, password) => {
 		);
 		return userCredentials.user;
 	} catch (error) {
-		const errorCode = error.code;
-		const errorMessage = error.message;
-		console.log(errorCode);
+		// const errorCode = error.code;
+		// const errorMessage = error.message;
+		// console.log(errorCode);
 		// TODO, return better errorsmessages
-		throw new Error(error);
+		throw new Error(error.code);
 	}
 };
 

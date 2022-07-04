@@ -58,7 +58,6 @@ const UserOverviewScreen = (props) => {
 		dispatch(logoutUser());
 	};
 
-	const memoAgeValue = useMemo(() => calculateAge(user), [user]); // useMemo is probably unnecessary
 
 	return (
 		<SafeAreaView style={styles.safeView}>
@@ -104,7 +103,7 @@ const UserOverviewScreen = (props) => {
 						Age
 					</LabelText>
 					<HeadlineText style={styles.infoText} large={true}>
-						{user.birthday ? memoAgeValue : "N/A"}
+						{user.birthday != null ? calculateAge(user) : "N/A"}
 					</HeadlineText>
 				</View>
 			</View>

@@ -1,5 +1,4 @@
 import { createSlice, createAsyncThunk, createAction } from "@reduxjs/toolkit";
-import { async } from "validate.js";
 import {
 	firebaseCreateUserWithEmailAndPassword,
 	firebaseInitSaveUserData,
@@ -19,18 +18,23 @@ const initialState = {
 export const loginUser = createAsyncThunk(
 	"user/loginUser",
 	async (authCredentials, thunkAPI) => {
-		console.log(authCredentials.email);
-		console.log(authCredentials.password);
-
-		const response = await firebaseLoginWithEmailAndPassword(
-			authCredentials.email,
-			authCredentials.password
-		);
-		const userID = response.uid;
-
-		// we have logged in successfully, fetch userdata
-		thunkAPI.dispatch(getUserData(userID));
-		return response;
+		try {
+			console.log(authCredentials.email);
+			console.log(authCredentials.password);
+	
+			const response = await firebaseLoginWithEmailAndPassword(
+				authCredentials.email,
+				authCredentials.password
+			);
+			const userID = response.uid;
+	
+			// we have logged in successfully, fetch userdata
+			thunkAPI.dispatch(getUserData(userID));
+			return response;
+	
+		} catch (error) {
+			return thunkAPI.rejectWithValue(error);
+		}
 	}
 );
 
@@ -71,25 +75,23 @@ export const initalUserInfoSave = createAsyncThunk(
 		} catch (error) {
 			return thunkAPI.rejectWithValue(error)
 		}
-
-		// const savedUserData 
 	}
 );
 
-export const DEVLoginAndCreateUser = createAsyncThunk(
-	"user/devLoginAndCreateUser",
-	async (authCredentials, thunkAPI) => {
-		try {
-			const user = await firebaseLoginWithEmailAndPassword(
-				authCredentials.email,
-				authCredentials.password
-			);
-			return user;
-		} catch (error) {
-			return thunkAPI.rejectWithValue(error);
-		}
-	}
-);
+// export const DEVLoginAndCreateUser = createAsyncThunk(
+// 	"user/devLoginAndCreateUser",
+// 	async (authCredentials, thunkAPI) => {
+// 		try {
+// 			const user = await firebaseLoginWithEmailAndPassword(
+// 				authCredentials.email,
+// 				authCredentials.password
+// 			);
+// 			return user;
+// 		} catch (error) {
+// 			return thunkAPI.rejectWithValue(error);
+// 		}
+// 	}
+// );
 
 export const logoutUser = createAction("auth/logoutUser");
 
@@ -112,9 +114,10 @@ export const authSlice = createSlice({
 			state.userID = userID;
 			// setLocalAuthState({token: userToken, userID: userID})
 		});
-		builder.addCase(loginUser.rejected, (test) => {
-			console.log("LoginUser REJECTED");
-			console.log(test);
+		builder.addCase(loginUser.rejected, (state, action) => {
+			if(action.payload){
+				state.error = action.payload;
+			}
 		});
 		builder.addCase(logoutUser, (state, action) => {
 			console.log(action);
@@ -158,15 +161,15 @@ export const authSlice = createSlice({
 			}
 		})
 
-		builder.addCase(DEVLoginAndCreateUser.fulfilled, (state, action) => {
-			const user = action.payload;
-			if (user) {
-				state.userID = user.uid;
-				const userToken = user.stsTokenManager.accessToken;
-				state.token = userToken;
-				state.newUserCreation = true;
-			}
-		});
+		// builder.addCase(DEVLoginAndCreateUser.fulfilled, (state, action) => {
+		// 	const user = action.payload;
+		// 	if (user) {
+		// 		state.userID = user.uid;
+		// 		const userToken = user.stsTokenManager.accessToken;
+		// 		state.token = userToken;
+		// 		state.newUserCreation = true;
+		// 	}
+		// });
 
 
 	},

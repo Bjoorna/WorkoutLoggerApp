@@ -36,12 +36,7 @@ const NewUserScreen = (props) => {
 	const [currentTheme, setCurrentTheme] = useState(
 		useDarkMode ? Themes.dark : Themes.light
 	);
-
-	// const authToken = useSelector((state) => state.auth.token);
 	const dispatch = useDispatch();
-
-	// const [newEmail, setNewEmail] = useState();
-	// const [newPassword, setNewPassword] = useState();
 	const [email, setEmail] = useState({
 		value: "",
 		isValid: false,
@@ -60,7 +55,6 @@ const NewUserScreen = (props) => {
 
 	const [isFormValid, setIsFormValid] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
-	const [error, setError] = useState(null);
 	const [snackBarVisible, setSnackBarVisible] = useState(false);
 	const [snackBarText, setSnackBarText] = useState("");
 
@@ -86,14 +80,6 @@ const NewUserScreen = (props) => {
 			console.log("auth error cleared");
 		}
 	}, [auth]);
-
-	// error handling
-	useEffect(() => {
-		if (error) {
-			Alert.alert("Error on AuthAttempt", error, [{ text: "Dismiss" }]);
-			setIsLoading(false);
-		}
-	}, [error]);
 
 	useEffect(() => {
 		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
@@ -366,10 +352,10 @@ const NewUserScreen = (props) => {
 								Login
 							</FilledButton>
 						</View>
-						<View style={{marginTop: 50}}>
+						{/* <View style={{marginTop: 50}}>
 							<TitleText style={{color: currentTheme.onSurface}}>DEV</TitleText>
 							<FilledButton onButtonPress={onDevCreateUser}>Createuserdetail</FilledButton>
-						</View>
+						</View> */}
 					</View>
 				</View>
 			)}

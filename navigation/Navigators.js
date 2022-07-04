@@ -43,7 +43,10 @@ export const AppTabNavigator = () => {
 
 	return (
 		<TabNavigator.Navigator
-			screenOptions={{ headerShown: false }}
+			screenOptions={{
+				headerShown: false,
+				cardStyle: { backgroundColor: currentTheme.surface },
+			}}
 			tabBar={(props) => <CustomTabBar {...props} />}
 		>
 			<TabNavigator.Screen
@@ -215,6 +218,7 @@ export const UserStackScreen = () => {
 					name="UserSettings"
 					component={UserSettingsScreen}
 					options={{
+						// cardStyle:{backgroundColor: currentTheme.error},
 						...getDefaultStyleOptions(currentTheme),
 						presentation: "card",
 						// headerTitle: "Settings",
@@ -273,7 +277,7 @@ export const CreateUserStackScreen = () => {
 				component={NewUserDetailScreen}
 				options={{
 					...getDefaultStyleOptions(currentTheme),
-					headerShown: false
+					headerShown: false,
 				}}
 			/>
 		</CreateUserStackNavigator.Navigator>
