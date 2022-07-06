@@ -18,6 +18,7 @@ import WorkoutDetailScreen from "../screens/Workout/WorkoutDetailScreen";
 import AddWorkoutDialogScreen from "../components/UI/AddWorkoutDialogScreen";
 import CustomTabBar from "../components/UI/CustomTabBar";
 import CalendarScreen from "../screens/CalendarScreen";
+import SplashScreen from "../screens/SplashScreen";
 
 const getDefaultStyleOptions = (theme) => {
 	return {
@@ -281,5 +282,28 @@ export const CreateUserStackScreen = () => {
 				}}
 			/>
 		</CreateUserStackNavigator.Navigator>
+	);
+};
+
+const SplashScreenNavigator = createStackNavigator();
+
+export const SplashScreenStack = () => {
+	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
+	const [currentTheme, setCurrentTheme] = useState(Themes.dark);
+	useEffect(() => {
+		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
+	}, [useDarkMode]);
+
+	return (
+		<SplashScreenNavigator.Navigator>
+			<SplashScreenNavigator.Screen
+				options={{
+					...getDefaultStyleOptions(currentTheme),
+					headerShown: false,
+				}}
+				component={SplashScreen}
+				name="SplashScreen"
+			></SplashScreenNavigator.Screen>
+		</SplashScreenNavigator.Navigator>
 	);
 };

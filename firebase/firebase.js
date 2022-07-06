@@ -23,9 +23,17 @@ import {
 	signOut,
 } from "firebase/auth";
 
-import * as firebaseConfig from "./config";
+const firebaseConfig = {
+    apiKey: "AIzaSyAf6yOGx_V5wXyVUzot1sDgsICKPbDVgIs",
+    authDomain: "workoutlogger-48f71.firebaseapp.com",
+    databaseURL: "https://workoutlogger-48f71-default-rtdb.europe-west1.firebasedatabase.app/",
+    storageBucket: "gs://workoutlogger-48f71.appspot.com",
+    projectId: "workoutlogger-48f71"
+};
+
+// import * as firebaseConfig from "./config";
 // APPSETUO
-const app = initializeApp(firebaseConfig.firebaseConfig);
+const app = initializeApp(firebaseConfig);
 
 // // FIRESTORE
 const database = getFirestore(app);

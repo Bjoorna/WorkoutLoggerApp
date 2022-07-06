@@ -5,12 +5,17 @@ import {
 	AppTabNavigator,
 	AuthStackScreen,
 	CreateUserStackScreen,
+	SplashScreenStack,
 } from "./Navigators";
-import { StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import { Themes } from "../shared/Theme";
 import { useDispatch, useSelector } from "react-redux";
-import { firebaseGetAuth, firebaseGetCurrentUser, getFirebaseAuth } from "../firebase/firebase";
+import {
+	firebaseGetAuth,
+	firebaseGetCurrentUser,
+	getFirebaseAuth,
+} from "../firebase/firebase";
 import { autoLogin, setAutoLoginState } from "../redux/slices/authSlice";
 const theme = Themes.dark;
 
@@ -22,11 +27,9 @@ const AppNavigator = (props) => {
 	);
 	const [isUserAuthenticated, setIsUserAuthenticated] = useState(false);
 	const [isNewUserCreation, setIsNewUserCreation] = useState(false);
-
-	
+	const [showSplashScreen, setShowSplashScreen] = useState(true);
 
 	const [isDarkMode, setIsDarkMode] = useState(useDarkModeStoreRef);
-
 
 	const navigatorDarktheme = {
 		dark: true,
@@ -39,24 +42,27 @@ const AppNavigator = (props) => {
 		colors: {
 			background: Themes.light.surface,
 		},
+	};
 
-	}
-
-	useEffect(()=> {
-		const firebaseAuthListener = firebaseGetAuth().onAuthStateChanged(async user => {
-			if(user) {
-				const userID = user.uid;
-				const token = await user.getIdToken()
-				dispatch(autoLogin({userID, token}));
-			}else {
-				// console.log("no user")
+	useEffect(() => {
+		const firebaseAuthListener = firebaseGetAuth().onAuthStateChanged(
+			async (user) => {
+				if (user) {
+					const userID = user.uid;
+					const token = await user.getIdToken();
+					dispatch(autoLogin({ userID, token }));
+					// setShowSplashScreen(false);
+				} else {
+					// console.log("no user")
+					setShowSplashScreen(false)
+				}
 			}
-		})
+		);
 		firebaseAuthListener();
 		// return () => {
 		// 	firebaseAuthListener();
 		// }
-	},[])
+	}, []);
 
 	useEffect(() => {
 		setIsDarkMode(useDarkModeStoreRef);
@@ -67,16 +73,25 @@ const AppNavigator = (props) => {
 		setIsNewUserCreation(reduxAuthState.newUserCreation);
 	}, [reduxAuthState]);
 
+	useEffect(()=> {
+		if(isUserAuthenticated){
+			setShowSplashScreen(false);
+		}
+	},[isUserAuthenticated])
+
 	return (
 		<NavigationContainer
 			theme={isDarkMode ? navigatorDarktheme : navigatorLightTheme}
 			// style={{backgroundColor: currentTheme.surface}}
 		>
-			{isUserAuthenticated && !isNewUserCreation && <AppTabNavigator />}
-			{isUserAuthenticated && isNewUserCreation && (
+			{showSplashScreen && (
+				<SplashScreenStack />
+			)}
+			{isUserAuthenticated && !isNewUserCreation && !showSplashScreen && <AppTabNavigator />}
+			{isUserAuthenticated && isNewUserCreation && !showSplashScreen  && (
 				<CreateUserStackScreen />
 			)}
-			{!isUserAuthenticated && <AuthStackScreen />}
+			{!isUserAuthenticated && !showSplashScreen  &&  <AuthStackScreen />}
 
 			{/* <AppTabNavigator /> */}
 		</NavigationContainer>
