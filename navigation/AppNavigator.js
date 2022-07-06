@@ -11,7 +11,7 @@ import { StyleSheet } from "react-native";
 import { Themes } from "../shared/Theme";
 import { useDispatch, useSelector } from "react-redux";
 import { firebaseGetAuth, firebaseGetCurrentUser, getFirebaseAuth } from "../firebase/firebase";
-import { autoLogin } from "../redux/slices/authSlice";
+import { autoLogin, setAutoLoginState } from "../redux/slices/authSlice";
 const theme = Themes.dark;
 
 const AppNavigator = (props) => {
@@ -45,19 +45,17 @@ const AppNavigator = (props) => {
 	useEffect(()=> {
 		const firebaseAuthListener = firebaseGetAuth().onAuthStateChanged(async user => {
 			if(user) {
-				console.log("user from appnavigator useeffect");
-				console.log(user);
 				const userID = user.uid;
 				const token = await user.getIdToken()
 				dispatch(autoLogin({userID, token}));
-
 			}else {
-				console.log("no user")
+				// console.log("no user")
 			}
 		})
-		return () => {
-			firebaseAuthListener();
-		}
+		firebaseAuthListener();
+		// return () => {
+		// 	firebaseAuthListener();
+		// }
 	},[])
 
 	useEffect(() => {
@@ -65,9 +63,6 @@ const AppNavigator = (props) => {
 	}, [useDarkModeStoreRef]);
 
 	useEffect(() => {
-		console.log("authState updated:");
-		console.log(reduxAuthState);
-		console.log(!!reduxAuthState.token);
 		setIsUserAuthenticated(!!reduxAuthState.token);
 		setIsNewUserCreation(reduxAuthState.newUserCreation);
 	}, [reduxAuthState]);

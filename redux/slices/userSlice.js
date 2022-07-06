@@ -5,18 +5,23 @@ import { setUseDarkMode } from "./appSettingsSlice";
 export const getUserData = createAsyncThunk(
 	"user/getUserData",
 	async (_, thunkApi) => {
-		let userID;
-		if(_) {
-			userID = _
-		}else{
-			userID = thunkApi.getState().auth.userID;
-		}
-		// const userID = thunkApi.getState().auth.userID;
-		const userData = await firebaseGetUser(userID);
-		if (userData) {
-			console.log(userData);
-			thunkApi.dispatch(setUseDarkMode(userData.useDarkMode));
-			return userData;
+		try {
+			let userID;
+			if(_) {
+				userID = _
+			}else{
+				userID = thunkApi.getState().auth.userID;
+			}
+			// const userID = thunkApi.getState().auth.userID;
+			const userData = await firebaseGetUser(userID);
+			if (userData) {
+				console.log(userData);
+				thunkApi.dispatch(setUseDarkMode(userData.useDarkMode));
+				return userData;
+			}
+	
+		} catch (error) {
+			
 		}
 	}
 );
@@ -45,11 +50,13 @@ export const userSlice = createSlice({
 		setUser(state, action) {
 			state.user = action.payload;
 		},
+		resetUser(state) {
+			state.user = {};
+		}
 	},
 	extraReducers: (builder) => {
 		builder.addCase(getUserData.fulfilled, (state, action) => {
 			console.log("UserSlice getuserdata fulfilled");
-			console.log(action.payload);
 			state.user = action.payload;
 		});
 
@@ -71,6 +78,6 @@ export const userSlice = createSlice({
 	},
 });
 
-export const { setUser } = userSlice.actions;
+export const { setUser, resetUser } = userSlice.actions;
 
 export default userSlice.reducer;

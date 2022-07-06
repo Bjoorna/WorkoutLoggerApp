@@ -5,9 +5,9 @@ import {
 	firebaseLoginWithEmailAndPassword,
 	firebaseSignOutUser,
 } from "../../firebase/firebase";
-import { getUserData } from "./userSlice";
+import { getUserData, resetUser } from "./userSlice";
+import { resetWorkoutState } from "./workoutSlice";
 
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const initialState = {
 	fireBaseUser: null,
@@ -20,7 +20,7 @@ const initialState = {
 
 // thunks
 export const loginUser = createAsyncThunk(
-	"user/loginUser",
+	"auth/loginUser",
 	async (authCredentials, thunkAPI) => {
 		try {
 			const user = await firebaseLoginWithEmailAndPassword(
@@ -31,8 +31,7 @@ export const loginUser = createAsyncThunk(
 			const userID = user.uid;
 			const token = await user.getIdToken();
 			thunkAPI.dispatch(getUserData(userID));
-			return {userID, token};
-
+			return { userID, token };
 		} catch (error) {
 			return thunkAPI.rejectWithValue(error);
 		}
@@ -40,9 +39,10 @@ export const loginUser = createAsyncThunk(
 );
 
 export const autoLogin = createAsyncThunk(
-	"user/autoLogin",
+	"auth/autoLogin",
 	async (user, thunkAPI) => {
 		try {
+			console.log("AutoLogin is called");
 			thunkAPI.dispatch(getUserData(user.userID));
 			return user;
 		} catch (error) {}
@@ -50,7 +50,7 @@ export const autoLogin = createAsyncThunk(
 );
 
 export const createUserWithEmailAndPassword = createAsyncThunk(
-	"user/createUserWithEmailAndPassword",
+	"auth/createUserWithEmailAndPassword",
 	async (authCredentials, thunkAPI) => {
 		try {
 			const createdUser = await firebaseCreateUserWithEmailAndPassword(
@@ -59,7 +59,7 @@ export const createUserWithEmailAndPassword = createAsyncThunk(
 			);
 			const userID = createdUser.uid;
 			const token = await createdUser.getIdToken();
-			return {userID, token};
+			return { userID, token };
 		} catch (error) {
 			return thunkAPI.rejectWithValue(error);
 		}
@@ -67,7 +67,7 @@ export const createUserWithEmailAndPassword = createAsyncThunk(
 );
 
 export const initalUserInfoSave = createAsyncThunk(
-	"user/initialUserInfoSave",
+	"auth/initialUserInfoSave",
 	async ({ userInfo }, thunkAPI) => {
 		const userObject = {
 			name: userInfo.name,
@@ -89,20 +89,27 @@ export const initalUserInfoSave = createAsyncThunk(
 	}
 );
 
-export const logoutUser = createAsyncThunk("auth/logoutUser" , async(_, thunkAPI) => {
-	try {
-		await firebaseSignOutUser();
-		return;
-	} catch (error) {
-		console.log("error on logout: SHOULD NOT HAPPEN");
+export const logoutUser = createAsyncThunk(
+	"auth/logoutUser",
+	async (_, thunkAPI) => {
+		try {
+			await firebaseSignOutUser();
+			thunkAPI.dispatch(resetWorkoutState());
+			thunkAPI.dispatch(resetUser());
+			return;
+		} catch (error) {
+			console.log("error on logout: SHOULD NOT HAPPEN");
+		}
 	}
-})
-
+);
 
 export const authSlice = createSlice({
 	name: "auth",
 	initialState,
 	reducers: {
+		setAutoLoginState(state, action){
+			state.hasTriedAutoLogin = action.payload;
+		},
 		clearErrorState(state) {
 			state.error = null;
 		},
@@ -111,7 +118,7 @@ export const authSlice = createSlice({
 		builder.addCase(loginUser.fulfilled, (state, action) => {
 			if (action.payload) {
 				const user = action.payload;
-				state.userID = user.uid;
+				state.userID = user.userID;
 				state.token = user.token;
 			}
 		});
@@ -121,8 +128,6 @@ export const authSlice = createSlice({
 			}
 		});
 		builder.addCase(logoutUser.fulfilled, (state, action) => {
-			console.log(action);
-			console.log(state);
 			state.token = null;
 			state.userID = null;
 		});
@@ -161,17 +166,17 @@ export const authSlice = createSlice({
 		});
 
 		builder.addCase(autoLogin.fulfilled, (state, action) => {
-			if(action.payload){
+			if (action.payload) {
 				const user = action.payload;
-				if(user) {
+				if (user) {
 					state.userID = user.userID;
-					state.token  =user.token;
+					state.token = user.token;
 				}
 			}
-		})
+		});
 	},
 });
 
-export const { clearErrorState } = authSlice.actions;
+export const { clearErrorState, setAutoLoginState } = authSlice.actions;
 
 export default authSlice.reducer;

@@ -94,6 +94,11 @@ export const workoutSlice = createSlice({
 	initialState,
 	reducers: {
 		resetFilteredExercises: (state) => (state.filteredExercises = {}),
+		resetWorkoutState: (state) => {
+			state.exercises = {};
+			state.filteredExercises = {};
+			state.workouts = {};
+		},
 	},
 	extraReducers: (builder) => {
 		// Workouts
@@ -161,6 +166,6 @@ export const workoutSlice = createSlice({
 	},
 });
 
-export const { resetFilteredExercises } = workoutSlice.actions;
+export const { resetFilteredExercises, resetWorkoutState } = workoutSlice.actions;
 
 export default workoutSlice.reducer;

@@ -117,6 +117,7 @@ const WorkoutListScreen = (props) => {
 
 
 	const onRefresh = useCallback(() => {
+		console.log(userID);
 		setRefreshing(true);
 		dispatch(getWorkoutByUserID(userID));
 		// dispatch(WorkoutActions.getUserWorkouts(userID));
