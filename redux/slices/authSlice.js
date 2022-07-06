@@ -3,10 +3,14 @@ import {
 	firebaseCreateUserWithEmailAndPassword,
 	firebaseInitSaveUserData,
 	firebaseLoginWithEmailAndPassword,
+	firebaseSignOutUser,
 } from "../../firebase/firebase";
 import { getUserData } from "./userSlice";
 
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 const initialState = {
+	fireBaseUser: null,
 	token: null,
 	userID: null,
 	hasTriedAutoLogin: false,
@@ -19,21 +23,29 @@ export const loginUser = createAsyncThunk(
 	"user/loginUser",
 	async (authCredentials, thunkAPI) => {
 		try {
-			console.log(authCredentials.email);
-			console.log(authCredentials.password);
-
-			const response = await firebaseLoginWithEmailAndPassword(
+			const user = await firebaseLoginWithEmailAndPassword(
 				authCredentials.email,
 				authCredentials.password
 			);
-			const userID = response.uid;
 
-			// we have logged in successfully, fetch userdata
+			const userID = user.uid;
+			const token = await user.getIdToken();
 			thunkAPI.dispatch(getUserData(userID));
-			return response;
+			return {userID, token};
+
 		} catch (error) {
 			return thunkAPI.rejectWithValue(error);
 		}
+	}
+);
+
+export const autoLogin = createAsyncThunk(
+	"user/autoLogin",
+	async (user, thunkAPI) => {
+		try {
+			thunkAPI.dispatch(getUserData(user.userID));
+			return user;
+		} catch (error) {}
 	}
 );
 
@@ -45,9 +57,9 @@ export const createUserWithEmailAndPassword = createAsyncThunk(
 				authCredentials.email,
 				authCredentials.password
 			);
-			const toJson = createdUser.toJSON();
-			console.log("ToJSon: ", toJson);
-			return createdUser;
+			const userID = createdUser.uid;
+			const token = await createdUser.getIdToken();
+			return {userID, token};
 		} catch (error) {
 			return thunkAPI.rejectWithValue(error);
 		}
@@ -77,7 +89,15 @@ export const initalUserInfoSave = createAsyncThunk(
 	}
 );
 
-export const logoutUser = createAction("auth/logoutUser");
+export const logoutUser = createAsyncThunk("auth/logoutUser" , async(_, thunkAPI) => {
+	try {
+		await firebaseSignOutUser();
+		return;
+	} catch (error) {
+		console.log("error on logout: SHOULD NOT HAPPEN");
+	}
+})
+
 
 export const authSlice = createSlice({
 	name: "auth",
@@ -89,19 +109,18 @@ export const authSlice = createSlice({
 	},
 	extraReducers: (builder) => {
 		builder.addCase(loginUser.fulfilled, (state, action) => {
-			console.log("Login Succeded");
-			const user = action.payload;
-			const userID = user.uid;
-			const userToken = user.stsTokenManager.accessToken;
-			state.token = userToken;
-			state.userID = userID;
+			if (action.payload) {
+				const user = action.payload;
+				state.userID = user.uid;
+				state.token = user.token;
+			}
 		});
 		builder.addCase(loginUser.rejected, (state, action) => {
 			if (action.payload) {
 				state.error = action.payload;
 			}
 		});
-		builder.addCase(logoutUser, (state, action) => {
+		builder.addCase(logoutUser.fulfilled, (state, action) => {
 			console.log(action);
 			console.log(state);
 			state.token = null;
@@ -113,10 +132,9 @@ export const authSlice = createSlice({
 			(state, action) => {
 				const user = action.payload;
 				if (user) {
-					state.userID = user.uid;
-					const userToken = user.stsTokenManager.accessToken;
+					state.userID = user.userID;
 					state.newUserCreation = true;
-					state.token = userToken;
+					state.token = user.token;
 				}
 			}
 		);
@@ -141,6 +159,16 @@ export const authSlice = createSlice({
 				state.error = action.payload;
 			}
 		});
+
+		builder.addCase(autoLogin.fulfilled, (state, action) => {
+			if(action.payload){
+				const user = action.payload;
+				if(user) {
+					state.userID = user.userID;
+					state.token  =user.token;
+				}
+			}
+		})
 	},
 });
 

@@ -26,6 +26,11 @@ import { setUseDarkMode } from "../../redux/slices/appSettingsSlice";
 import validator from "validator";
 import FilledButton from "../../components/Buttons/FilledButton";
 import HeadlineText from "../../components/Text/Headline";
+import {
+	firebaseGetAuth,
+	setAuthPersistence,
+	firebaseSignOutUser,
+} from "../../firebase/firebase";
 
 const passwordRegEx = new RegExp(
 	/^((?=\S*?[A-Z])(?=\S*?[a-z])(?=\S*?[0-9]).{6,})\S$/
@@ -69,6 +74,7 @@ const AuthScreen = (props) => {
 	useEffect(() => {
 		if (authStatus.error) {
 			const errorMessage = authStatus.error.message;
+			console.log(errorMessage);
 			let errorText = "Error on login";
 			if (errorMessage == "auth/email-already-in-use") {
 				errorText = "Wrong email or password";

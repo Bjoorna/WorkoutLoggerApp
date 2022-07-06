@@ -9,24 +9,24 @@ import {
 import { StyleSheet } from "react-native";
 
 import { Themes } from "../shared/Theme";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { firebaseGetAuth, firebaseGetCurrentUser, getFirebaseAuth } from "../firebase/firebase";
+import { autoLogin } from "../redux/slices/authSlice";
 const theme = Themes.dark;
 
 const AppNavigator = (props) => {
-	const reduxState = useSelector((state) => state.auth);
+	const dispatch = useDispatch();
+	const reduxAuthState = useSelector((state) => state.auth);
 	const useDarkModeStoreRef = useSelector(
 		(state) => state.appSettings.useDarkMode
 	);
 	const [isUserAuthenticated, setIsUserAuthenticated] = useState(false);
 	const [isNewUserCreation, setIsNewUserCreation] = useState(false);
-	// const [isUserAuthenticated, setIsUserAuthenticated] = useState(!!reduxState.token);
-	// const isNewUserCreation = useSelector(
-	// 	(state) => state.auth.newUserCreation
-	// );
+
+	
 
 	const [isDarkMode, setIsDarkMode] = useState(useDarkModeStoreRef);
 
-	// const [navigatorTheme, setNavigatorTheme] = useState({colors: {background: isDarkMode} })
 
 	const navigatorDarktheme = {
 		dark: true,
@@ -42,14 +42,35 @@ const AppNavigator = (props) => {
 
 	}
 
+	useEffect(()=> {
+		const firebaseAuthListener = firebaseGetAuth().onAuthStateChanged(async user => {
+			if(user) {
+				console.log("user from appnavigator useeffect");
+				console.log(user);
+				const userID = user.uid;
+				const token = await user.getIdToken()
+				dispatch(autoLogin({userID, token}));
+
+			}else {
+				console.log("no user")
+			}
+		})
+		return () => {
+			firebaseAuthListener();
+		}
+	},[])
+
 	useEffect(() => {
 		setIsDarkMode(useDarkModeStoreRef);
 	}, [useDarkModeStoreRef]);
 
 	useEffect(() => {
-		setIsUserAuthenticated(reduxState.token);
-		setIsNewUserCreation(reduxState.newUserCreation);
-	}, [reduxState]);
+		console.log("authState updated:");
+		console.log(reduxAuthState);
+		console.log(!!reduxAuthState.token);
+		setIsUserAuthenticated(!!reduxAuthState.token);
+		setIsNewUserCreation(reduxAuthState.newUserCreation);
+	}, [reduxAuthState]);
 
 	return (
 		<NavigationContainer

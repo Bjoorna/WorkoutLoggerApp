@@ -1,5 +1,4 @@
 import { initializeApp } from "firebase/app";
-import { getDatabase } from "firebase/database";
 import {
 	collection,
 	doc,
@@ -25,12 +24,14 @@ import {
 } from "firebase/auth";
 
 import * as firebaseConfig from "./config";
-import { async } from "validate.js";
 // APPSETUO
 const app = initializeApp(firebaseConfig.firebaseConfig);
 
-// FIRESTORE
+// // FIRESTORE
 const database = getFirestore(app);
+
+// // auth
+const auth = getAuth(app);
 
 // userFunctions
 
@@ -59,7 +60,7 @@ export const firebaseInitSaveUserData = async (userData, userID) => {
 	} catch (error) {
 		throw new Error(error.code);
 	}
-}
+};
 
 // export const updateUser = async (userID, newUserState) => {
 // 	const userRef = doc(database, "users", userID);
@@ -82,15 +83,15 @@ export const firebaseInitSaveUserData = async (userData, userID) => {
 // 	}
 // };
 
-export const firebaseUpdateUserField = async(userID, test) => {
+export const firebaseUpdateUserField = async (userID, test) => {
 	try {
-		const userDocRef = doc(database, "users" , userID);
+		const userDocRef = doc(database, "users", userID);
 		await updateDoc(userDocRef, test);
-		return; 
+		return;
 	} catch (error) {
 		throw new Error(error.code);
 	}
-}
+};
 
 export const firebaseGetUser = async (userID) => {
 	try {
@@ -409,7 +410,6 @@ export const getWorkoutOnDay = async (userID, dayStart, dayEnd) => {
 // };
 
 // AUTHENTICATION
-const auth = getAuth();
 
 export const firebaseCreateUserWithEmailAndPassword = async (
 	email,
@@ -440,13 +440,31 @@ export const firebaseLoginWithEmailAndPassword = async (email, password) => {
 	}
 };
 
-export const signOutUser = async () => {
+export const firebaseGetCurrentUser = () => {
+	return auth.currentUser;
+}
+
+export const firebaseReloadUser = async()=> {
+
+}
+
+export const firebaseSignOutUser = async () => {
 	await signOut(auth);
 };
 
-export const getFirebaseAuth = () => {
+export const firebaseGetAuth = () => {
 	return auth;
 };
+
+// onAuthStateChanged(auth, (user) => {
+// 	if (user) {
+// 		console.log("have user");
+// 		console.log(user)
+// 	} else {
+// 		console.log("noUser");
+// 	}
+// });
+
 // utils
 
 export const createTimeStampFromDate = (date) => {

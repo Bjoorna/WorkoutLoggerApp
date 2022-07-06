@@ -9,10 +9,15 @@ import CustomSwitch from "../../components/UI/CustomSwitch";
 import LabelText from "../../components/Text/Label";
 
 import FilledButton from "../../components/Buttons/FilledTonalButton";
-import { setHideTabBar, setUseDarkMode } from "../../redux/slices/appSettingsSlice";
+import {
+	setHideTabBar,
+	setUseDarkMode,
+} from "../../redux/slices/appSettingsSlice";
 import TopAppBar from "../../components/UI/TopAppBarComponent";
 import IconButton from "../../components/Buttons/IconButton";
 import { getUserData, updateUserField } from "../../redux/slices/userSlice";
+
+import { Snackbar } from "react-native-paper";
 const UserSettingsScreen = (props) => {
 	const userStoreRef = useSelector((state) => state.user);
 	const userID = useSelector((state) => state.auth.userID);
@@ -30,17 +35,19 @@ const UserSettingsScreen = (props) => {
 	const [isMondayFirstDayValue, setIsMondayFirstDayValue] =
 		useState(isMondayFirstDay);
 
-
 	const [styles, setStyles] = useState(getStyles(Themes.light));
 	const [currentTheme, setCurrentTheme] = useState(
 		useDarkMode ? Themes.dark : Themes.light
 	);
 
+	const [snackBarVisible, setSnackBarVisible] = useState(false);
+	const [snackBarText, setSnackBarText] = useState("");
+
 	useEffect(() => {
 		return () => {
 			dispatch(setHideTabBar(false));
-		} 
-	}, [])
+		};
+	}, []);
 
 	// initialize userSettingsValues
 	useEffect(() => {
@@ -48,16 +55,16 @@ const UserSettingsScreen = (props) => {
 		setUseMetricValue(user.useMetric);
 	}, [user]);
 
-	useEffect(()=> {
+	useEffect(() => {
 		const storeError = userStoreRef.error;
-		if(storeError != null){
+		if (storeError != null) {
 			console.log("errorHandling");
 			console.log(storeError);
 		}
-		if(userStoreRef.user) {
+		if (userStoreRef.user) {
 			setUser(userStoreRef.user);
 		}
-	}, [userStoreRef])
+	}, [userStoreRef]);
 
 	useEffect(() => {
 		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
@@ -65,16 +72,27 @@ const UserSettingsScreen = (props) => {
 		setUseDarkModeValue(useDarkMode);
 	}, [useDarkMode]);
 
-	const onToggleDarkMode = () => {
+	const onToggleDarkMode = async () => {
 		const newValue = !useDarkModeValue;
 		dispatch(setUseDarkMode(newValue));
-		dispatch(updateUserField({useDarkMode: newValue}));
+		try {
+			const dispatchResult = await dispatch(
+				updateUserField({ useDarkMode: newValue })
+			).unwrap();
+
+			setSnackBarText("User updated");
+			setSnackBarVisible(true);
+		} catch (error) {}
 	};
 
-	const onToggleUseMetric = () => {
+	const onToggleUseMetric = async () => {
 		try {
-			const updateData = {useMetric: !useMetricValue}
-			dispatch(updateUserField(updateData));
+			const updateData = { useMetric: !useMetricValue };
+			const dispatchResult = await dispatch(
+				updateUserField(updateData)
+			).unwrap();
+			setSnackBarText("User updated");
+			setSnackBarVisible(true);
 		} catch (error) {
 			console.log(error);
 		}
@@ -85,11 +103,36 @@ const UserSettingsScreen = (props) => {
 	};
 
 	const testGetUser = () => {
-		dispatch(getUserData())
-	}
+		dispatch(getUserData());
+	};
+
+	const onSnackBarDismissed = () => {
+		setSnackBarText("");
+		setSnackBarVisible(false);
+	};
 
 	return (
 		<View style={styles.screen}>
+			<Snackbar
+				style={{
+					backgroundColor: currentTheme.secondaryContainer,
+					borderRadius: 24,
+					marginBottom: 50,
+					elevation: 0,
+					color: currentTheme.error,
+				}}
+				visible={snackBarVisible}
+				onDismiss={onSnackBarDismissed}
+				theme={{
+					colors: {
+						surface: currentTheme.onSecondaryContainer,
+					},
+				}}
+				duration={3000}
+			>
+				{snackBarText}
+			</Snackbar>
+
 			<TopAppBar
 				headlineText="Settings"
 				navigationButton={
@@ -219,13 +262,10 @@ const UserSettingsScreen = (props) => {
 							</BodyText>
 						</View>
 
-						<FilledButton
-							onButtonPress={testGetUser}
-						>
+						<FilledButton onButtonPress={testGetUser}>
 							Get
 						</FilledButton>
 					</View>
-
 				</View>
 				{/* <View style={styles.userSettingsItem}>
 					<BodyText large={true} style={styles.text}>
