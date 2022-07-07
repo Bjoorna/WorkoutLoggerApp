@@ -88,9 +88,6 @@ const WeightCalculatorScreen = (props) => {
 		hexToRGB(currentTheme.surface)
 	);
 	useEffect(() => {
-		console.log("USERsettings from calculator");
-		console.log(userSettings);
-		console.log(useMetric);
 
 		return () => {
 			dispatch(setHideTabBar(false));

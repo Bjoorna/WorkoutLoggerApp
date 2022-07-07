@@ -42,7 +42,6 @@ export const convertImperialHeightToMetric = ({ feet, inch }) => {
 	const feetToCentimeters = Math.round(feet * 30.48);
 
 	const finalCentimeters = feetToCentimeters + inchToCentimeters;
-	console.log(finalCentimeters);
 	return finalCentimeters;
 };
 
@@ -67,10 +66,8 @@ export const createCalendar = async (years) => {
 };
 
 export const addYearToCalendar = (calendar, yearToAdd) => {
-	console.log("YearTOAdd: " + yearToAdd);
 	const newMap = new Map(calendar);
 	if (newMap) {
-		console.log("Create new year");
 		const newYear = createYear(yearToAdd);
 		newMap.set(yearToAdd, newYear);
 
@@ -102,31 +99,6 @@ export const createYear = (year) => {
 	}
 	return months;
 };
-
-// export const saveCalendar = async (calendar) => {
-// 	const serializedCalendar = JSON.stringify(Array.from(calendar.entries()));
-// 	try{
-// 		return await(saveToAsyncStorage("calendar", serializedCalendar));
-// 	}catch(error){
-
-// 	}
-// 	// console.log(newJSON);
-// 	// const toMap = new Map(JSON.parse(newJSON));
-// 	// console.log(toMap);
-// };
-
-// export const getCalendarFromStorage = async() => {
-// 	try {
-// 		const fromStorage = await getFromAsyncStorage("calendar");
-// 		if(fromStorage){
-// 			const calendarToMap = new Map(JSON.parse(fromStorage));
-// 			// console.log(calendarToMap);
-// 			return calendarToMap;
-// 		}else{return null}
-// 	} catch (error) {
-// 		console.log("Error");
-// 	}
-// }
 
 export const saveToAsyncStorage = async (key, value) => {
 	try {

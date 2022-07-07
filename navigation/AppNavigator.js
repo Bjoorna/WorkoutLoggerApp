@@ -13,10 +13,8 @@ import { Themes } from "../shared/Theme";
 import { useDispatch, useSelector } from "react-redux";
 import {
 	firebaseGetAuth,
-	firebaseGetCurrentUser,
-	getFirebaseAuth,
 } from "../firebase/firebase";
-import { autoLogin, setAutoLoginState } from "../redux/slices/authSlice";
+import { autoLogin } from "../redux/slices/authSlice";
 const theme = Themes.dark;
 
 const AppNavigator = (props) => {
@@ -51,17 +49,12 @@ const AppNavigator = (props) => {
 					const userID = user.uid;
 					const token = await user.getIdToken();
 					dispatch(autoLogin({ userID, token }));
-					// setShowSplashScreen(false);
 				} else {
-					// console.log("no user")
-					setShowSplashScreen(false)
+					setShowSplashScreen(false);
 				}
 			}
 		);
 		firebaseAuthListener();
-		// return () => {
-		// 	firebaseAuthListener();
-		// }
 	}, []);
 
 	useEffect(() => {
@@ -73,27 +66,25 @@ const AppNavigator = (props) => {
 		setIsNewUserCreation(reduxAuthState.newUserCreation);
 	}, [reduxAuthState]);
 
-	useEffect(()=> {
-		if(isUserAuthenticated){
+	useEffect(() => {
+		if (isUserAuthenticated) {
 			setShowSplashScreen(false);
 		}
-	},[isUserAuthenticated])
+	}, [isUserAuthenticated]);
 
 	return (
 		<NavigationContainer
 			theme={isDarkMode ? navigatorDarktheme : navigatorLightTheme}
 			// style={{backgroundColor: currentTheme.surface}}
 		>
-			{showSplashScreen && (
-				<SplashScreenStack />
+			{showSplashScreen && <SplashScreenStack />}
+			{isUserAuthenticated && !isNewUserCreation && !showSplashScreen && (
+				<AppTabNavigator />
 			)}
-			{isUserAuthenticated && !isNewUserCreation && !showSplashScreen && <AppTabNavigator />}
-			{isUserAuthenticated && isNewUserCreation && !showSplashScreen  && (
+			{isUserAuthenticated && isNewUserCreation && !showSplashScreen && (
 				<CreateUserStackScreen />
 			)}
-			{!isUserAuthenticated && !showSplashScreen  &&  <AuthStackScreen />}
-
-			{/* <AppTabNavigator /> */}
+			{!isUserAuthenticated && !showSplashScreen && <AuthStackScreen />}
 		</NavigationContainer>
 	);
 };

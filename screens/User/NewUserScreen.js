@@ -77,7 +77,6 @@ const NewUserScreen = (props) => {
 		}else {
 			setSnackBarText("");
 			setSnackBarVisible(false);
-			console.log("auth error cleared");
 		}
 	}, [auth]);
 

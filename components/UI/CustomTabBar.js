@@ -87,6 +87,7 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
 		]).start();
 	};
 
+
 	return (
 		<View
 			style={
@@ -94,6 +95,11 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
 					? { display: "none" }
 					: styles.tabBarContainer
 			}
+			// style={
+			// 	hideTabBar || isKeyboardVisible
+			// 		? {...styles.tabBarContainer, top: 40 }
+			// 		: styles.tabBarContainer
+			// }
 		>
 			{state.routes.map((route, index) => {
 				const { options } = descriptors[route.key];
@@ -198,6 +204,7 @@ const getStyles = (theme) => {
 		tabBarContainer: {
 			flexDirection: "row",
 			height: 80,
+			backgroundColor: theme.surfaceE2
 		},
 		tabBarItemContainer: {
 			flex: 1,

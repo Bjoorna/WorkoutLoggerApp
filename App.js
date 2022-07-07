@@ -13,10 +13,18 @@ LogBox.ignoreLogs(["AsyncStorage has been"]);
 // redux
 import { Provider, useSelector } from "react-redux";
 
-import { configureStore, getDefaultMiddleware, Reducer } from "@reduxjs/toolkit";
+import {
+	configureStore,
+	getDefaultMiddleware,
+	Reducer,
+} from "@reduxjs/toolkit";
 
 // Navigator
 import AppNavigator from "./navigation/AppNavigator";
+
+
+// sda
+import BaseScreen from "./screens/BaseScreen";
 
 // themeing
 import { Themes } from "./shared/Theme";
@@ -27,18 +35,12 @@ const theme = Themes.dark;
 import AppLoading from "expo-app-loading";
 import * as Font from "expo-font";
 
-// Reducers
-// import authReducer from "./store/reducers/auth";
-// import userReducer from "./store/reducers/user";
-// import workoutReducer from "./store/reducers/workout";
-// import appsettingsReducer from "./store/reducers/appsettings";
-
 // react native paper
 import { Provider as PaperProvider } from "react-native-paper";
 import authReducer from "./redux/slices/authSlice";
 import appSettingsReducer from "./redux/slices/appSettingsSlice";
-import workoutReducer from './redux/slices/workoutSlice'
-import userReducer from './redux/slices/userSlice';
+import workoutReducer from "./redux/slices/workoutSlice";
+import userReducer from "./redux/slices/userSlice";
 // import store from "./redux/store/store";
 
 // const rootReducer = combineReducers({
@@ -53,12 +55,13 @@ const reducer = {
 	auth: authReducer,
 	appSettings: appSettingsReducer,
 	workout: workoutReducer,
-	user: userReducer
-}
+	user: userReducer,
+};
 // const store = store;
 const store = configureStore({
 	reducer: reducer,
-	middleware: (getDefaultMiddleware) => getDefaultMiddleware({serializableCheck: false})
+	middleware: (getDefaultMiddleware) =>
+		getDefaultMiddleware({ serializableCheck: false }),
 });
 const loadFonts = () => {
 	return Font.loadAsync({
@@ -70,18 +73,7 @@ const loadFonts = () => {
 export default function App() {
 	const [fontLoaded, setFontLoaded] = useState(false);
 	// const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
-	const [styles, setStyles] = useState(
-		getStyles(Themes.dark)
-	);
-	
-	// const [currentTheme, setCurrentTheme] = useState(
-	// 	useDarkMode ? Themes.dark : Themes.light
-	// );
-
-	// useEffect(() => {
-	// 	setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
-	// 	// setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
-	// }, [useDarkMode]);
+	const [styles, setStyles] = useState(getStyles(Themes.dark));
 
 	if (!fontLoaded) {
 		return (
@@ -93,23 +85,22 @@ export default function App() {
 		);
 	}
 	return (
-		
 		<PaperProvider>
 			<Provider store={store}>
 				<View style={styles.baseScreen}>
 					<StatusBarWrapper />
-					<AppNavigator />
+					<BaseScreen />
 				</View>
 			</Provider>
 		</PaperProvider>
 	);
 }
 
-const getStyles = theme => {
- return StyleSheet.create({
-	baseScreen: {
-		flex: 1,
-		backgroundColor: theme.surface,
-	},
-});
-}
+const getStyles = (theme) => {
+	return StyleSheet.create({
+		baseScreen: {
+			flex: 1,
+			backgroundColor: theme.surface,
+		},
+	});
+};

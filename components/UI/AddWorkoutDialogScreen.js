@@ -128,9 +128,6 @@ const AddWorkoutDialogScreen = (props) => {
 	const rpeRef = useRef(null);
 
 	useEffect(() => {
-		// console.log(userData.user.useMetric);
-		if (Platform.OS === "android") {
-		}
 	}, []);
 
 	useEffect(() => {
@@ -155,7 +152,6 @@ const AddWorkoutDialogScreen = (props) => {
 	}, [workoutState]);
 
 	useEffect(() => {
-		console.log(selectedDate);
 	}, [selectedDate]);
 
 	// when the user wants to exit the screen

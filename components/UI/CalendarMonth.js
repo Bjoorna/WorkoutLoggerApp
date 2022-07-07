@@ -30,7 +30,6 @@ const CalendarMonth = ({ month }) => {
 
 	useEffect(() => {
 		if (month) {
-			// console.log(month[16]);
 		} else {
 			console.log("no month yet");
 		}
@@ -42,28 +41,14 @@ const CalendarMonth = ({ month }) => {
 	}, [useDarkMode]);
 
 	useEffect(() => {
-
 		setMondayFirst(isMondayFirstDayOfWeek);
 	}, [isMondayFirstDayOfWeek]);
 
 	useEffect(() => {
-		// console.log("Month changed");
 		if (month) {
-			// console.log(month[0].getDate);
 			getMonthName(month[0].getDate);
 			createViewMonth(month);
 		}
-		// if (month) {
-		// 	if (displayMonth == null) {
-		// 		setIsLoading(true);
-		// 		if(month[0].date){
-		// 			getMonthName(month[16].date);
-		// 		}
-		// 		createViewMonth(month);
-		// 	} else if(displayMonth.length > 0) {
-		// 	}
-		// } else {
-		// }
 	}, [month]);
 
 	useEffect(() => {

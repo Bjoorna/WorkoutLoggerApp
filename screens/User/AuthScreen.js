@@ -93,7 +93,6 @@ const AuthScreen = (props) => {
 	}, [useDarkMode]);
 
 	useEffect(() => {
-		// console.log(email);
 		setIsFormValid(email.isValid && password.isValid);
 	}, [email, password]);
 

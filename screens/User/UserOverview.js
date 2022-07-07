@@ -110,9 +110,6 @@ const UserOverviewScreen = (props) => {
 					</HeadlineText>
 				</View>
 			</View>
-			{/* <OutlineButton onButtonPress={() => console.log(user)}>
-				UserDetaail
-			</OutlineButton> */}
 			<OutlineButton
 				style={{ marginTop: 20 }}
 				onButtonPress={onLogoutUser}

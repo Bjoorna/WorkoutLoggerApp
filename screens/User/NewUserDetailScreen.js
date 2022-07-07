@@ -96,15 +96,7 @@ const NewUserDetailScreen = (props) => {
 	const [isLoading, setIsLoading] = useState(false);
 
 	useEffect(() => {
-		console.log(userInfoState);
 		dispatch(setUseDarkMode(userInfoState.useDarkMode));
-		// if (!userInfoState.useMetric) {
-		// 	const test = convertImperialHeightToMetric(userInfoState.height);
-		// 	console.log(test);
-		// }else {
-		// 	const test = convertMetricHeightToImperial(userInfoState.height);
-		// 	console.log(test);
-		// }
 	}, [userInfoState]);
 
 	useEffect(() => {
@@ -132,14 +124,12 @@ const NewUserDetailScreen = (props) => {
 
 	const onFeetEndEditing = (event) => {
 		const newFeet = event.nativeEvent.text;
-		console.log(newFeet);
 		const heightImp = { feet: newFeet, inch: userInfoState.height.inch };
 		userInfoDispatch({ type: SET_HEIGHT, height: heightImp });
 	};
 
 	const onInchesEndEditing = (event) => {
 		const newInch = event.nativeEvent.text;
-		console.log(newInch);
 		const heightImp = { feet: userInfoState.height.feet, inch: newInch };
 		userInfoDispatch({ type: SET_HEIGHT, height: heightImp });
 	};
@@ -192,7 +182,6 @@ const NewUserDetailScreen = (props) => {
 	};
 
 	const onSubmitUserInfo = () => {
-		console.log(userInfoState);
 		try {
 			setIsLoading(true);
 			const userInfo = userInfoState;

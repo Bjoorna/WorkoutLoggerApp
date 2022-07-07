@@ -131,7 +131,6 @@ const WorkoutListItem = ({ workoutID, userID }) => {
 			};
 			dispatch(getExercisesInWorkout(requestPayload));
 		}else {
-			console.log("useffect on workout remove");
 			setDateObject(new Date());
 		}
 

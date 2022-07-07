@@ -58,7 +58,6 @@ const UserSettingsScreen = (props) => {
 	useEffect(() => {
 		const storeError = userStoreRef.error;
 		if (storeError != null) {
-			console.log("errorHandling");
 			console.log(storeError);
 		}
 		if (userStoreRef.user) {

@@ -107,9 +107,6 @@ export const authSlice = createSlice({
 	name: "auth",
 	initialState,
 	reducers: {
-		setAutoLoginState(state, action){
-			state.hasTriedAutoLogin = action.payload;
-		},
 		clearErrorState(state) {
 			state.error = null;
 		},
@@ -177,6 +174,6 @@ export const authSlice = createSlice({
 	},
 });
 
-export const { clearErrorState, setAutoLoginState } = authSlice.actions;
+export const { clearErrorState } = authSlice.actions;
 
 export default authSlice.reducer;
