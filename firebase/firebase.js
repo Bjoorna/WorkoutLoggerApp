@@ -229,16 +229,17 @@ export const firebaseWriteExercisesToDatabase = async (
 		for (let exercise of exercises) {
 			const newExerciseRef = doc(collection(database, "exercises"));
 			const exerciseID = newExerciseRef.id;
-			const exerciseTransform = {
-				exercise: exercise.exercise,
-				weight: exercise.weight,
-				reps: exercise.reps,
-				sets: exercise.sets,
-				rpe: exercise.rpe,
-				date: timestamp,
-				owner: userID,
-				workoutID: workoutID,
-			};
+			// const exerciseTransform = {
+			// 	exercise: exercise.exercise,
+			// 	weight: exercise.weight,
+			// 	reps: exercise.reps,
+			// 	sets: exercise.sets,
+			// 	rpe: exercise.rpe,
+			// 	date: timestamp,
+			// 	owner: userID,
+			// 	workoutID: workoutID,
+			// };
+			const exerciseTransform = {...exercise, date: timestamp, owner: userID, workoutID: workoutID }
 			arrayOfExerciseIDs.push(exerciseID);
 			batch.set(newExerciseRef, exerciseTransform);
 		}

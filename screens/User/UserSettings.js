@@ -17,7 +17,7 @@ import TopAppBar from "../../components/UI/TopAppBarComponent";
 import IconButton from "../../components/Buttons/IconButton";
 import { getUserData, updateUserField } from "../../redux/slices/userSlice";
 
-import { Snackbar } from "react-native-paper";
+import { Snackbar, Menu } from "react-native-paper";
 const UserSettingsScreen = (props) => {
 	const userStoreRef = useSelector((state) => state.user);
 	const userID = useSelector((state) => state.auth.userID);
@@ -42,6 +42,8 @@ const UserSettingsScreen = (props) => {
 
 	const [snackBarVisible, setSnackBarVisible] = useState(false);
 	const [snackBarText, setSnackBarText] = useState("");
+
+	const [showMenu, setShowMenu] = useState(false);
 
 	useEffect(() => {
 		return () => {
@@ -108,6 +110,14 @@ const UserSettingsScreen = (props) => {
 	const onSnackBarDismissed = () => {
 		setSnackBarText("");
 		setSnackBarVisible(false);
+	};
+
+	const onShowMenu = () => {
+		setShowMenu(true);
+	};
+
+	const onHideMenu = () => {
+		setShowMenu(false);
 	};
 
 	return (
@@ -263,6 +273,31 @@ const UserSettingsScreen = (props) => {
 
 						<FilledButton onButtonPress={testGetUser}>
 							Get
+						</FilledButton>
+					</View>
+					{/* <Menu
+						visible={showMenu}
+						onDismiss={onHideMenu}
+						anchor={{ x: 150, y: 150 }}
+					>
+						<Menu.Item
+							onPress={onHideMenu}
+							title="Delete"
+						></Menu.Item>
+					</Menu> */}
+
+					<View style={styles.userSettingsItem}>
+						<View style={styles.userSettingsText}>
+							<BodyText
+								large={true}
+								style={{ color: currentTheme.onSurface }}
+							>
+								Menu
+							</BodyText>
+						</View>
+
+						<FilledButton onButtonPress={setShowMenu}>
+							Menu
 						</FilledButton>
 					</View>
 				</View>

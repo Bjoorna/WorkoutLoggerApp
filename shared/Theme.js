@@ -85,7 +85,6 @@
 // 	// variants
 // 	outline: "#857370",
 
-
 export const Themes = {
 	dark: {
 		primary: "#96ccff",
@@ -129,6 +128,9 @@ export const Themes = {
 
 		// variants
 		outline: "#8c9198",
+
+		// scrim
+		scrim: "rgba(26,28,30, 0.80)",
 	},
 	light: {
 		primary: "#00639d",
@@ -173,5 +175,7 @@ export const Themes = {
 		// variants
 		outline: "#72777f",
 
-	}
+		// scrim
+		scrim: "rgba(253,252,255, 0.80)",
+	},
 };

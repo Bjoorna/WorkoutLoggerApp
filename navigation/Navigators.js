@@ -151,12 +151,9 @@ export const WorkoutStackScreen = () => {
 					component={AddWorkoutDialogScreen}
 					options={{
 						...getDefaultStyleOptions(currentTheme),
-						headerTitle: "Add Workout",
+						headerShown: false,
+						presentation: "modal"
 					}}
-				/>
-				<WorkoutStackNavigator.Screen
-					name="TestAddWorkout"
-					component={AddWorkoutDialogScreen}
 				/>
 			</WorkoutStackNavigator.Group>
 			<WorkoutStackNavigator.Group

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Pressable, StyleSheet, Text, View, Vibration } from "react-native";
 import { useSelector } from "react-redux";
-
+import { hexToRGB } from "../../shared/utils/UtilFunctions";
 import { Themes } from "../../shared/Theme";
 import LabelText from "../Text/Label";
 
@@ -15,9 +15,12 @@ const OutlineButton = (props) => {
 		useDarkMode ? Themes.dark : Themes.light
 	);
 
+	const [rippleColor, setRippleColor] = useState(hexToRGB(currentTheme.error))
+
 	useEffect(() => {
 		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
 		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
+		setRippleColor(currentTheme.primary);
 	}, [useDarkMode]);
 
 	const [isPressed, setIsPressed] = useState(false);
@@ -44,16 +47,25 @@ const OutlineButton = (props) => {
 		);
 	} else {
 		return (
-			<Pressable
-				style={{ ...styles.baseButtonStyle, ...props.style }}
-				onPressIn={handleOnPressIn}
-				onPressOut={() => setIsPressed(false)}
-				onPress={props.onButtonPress}
-			>
-				<LabelText style={styles.text} large={true}>
-					{props.children}
-				</LabelText>
-			</Pressable>
+			<View style={{ borderRadius: 20, overflow: "hidden" }}>
+				<Pressable
+					android_ripple={{
+						borderless: false,
+						radius: 200,
+						color: currentTheme.primary,
+						// color: `rgba(${rippleColor[0]}, ${rippleColor[1]}, ${rippleColor[2]}, 1 )`,
+						foreground: false,
+					}}
+					style={{ ...styles.baseButtonStyle, ...props.style }}
+					onPressIn={handleOnPressIn}
+					onPressOut={() => setIsPressed(false)}
+					onPress={props.onButtonPress}
+				>
+					<LabelText style={styles.text} large={true}>
+						{props.children}
+					</LabelText>
+				</Pressable>
+			</View>
 		);
 	}
 };
@@ -78,12 +90,14 @@ const getStyles = (theme) => {
 		baseButtonStyle: {
 			minWidth: 48,
 			height: 40,
+
+			// overflow: "hidden",
+
 			borderRadius: 20,
-			overflow: "hidden",
 			paddingHorizontal: 24,
 			alignItems: "center",
 			justifyContent: "center",
-			borderWidth: 1,
+			borderWidth: .5,
 			borderStyle: "solid",
 			borderColor: theme.outline,
 		},

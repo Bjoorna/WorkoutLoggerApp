@@ -20,31 +20,33 @@ import TitleText from "../Text/Title";
 import HeadlineText from "../Text/Headline";
 import LabelText from "../Text/Label";
 import FilledTonalButton from "../Buttons/FilledTonalButton";
+import OutlineButton from "../Buttons/OutlineButton";
 import {
 	TextField,
 	FilledTextField,
 	OutlinedTextField,
 } from "rn-material-ui-textfield";
 import Workout from "../../models/workout";
-import UtilFunctions from "../../shared/utils/UtilFunctions";
 import { ExerciseTypes } from "../../shared/utils/ExerciseTypes";
 import { Divider } from "react-native-paper";
 import Exercise from "../../models/Exercise";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import * as firebase from "../../firebase/firebase";
 
-import { hexToRGB } from "../../shared/utils/UtilFunctions";
 import { saveWorkout } from "../../redux/slices/workoutSlice";
 import TopAppBar from "./TopAppBarComponent";
+import { Menu } from "react-native-paper";
+import { setHideTabBar } from "../../redux/slices/appSettingsSlice";
 
 const windowWidth = Dimensions.get("screen").width;
 const textFieldWidth = Math.floor((windowWidth - 24 * 2 - 8) / 2);
 
 const ADD_EXERCISE = "ADD_EXERCISE";
+const ADD_SET_TO_EXERCISE = "ADD_SET_TO_EXERCISE";
 const REMOVE_EXERCISE = "REMOVE_EXERCISE";
+
 const workoutReducer = (state, action) => {
 	switch (action.type) {
-		case ADD_EXERCISE:
+		case ADD_EXERCISE: {
 			// const newEArray = [...state.workout.exercises];
 			// newEArray.pus
 			console.log(action.exercise);
@@ -53,7 +55,8 @@ const workoutReducer = (state, action) => {
 			eArrayCopy.push(action.exercise);
 			newWorkoutState.exercises = eArrayCopy;
 			return { ...state, workout: newWorkoutState };
-		case REMOVE_EXERCISE:
+		}
+		case REMOVE_EXERCISE: {
 			const exerciseToRemove = action.exercise;
 			let exerciseArray = [...state.workout.exercises];
 			exerciseArray = exerciseArray.filter(
@@ -63,6 +66,30 @@ const workoutReducer = (state, action) => {
 			workoutWithRemovedExercise.exercises = exerciseArray;
 
 			return { ...state, workout: workoutWithRemovedExercise };
+		}
+
+		case ADD_SET_TO_EXERCISE: {
+			const newWorkoutState = { ...state.workout };
+			const newExerciseName = action.exerciseName;
+			const setToAdd = action.set;
+
+			const existingExercise = newWorkoutState.exercises.find(
+				(ex) => ex.exerciseName == newExerciseName
+			);
+
+			// avoid undefined
+			if (existingExercise) {
+				const sets = { ...existingExercise.sets };
+				const keys = Object.keys(sets);
+				const nextSetNumber = keys.length + 1;
+				sets[nextSetNumber] = setToAdd;
+				console.log("Sets after adding: ", sets);
+
+				existingExercise.sets = sets;
+				return { ...state, workout: newWorkoutState };
+			}
+		}
+
 		default:
 			return state;
 	}
@@ -79,7 +106,7 @@ const exerciseReducer = (state, action) => {
 };
 
 const baseExerciseState = {
-	exercise: { value: null, error: false },
+	exerciseName: { value: null, error: false },
 	weight: { value: null, error: false },
 	reps: { value: null, error: false },
 	sets: { value: null, error: false },
@@ -118,9 +145,6 @@ const AddWorkoutDialogScreen = (props) => {
 
 	const [showExerciseModal, setShowExerciseModal] = useState(false);
 	const [showCloseDialogModal, setShowCloseDialogModal] = useState(false);
-	const [modalBackdropHex, setModalBackdropHex] = useState(
-		hexToRGB(currentTheme.surface)
-	);
 
 	const repRef = useRef(null);
 	const weightRef = useRef(null);
@@ -128,6 +152,9 @@ const AddWorkoutDialogScreen = (props) => {
 	const rpeRef = useRef(null);
 
 	useEffect(() => {
+		return () => {
+			dispatch(setHideTabBar(false));
+		};
 	}, []);
 
 	useEffect(() => {
@@ -149,15 +176,15 @@ const AddWorkoutDialogScreen = (props) => {
 
 	useEffect(() => {
 		setExerciseListDisplay(workoutState.workout.exercises);
+		// console.log(workoutState);
 	}, [workoutState]);
 
-	useEffect(() => {
-	}, [selectedDate]);
+	useEffect(() => {}, [selectedDate]);
 
 	// when the user wants to exit the screen
 	const handleBackBehavior = () => {
 		// setShowCloseDialogModal(true);
-		props.toggleModal();
+		// props.toggleModal();
 	};
 
 	const onValueEntered = (ref, type) => {
@@ -165,7 +192,7 @@ const AddWorkoutDialogScreen = (props) => {
 
 		// replace comma with dot
 		const sanitizedValue = Number(value.replace(/,/g, "."));
-		console.log(sanitizedValue);
+		// console.log(sanitizedValue);
 
 		// check if value is valid
 		const isValid = inputValueValidityCheck(type, sanitizedValue);
@@ -187,7 +214,7 @@ const AddWorkoutDialogScreen = (props) => {
 	const onExerciseSelected = (value, error) => {
 		dispatchExercise({
 			type: ADD_VALUE,
-			field: "exercise",
+			field: "exerciseName",
 			newValue: { value: value, error: error },
 		});
 		setShowExerciseModal(false);
@@ -195,15 +222,58 @@ const AddWorkoutDialogScreen = (props) => {
 
 	const saveExercise = () => {
 		const exerciseValues = exerciseState.exercise;
-		const newExercise = new Exercise(
-			exerciseValues.exercise.value,
-			exerciseValues.weight.value,
-			exerciseValues.reps.value,
-			exerciseValues.sets.value,
-			exerciseValues.rpe.value
-		);
+		const newExerciseName = exerciseValues.exerciseName.value;
 
-		dispatchWorkout({ type: ADD_EXERCISE, exercise: newExercise });
+		if (checkIfWorkoutContainsSameExercise(newExerciseName)) {
+			const newSet = {
+				weight: exerciseValues.weight.value,
+				reps: exerciseValues.reps.value,
+				rpe: exerciseValues.rpe.value,
+			};
+			dispatchWorkout({
+				type: ADD_SET_TO_EXERCISE,
+				set: newSet,
+				exerciseName: newExerciseName,
+			});
+		} else {
+			const sets = exerciseValues.sets.value;
+			console.log(sets);
+			let onSet = 1;
+			const newSetObject = {};
+
+			if (sets > 1) {
+				while (onSet <= sets) {
+					newSetObject[onSet] = {
+						weight: exerciseValues.weight.value,
+						reps: exerciseValues.reps.value,
+						rpe: exerciseValues.rpe.value,
+					};
+					onSet++;
+				}
+			} else {
+				newSetObject[1] = {
+					weight: exerciseValues.weight.value,
+					reps: exerciseValues.reps.value,
+					rpe: exerciseValues.rpe.value,
+				};
+			}
+
+			const newExercise = {
+				exerciseName: exerciseValues.exerciseName.value,
+				sets: newSetObject,
+			};
+			dispatchWorkout({ type: ADD_EXERCISE, exercise: newExercise });
+		}
+	};
+
+	const checkIfWorkoutContainsSameExercise = (exerciseName) => {
+		const currentExercisesInWorkout = workoutState.workout.exercises;
+		for (let exercise of currentExercisesInWorkout) {
+			if (exercise.exerciseName == exerciseName) {
+				return true;
+			}
+		}
+		return false;
 	};
 
 	const removeExercise = (exerciseToRemove) => {
@@ -255,20 +325,26 @@ const AddWorkoutDialogScreen = (props) => {
 		setShowExerciseModal(value);
 	};
 
+	const onPrintExercise = () => {
+		console.log(workoutState.workout.exercises);
+	};
+
+	const onNavigateBack = () => {
+		props.navigation.goBack();
+	};
+
 	return (
 		<Pressable onPress={handlePress} style={styles.container}>
 			<Modal
 				visible={showCloseDialogModal}
 				transparent={true}
-				onRequestClose={() => setShowCloseDialogModal(false)}
+				onRequestClose={onNavigateBack}
 			>
 				<Pressable
-					onPress={() => {
-						setShowCloseDialogModal(false);
-					}}
+					onPress={() => setShowCloseDialogModal(false)}
 					style={{
 						...styles.closeDialogModalView,
-						backgroundColor: `rgba(${modalBackdropHex[0]}, ${modalBackdropHex[1]}, ${modalBackdropHex[2]}, 0.8)`,
+						backgroundColor: currentTheme.scrim,
 					}}
 				>
 					<Pressable style={styles.closeDialogModalContent}>
@@ -293,7 +369,7 @@ const AddWorkoutDialogScreen = (props) => {
 							<TextButton
 								textStyle={{ color: currentTheme.primary }}
 								disabled={false}
-								onButtonPress={handleBackBehavior}
+								onButtonPress={onNavigateBack}
 							>
 								Discard
 							</TextButton>
@@ -313,7 +389,7 @@ const AddWorkoutDialogScreen = (props) => {
 					}}
 					style={{
 						...styles.modalView,
-						backgroundColor: `rgba(${modalBackdropHex[0]}, ${modalBackdropHex[1]}, ${modalBackdropHex[2]}, 0.8)`,
+						backgroundColor: currentTheme.scrim,
 					}}
 				>
 					<Pressable style={styles.modalContent}>
@@ -409,45 +485,22 @@ const AddWorkoutDialogScreen = (props) => {
 					/>
 				}
 				trailingIcons={[
+					<TextButton onButtonPress={onPrintExercise}>
+						Exer
+					</TextButton>,
 					<TextButton
-					onButtonPress={onSaveWorkout}
-						disabled={
-							workoutState.workout.exercises.length === 0
-								? true
-								: false
-						}
-					>Save</TextButton>,
-				]}
-				optionalStyle={{paddingTop: 0, height: 64}}
-			/>
-			{/* <View style={styles.headerContainer}>
-				<View style={styles.headerBackButton}>
-					<IconButton
-						name="close"
-						onPress={() => setShowCloseDialogModal(true)}
-					/>
-				</View>
-				<View style={styles.headerTitle}>
-					<TitleText
-						large={true}
-						style={{ color: currentTheme.onSurface }}
-					>
-						New Workout
-					</TitleText>
-				</View>
-				<View style={styles.headerSaveButton}>
-					<TextButton
-						disabled={
-							workoutState.workout.exercises.length === 0
-								? true
-								: false
-						}
 						onButtonPress={onSaveWorkout}
+						disabled={
+							workoutState.workout.exercises.length === 0
+								? true
+								: false
+						}
 					>
 						Save
-					</TextButton>
-				</View>
-			</View> */}
+					</TextButton>,
+				]}
+				// optionalStyle={{ paddingTop: 0, height: 64 }}
+			/>
 			{isLoading && (
 				<View style={styles.loadingSpinner}>
 					<ActivityIndicator
@@ -468,12 +521,13 @@ const AddWorkoutDialogScreen = (props) => {
 								large={true}
 								style={{ color: currentTheme.onSurface }}
 							>
-								{exerciseState.exercise["exercise"].value ==
+								{exerciseState.exercise["exerciseName"].value ==
 								null
 									? "Select exercise"
-									: exerciseState.exercise["exercise"].value}
+									: exerciseState.exercise["exerciseName"]
+											.value}
 							</BodyText>
-							{exerciseState.exercise["exercise"].value !=
+							{exerciseState.exercise["exerciseName"].value !=
 								null && (
 								<IconButton
 									style={{ marginLeft: "auto" }}
@@ -483,7 +537,7 @@ const AddWorkoutDialogScreen = (props) => {
 									}
 								/>
 							)}
-							{exerciseState.exercise["exercise"].value ==
+							{exerciseState.exercise["exerciseName"].value ==
 								null && (
 								<IconButton
 									style={{ marginLeft: "auto" }}
@@ -648,8 +702,13 @@ const AddWorkoutDialogScreen = (props) => {
 									/>
 								</View>
 							</View>
-							<View style={styles.exerciseValuesInputRow}>
-								<View style={{ width: "100%" }}>
+							<View
+								style={{
+									...styles.exerciseValuesInputRow,
+									justifyContent: "space-around",
+								}}
+							>
+								<View style={{ width: "60%" }}>
 									<FilledTonalButton
 										disabled={isFormValid ? false : true}
 										onButtonPress={saveExercise}
@@ -657,6 +716,7 @@ const AddWorkoutDialogScreen = (props) => {
 										Add exercise
 									</FilledTonalButton>
 								</View>
+								<OutlineButton>Add Note</OutlineButton>
 							</View>
 						</View>
 					</View>
@@ -676,6 +736,20 @@ const AddWorkoutDialogScreen = (props) => {
 								keyExtractor={(item, index) => index}
 								renderItem={(itemData) => {
 									return (
+										<ExerciseView
+											exerciseData={itemData.item}
+											isDarkMode={useDarkMode}
+											currentTheme={currentTheme}
+										/>
+									);
+								}}
+							/>
+							{/* <FlatList
+								data={exerciseListDisplay}
+								extraData={exerciseListDisplay}
+								keyExtractor={(item, index) => index}
+								renderItem={(itemData) => {
+									return (
 										<View style={styles.summaryListItem}>
 											<TitleText
 												large={true}
@@ -683,7 +757,7 @@ const AddWorkoutDialogScreen = (props) => {
 													color: currentTheme.onSurface,
 												}}
 											>
-												{itemData.item.exercise}
+												{itemData.item.exerciseName}
 											</TitleText>
 											<LabelText
 												large={true}
@@ -691,10 +765,7 @@ const AddWorkoutDialogScreen = (props) => {
 													color: currentTheme.onSurface,
 												}}
 											>
-												{itemData.item.weight}kg{" "}
-												{itemData.item.reps}reps{" "}
-												{itemData.item.sets}sets @
-												{itemData.item.rpe}
+												
 											</LabelText>
 											<TextButton
 												textStyle={{
@@ -711,13 +782,104 @@ const AddWorkoutDialogScreen = (props) => {
 										</View>
 									);
 								}}
-							/>
+							/> */}
 						</View>
 					</View>
 				</View>
 			)}
 		</Pressable>
 	);
+};
+
+const ExerciseView = ({ exerciseData, isDarkMode, currentTheme }) => {
+	const [styles, setStyles] = useState(
+		getExerciseViewStyle(isDarkMode ? Themes.dark : Themes.light)
+	);
+
+	const [showMenu, setShowMenu] = useState(false);
+
+	const menuAnchor = { x: 150, y: 150 };
+
+	useEffect(() => {}, []);
+
+	useEffect(() => {
+		console.log("ExerciseData: ", exerciseData);
+	}, [exerciseData]);
+
+	const onCloseMenu = () => {
+		setShowMenu(false);
+	};
+	const onShowMenu = () => {
+		console.log("Show");
+		setShowMenu(true);
+	};
+
+	return (
+		<View style={styles.exerciseDisplay}>
+			{/* <View style={Platform.OS=="android" ? { elevation: 5 } : {zIndex: 100}}>
+				<Provider>
+					<Menu
+						visible={showMenu}
+						onDismiss={onCloseMenu}
+						anchor={menuAnchor}
+					>
+						<Menu.Item
+							onPress={() => console.log("MenuPress1")}
+							title="Delete"
+						/>
+					</Menu>
+				</Provider>
+			</View> */}
+
+			<View style={styles.exerciseHeader}>
+				<TitleText
+					style={{ color: currentTheme.onSurface }}
+					large={true}
+				>
+					{exerciseData.exerciseName}
+				</TitleText>
+				<Menu
+					visible={showMenu}
+					onDismiss={onCloseMenu}
+					anchor={
+						<IconButton
+							onPress={onShowMenu}
+							name="ellipsis-horizontal"
+						/>
+					}
+					// style={{backgroundColor: currentTheme.surfaceE2}}
+					contentStyle={{ backgroundColor: currentTheme.surfaceE2 }}
+				>
+					<Menu.Item
+						icon={"delete"}
+						onPress={() => console.log("MenuPress1")}
+						title="Delete"
+						titleStyle={{ color: currentTheme.onSurface }}
+					/>
+				</Menu>
+			</View>
+		</View>
+	);
+};
+
+const getExerciseViewStyle = (theme) => {
+	return StyleSheet.create({
+		exerciseDisplay: {
+			width: "100%",
+			height: 100,
+			paddingHorizontal: 6,
+			paddingVertical: 3,
+
+			// backgroundColor: theme.error,
+			borderRadius: 12,
+			borderWidth: 1,
+			borderColor: theme.outline,
+		},
+		exerciseHeader: {
+			flexDirection: "row",
+			justifyContent: "space-between",
+		},
+	});
 };
 
 const getStyles = (theme) => {
@@ -757,6 +919,7 @@ const getStyles = (theme) => {
 			alignItems: "center",
 			marginTop: 8,
 		},
+
 		selectExercise: {
 			flexDirection: "row",
 			width: "100%",
@@ -768,6 +931,7 @@ const getStyles = (theme) => {
 			paddingHorizontal: 16,
 			alignItems: "center",
 		},
+
 		exerciseValuesContainer: {
 			width: "100%",
 			marginTop: 20,
@@ -826,7 +990,7 @@ const getStyles = (theme) => {
 			flex: 1,
 			justifyContent: "center",
 			alignItems: "center",
-			backgroundColor: theme.surface,
+			// backgroundColor: theme.error,
 		},
 		modalContent: {
 			minHeight: 200,
@@ -856,7 +1020,7 @@ const getStyles = (theme) => {
 			flex: 1,
 			justifyContent: "center",
 			alignItems: "center",
-			backgroundColor: theme.surface,
+			// backgroundColor: theme.surface,
 		},
 		closeDialogModalContent: {
 			// height: 200,

@@ -141,9 +141,9 @@ const WorkoutListScreen = (props) => {
 	};
 
 	const navigateToAddNewWorkout = () => {
-		setShowModal(true);
-		// dispatch({ type: SET_TAB_BAR_VALUE, value: true });
-		// props.navigation.navigate("AddWorkout");
+		// setShowModal(true);
+		dispatch(setHideTabBar(true));
+		props.navigation.navigate("AddWorkout");
 	};
 
 	const onNavigateToCalculator = ()=> {
@@ -154,7 +154,7 @@ const WorkoutListScreen = (props) => {
 
 	return (
 		<View style={styles.container}>
-			<Modal
+			{/* <Modal
 				visible={showModal}
 				animationType="slide"
 				transparent={true}
@@ -163,7 +163,7 @@ const WorkoutListScreen = (props) => {
 				<AddWorkoutDialogScreen
 					toggleModal={() => setShowModal(false)}
 				/>
-			</Modal>
+			</Modal> */}
 			{!showFilter && (
 				<FabButton
 					onButtonPress={navigateToAddNewWorkout}
