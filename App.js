@@ -22,7 +22,6 @@ import {
 // Navigator
 import AppNavigator from "./navigation/AppNavigator";
 
-
 // sda
 import BaseScreen from "./screens/BaseScreen";
 
@@ -36,7 +35,11 @@ import AppLoading from "expo-app-loading";
 import * as Font from "expo-font";
 
 // react native paper
-import { Provider as PaperProvider } from "react-native-paper";
+import {  DefaultTheme, Provider as PaperProvider } from "react-native-paper";
+
+
+
+
 import authReducer from "./redux/slices/authSlice";
 import appSettingsReducer from "./redux/slices/appSettingsSlice";
 import workoutReducer from "./redux/slices/workoutSlice";
@@ -70,6 +73,11 @@ const loadFonts = () => {
 	});
 };
 
+const paperTheme = {
+	...DefaultTheme,
+	version: 3,
+};
+
 export default function App() {
 	const [fontLoaded, setFontLoaded] = useState(false);
 	// const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
@@ -85,14 +93,14 @@ export default function App() {
 		);
 	}
 	return (
-		<PaperProvider>
-			<Provider store={store}>
+		<Provider store={store}>
+			<PaperProvider theme={paperTheme}>
 				<View style={styles.baseScreen}>
 					<StatusBarWrapper />
 					<BaseScreen />
 				</View>
-			</Provider>
-		</PaperProvider>
+			</PaperProvider>
+		</Provider>
 	);
 }
 

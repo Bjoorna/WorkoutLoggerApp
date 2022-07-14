@@ -300,7 +300,7 @@ export const firebaseGetUserWorkouts = async (userID) => {
 			collection(database, "workouts"),
 			where("owner", "==", userID),
 			orderBy("date", "desc"),
-			limit(3)
+			// limit(3)
 		);
 		const querySnapshot = await getDocs(q);
 		return querySnapshot;

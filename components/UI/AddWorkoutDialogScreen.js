@@ -10,6 +10,7 @@ import {
 	SectionList,
 	FlatList,
 	Platform,
+	ScrollView,
 } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { Themes } from "../../shared/Theme";
@@ -28,14 +29,14 @@ import {
 } from "rn-material-ui-textfield";
 import Workout from "../../models/workout";
 import { ExerciseTypes } from "../../shared/utils/ExerciseTypes";
-import { Divider } from "react-native-paper";
 import Exercise from "../../models/Exercise";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
 import { saveWorkout } from "../../redux/slices/workoutSlice";
 import TopAppBar from "./TopAppBarComponent";
-import { Menu } from "react-native-paper";
+import { Menu, Divider } from "react-native-paper";
 import { setHideTabBar } from "../../redux/slices/appSettingsSlice";
+import { nanoid } from "@reduxjs/toolkit";
 
 const windowWidth = Dimensions.get("screen").width;
 const textFieldWidth = Math.floor((windowWidth - 24 * 2 - 8) / 2);
@@ -43,6 +44,7 @@ const textFieldWidth = Math.floor((windowWidth - 24 * 2 - 8) / 2);
 const ADD_EXERCISE = "ADD_EXERCISE";
 const ADD_SET_TO_EXERCISE = "ADD_SET_TO_EXERCISE";
 const REMOVE_EXERCISE = "REMOVE_EXERCISE";
+const RERENDER = "RERENDER";
 
 const workoutReducer = (state, action) => {
 	switch (action.type) {
@@ -89,6 +91,10 @@ const workoutReducer = (state, action) => {
 				return { ...state, workout: newWorkoutState };
 			}
 		}
+		case RERENDER: {
+			const newState = { ...state.workout };
+			return { ...state, workout: newState };
+		}
 
 		default:
 			return state;
@@ -111,6 +117,48 @@ const baseExerciseState = {
 	reps: { value: null, error: false },
 	sets: { value: null, error: false },
 	rpe: { value: null, error: false },
+};
+
+const ex1 = {
+	exerciseName: "Sumo-DL",
+	listID: nanoid(),
+
+	sets: {
+		1: { weight: 100, reps: 5, rpe: 7 },
+		2: { weight: 110, reps: 5, rpe: 8 },
+		3: { weight: 110, reps: 5, rpe: 8 },
+		4: { weight: 110, reps: 5, rpe: 8 },
+		5: { weight: 110, reps: 5, rpe: 8 },
+	},
+};
+
+const ex2 = {
+	exerciseName: "Squat",
+	listID: nanoid(),
+
+	sets: {
+		1: { weight: 100, reps: 5, rpe: 7 },
+		2: { weight: 110, reps: 5, rpe: 8 },
+	},
+};
+
+const ex3 = {
+	exerciseName: "RDL",
+	listID: nanoid(),
+
+	sets: {
+		1: { weight: 100, reps: 5, rpe: 7 },
+		2: { weight: 110, reps: 5, rpe: 8 },
+	},
+};
+
+const ex4 = {
+	exerciseName: "Deadlift",
+	listID: nanoid(),
+	sets: {
+		1: { weight: 100, reps: 5, rpe: 7 },
+		2: { weight: 110, reps: 5, rpe: 8 },
+	},
 };
 
 const AddWorkoutDialogScreen = (props) => {
@@ -139,7 +187,7 @@ const AddWorkoutDialogScreen = (props) => {
 	const [datePickerModalVisible, setDatePickerModalVisible] = useState(false);
 	const [selectedDate, setSelectedDate] = useState(new Date());
 
-	const [exerciseListDisplay, setExerciseListDisplay] = useState([]);
+	const [exerciseListDisplay, setExerciseListDisplay] = useState(null);
 
 	const [isFormValid, setIsFormValid] = useState(false);
 
@@ -175,7 +223,11 @@ const AddWorkoutDialogScreen = (props) => {
 	}, [exerciseState]);
 
 	useEffect(() => {
-		setExerciseListDisplay(workoutState.workout.exercises);
+		const listDisplay = workoutState.workout.exercises.map((exercise) => {
+			return <ExerciseView key={nanoid()} exerciseData={exercise} currentTheme={currentTheme} isDarkMode={useDarkMode} removeExercise={removeExercise} />
+		})
+		setExerciseListDisplay(listDisplay);
+		// setExerciseListDisplay(workoutState.workout.exercises);
 		// console.log(workoutState);
 	}, [workoutState]);
 
@@ -225,7 +277,12 @@ const AddWorkoutDialogScreen = (props) => {
 		const newExerciseName = exerciseValues.exerciseName.value;
 
 		if (checkIfWorkoutContainsSameExercise(newExerciseName)) {
-			const newSet = {
+			const sets = exerciseValues.sets.value;
+			const onExercise = workoutState.workout.exercises.find(exercise => exercise.exerciseName == exerciseValues.exerciseName.value);
+			if(onExercise){
+				console.log("FOUND EXERCISE: ", onExercise);
+			}
+			const newSet = {	
 				weight: exerciseValues.weight.value,
 				reps: exerciseValues.reps.value,
 				rpe: exerciseValues.rpe.value,
@@ -325,8 +382,11 @@ const AddWorkoutDialogScreen = (props) => {
 		setShowExerciseModal(value);
 	};
 
-	const onPrintExercise = () => {
-		console.log(workoutState.workout.exercises);
+	const onAddTempData = () => {
+		dispatchWorkout({ type: ADD_EXERCISE, exercise: ex1 });
+		dispatchWorkout({ type: ADD_EXERCISE, exercise: ex2 });
+		dispatchWorkout({ type: ADD_EXERCISE, exercise: ex3 });
+		dispatchWorkout({ type: ADD_EXERCISE, exercise: ex4 });
 	};
 
 	const onNavigateBack = () => {
@@ -485,9 +545,7 @@ const AddWorkoutDialogScreen = (props) => {
 					/>
 				}
 				trailingIcons={[
-					<TextButton onButtonPress={onPrintExercise}>
-						Exer
-					</TextButton>,
+					<TextButton onButtonPress={onAddTempData}>Temp</TextButton>,
 					<TextButton
 						onButtonPress={onSaveWorkout}
 						disabled={
@@ -721,69 +779,46 @@ const AddWorkoutDialogScreen = (props) => {
 						</View>
 					</View>
 					<View style={styles.summaryContainer}>
-						<View style={styles.summaryHeader}>
+						<ScrollView contentContainerStyle={{paddingBottom: 10}}>
+							{exerciseListDisplay}
+						</ScrollView>
+						{/* {exerciseListDisplay.map(exercise => {
+							console.log(exercise);
+							return(<View style={{height: 200, width: "100%", backgroundColor: currentTheme.onSurface, marginBottom: 20}}></View>)
+						})} */}
+						{/* <View
+							style={{
+								...styles.summaryHeader,
+								flexDirection: "row",
+								justifyContent: "flex-start",
+							}}
+						>
 							<HeadlineText
 								large={true}
 								style={{ color: currentTheme.onSurface }}
 							>
 								Summary
 							</HeadlineText>
-						</View>
-						<View style={styles.summaryList}>
-							<FlatList
-								data={exerciseListDisplay}
-								extraData={exerciseListDisplay}
-								keyExtractor={(item, index) => index}
-								renderItem={(itemData) => {
-									return (
-										<ExerciseView
-											exerciseData={itemData.item}
-											isDarkMode={useDarkMode}
-											currentTheme={currentTheme}
-										/>
-									);
-								}}
-							/>
-							{/* <FlatList
-								data={exerciseListDisplay}
-								extraData={exerciseListDisplay}
-								keyExtractor={(item, index) => index}
-								renderItem={(itemData) => {
-									return (
-										<View style={styles.summaryListItem}>
-											<TitleText
-												large={true}
-												style={{
-													color: currentTheme.onSurface,
-												}}
-											>
-												{itemData.item.exerciseName}
-											</TitleText>
-											<LabelText
-												large={true}
-												style={{
-													color: currentTheme.onSurface,
-												}}
-											>
-												
-											</LabelText>
-											<TextButton
-												textStyle={{
-													color: currentTheme.error,
-												}}
-												onButtonPress={() =>
-													removeExercise(
-														itemData.item
-													)
-												}
-											>
-												Delete
-											</TextButton>
-										</View>
-									);
-								}}
-							/> */}
-						</View>
+						</View> */}
+						{/* <View style={styles.summaryList}> */}
+						{/* <FlatList
+							style={{ paddingBottom: 20 }}
+							horizontal={true}
+							data={exerciseListDisplay}
+							// extraData={exerciseListDisplay}
+							keyExtractor={(item) => item.listID}
+							renderItem={(itemData) => {
+								return (
+									<ExerciseView
+										exerciseData={itemData.item}
+										isDarkMode={useDarkMode}
+										currentTheme={currentTheme}
+										removeExercise={removeExercise}
+									/>
+								);
+							}}
+						/> */}
+						{/* </View> */}
 					</View>
 				</View>
 			)}
@@ -791,46 +826,65 @@ const AddWorkoutDialogScreen = (props) => {
 	);
 };
 
-const ExerciseView = ({ exerciseData, isDarkMode, currentTheme }) => {
+const ExerciseView = ({
+	exerciseData,
+	isDarkMode,
+	currentTheme,
+	removeExercise,
+}) => {
 	const [styles, setStyles] = useState(
 		getExerciseViewStyle(isDarkMode ? Themes.dark : Themes.light)
 	);
 
+	const [setView, setSetView] = useState([]);
+
 	const [showMenu, setShowMenu] = useState(false);
 
-	const menuAnchor = { x: 150, y: 150 };
-
-	useEffect(() => {}, []);
+	useEffect(() => {
+		return () => {
+			// onCloseMenu();
+		};
+	}, []);
 
 	useEffect(() => {
-		console.log("ExerciseData: ", exerciseData);
+		if (exerciseData) {
+			console.log("ExerciseData changed: ", exerciseData.exerciseName);
+			const newSetView = [];
+			// const sets = exerciseData.sets;
+			for (const [setNumber, setData] of Object.entries(
+				exerciseData.sets
+			)) {
+				const onSet = [];
+				onSet.push(setNumber);
+				const eValues = [];
+				eValues.push(setData.weight);
+				eValues.push(setData.reps);
+				eValues.push(setData.rpe);
+				onSet.push(eValues);
+				newSetView.push(onSet);
+			}
+			setSetView(newSetView);
+		}
 	}, [exerciseData]);
+
+	useEffect(() => {
+		// console.log("Test", setView.length);
+	}, [setView]);
 
 	const onCloseMenu = () => {
 		setShowMenu(false);
 	};
 	const onShowMenu = () => {
-		console.log("Show");
 		setShowMenu(true);
 	};
 
-	return (
-		<View style={styles.exerciseDisplay}>
-			{/* <View style={Platform.OS=="android" ? { elevation: 5 } : {zIndex: 100}}>
-				<Provider>
-					<Menu
-						visible={showMenu}
-						onDismiss={onCloseMenu}
-						anchor={menuAnchor}
-					>
-						<Menu.Item
-							onPress={() => console.log("MenuPress1")}
-							title="Delete"
-						/>
-					</Menu>
-				</Provider>
-			</View> */}
+	const onRemoveExercise = () => {
+		onCloseMenu();
+		removeExercise(exerciseData);
+	};
 
+	return (
+		<View style={styles.exerciseContainer}>
 			<View style={styles.exerciseHeader}>
 				<TitleText
 					style={{ color: currentTheme.onSurface }}
@@ -839,6 +893,7 @@ const ExerciseView = ({ exerciseData, isDarkMode, currentTheme }) => {
 					{exerciseData.exerciseName}
 				</TitleText>
 				<Menu
+					theme={{ version: 3 }}
 					visible={showMenu}
 					onDismiss={onCloseMenu}
 					anchor={
@@ -851,12 +906,56 @@ const ExerciseView = ({ exerciseData, isDarkMode, currentTheme }) => {
 					contentStyle={{ backgroundColor: currentTheme.surfaceE2 }}
 				>
 					<Menu.Item
-						icon={"delete"}
-						onPress={() => console.log("MenuPress1")}
+						leadingIcon="redo"
+						onPress={onRemoveExercise}
 						title="Delete"
 						titleStyle={{ color: currentTheme.onSurface }}
 					/>
 				</Menu>
+			</View>
+			<View style={styles.exerciseDisplay}>
+					{setView.map((set) => {
+						const setData = set;
+						return (
+							<View style={styles.setView} key={nanoid()}>
+								<View style={styles.setNumber}>
+									<LabelText
+										style={{
+											color: currentTheme.onSurfaceVariant,
+										}}
+									>
+										Set {setData[0]}
+									</LabelText>
+								</View>
+								<View style={styles.setValues}>
+									<BodyText
+										style={{
+											color: currentTheme.onSurface,
+										}}
+										large={true}
+									>
+										{setData[1][0]}kg
+									</BodyText>
+									<BodyText
+										style={{
+											color: currentTheme.onSurface,
+										}}
+										large={true}
+									>
+										{setData[1][1]}reps
+									</BodyText>
+									<BodyText
+										style={{
+											color: currentTheme.onSurface,
+										}}
+										large={true}
+									>
+										{setData[1][2]}rpe
+									</BodyText>
+								</View>
+							</View>
+						);
+					})}
 			</View>
 		</View>
 	);
@@ -864,9 +963,10 @@ const ExerciseView = ({ exerciseData, isDarkMode, currentTheme }) => {
 
 const getExerciseViewStyle = (theme) => {
 	return StyleSheet.create({
-		exerciseDisplay: {
+		exerciseContainer: {
 			width: "100%",
-			height: 100,
+			// height: "100%",
+			marginRight: 20,
 			paddingHorizontal: 6,
 			paddingVertical: 3,
 
@@ -878,6 +978,27 @@ const getExerciseViewStyle = (theme) => {
 		exerciseHeader: {
 			flexDirection: "row",
 			justifyContent: "space-between",
+			alignItems: "center",
+		},
+		exerciseDisplay: {
+			flex: 1,
+			// height: "100%",
+			// width: "100%"
+			// flexDirection: "column",
+		},
+		setView: {
+			flexDirection: "row",
+			paddingVertical: 4,
+			paddingHorizontal: 8
+			// height: 100,
+			// backgroundColor: theme.error
+		},
+		setNumber: { width: 50 },
+		setValues: {
+			flex: 1,
+			flexDirection: "column",
+			alignItems: "flex-end",
+			// marginRight: 15,
 		},
 	});
 };
@@ -887,29 +1008,12 @@ const getStyles = (theme) => {
 		container: {
 			flex: 1,
 			backgroundColor: theme.surface,
-			maxWidth: 560,
-			// marginTop: 100
-			// alignItems: "center"
 		},
-		// headerContainer: {
-		// 	flexDirection: "row",
-		// 	width: "100%",
-		// 	height: 56,
-		// 	backgroundColor: theme.surface,
-		// 	alignItems: "center",
-		// },
-		// headerBackButton: {
-		// 	marginHorizontal: 16,
-		// },
-		// headerSaveButton: {
-		// 	marginLeft: "auto",
-		// 	marginRight: 24,
-		// },
 		contentContainer: {
 			flex: 1,
 			// width: "100%"
 			flexDirection: "column",
-			alignItems: "center",
+			// alignItems: "center",
 			paddingHorizontal: 24,
 		},
 		selectExerciseContainer: {
@@ -934,6 +1038,7 @@ const getStyles = (theme) => {
 
 		exerciseValuesContainer: {
 			width: "100%",
+			// flex: 1,
 			marginTop: 20,
 		},
 		exerciseValuesInputs: {
@@ -968,14 +1073,9 @@ const getStyles = (theme) => {
 			backgroundColor: theme.surface,
 		},
 		summaryContainer: {
-			marginTop: 20,
-			width: "100%",
-			height: 300,
-		},
-		summaryList: {
-			height: 300,
-			width: "100%",
-			flexDirection: "column",
+			flex: 1,
+
+			paddingVertical: 10,
 		},
 		summaryListItem: {
 			flexDirection: "row",

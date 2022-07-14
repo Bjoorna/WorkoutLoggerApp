@@ -25,13 +25,13 @@ const styles = StyleSheet.create({
 		fontFamily: rob400,
 		fontSize: 16,
 		fontWeight: "400",
-		color: theme.onBackground,
+		color: theme.onSurface,
 	},
 	bodyMedium: {
 		fontFamily: rob400,
 		fontSize: 14,
 		fontWeight: "500",
-		color: theme.onBackground,
+		color: theme.onSurface,
 	},
 	titleSmall: {
 		fontFamily: rob500,

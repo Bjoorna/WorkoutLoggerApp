@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { View, StyleSheet, Switch, Alert } from "react-native";
+import { View, StyleSheet, Switch, Alert, ScrollView } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import BodyText from "../../components/Text/Body";
 
@@ -120,6 +120,10 @@ const UserSettingsScreen = (props) => {
 		setShowMenu(false);
 	};
 
+
+	const onScroll = ()=> {
+
+	}
 	return (
 		<View style={styles.screen}>
 			<Snackbar
@@ -152,7 +156,7 @@ const UserSettingsScreen = (props) => {
 					/>
 				}
 			/>
-			<View style={styles.userSettingsList}>
+			<ScrollView style={styles.userSettingsList}>
 				<View style={styles.userSettingsSection}>
 					<View style={styles.userSettingsHeader}>
 						<LabelText
@@ -275,16 +279,6 @@ const UserSettingsScreen = (props) => {
 							Get
 						</FilledButton>
 					</View>
-					{/* <Menu
-						visible={showMenu}
-						onDismiss={onHideMenu}
-						anchor={{ x: 150, y: 150 }}
-					>
-						<Menu.Item
-							onPress={onHideMenu}
-							title="Delete"
-						></Menu.Item>
-					</Menu> */}
 
 					<View style={styles.userSettingsItem}>
 						<View style={styles.userSettingsText}>
@@ -300,6 +294,151 @@ const UserSettingsScreen = (props) => {
 							Menu
 						</FilledButton>
 					</View>
+					<View style={styles.userSettingsItem}>
+						<View style={styles.userSettingsText}>
+							<BodyText
+								large={true}
+								style={{ color: currentTheme.onSurface }}
+							>
+								Dummy
+							</BodyText>
+						</View>
+
+						<FilledButton
+							onButtonPress={() => console.log("dummy")}
+						>
+							Dummy
+						</FilledButton>
+					</View>
+					<View style={styles.userSettingsItem}>
+						<View style={styles.userSettingsText}>
+							<BodyText
+								large={true}
+								style={{ color: currentTheme.onSurface }}
+							>
+								Dummy
+							</BodyText>
+						</View>
+
+						<FilledButton
+							onButtonPress={() => console.log("dummy")}
+						>
+							Dummy
+						</FilledButton>
+					</View>
+					<View style={styles.userSettingsItem}>
+						<View style={styles.userSettingsText}>
+							<BodyText
+								large={true}
+								style={{ color: currentTheme.onSurface }}
+							>
+								Dummy
+							</BodyText>
+						</View>
+
+						<FilledButton
+							onButtonPress={() => console.log("dummy")}
+						>
+							Dummy
+						</FilledButton>
+					</View>
+					<View style={styles.userSettingsItem}>
+						<View style={styles.userSettingsText}>
+							<BodyText
+								large={true}
+								style={{ color: currentTheme.onSurface }}
+							>
+								Dummy
+							</BodyText>
+						</View>
+
+						<FilledButton
+							onButtonPress={() => console.log("dummy")}
+						>
+							Dummy
+						</FilledButton>
+					</View>
+					<View style={styles.userSettingsItem}>
+						<View style={styles.userSettingsText}>
+							<BodyText
+								large={true}
+								style={{ color: currentTheme.onSurface }}
+							>
+								Dummy
+							</BodyText>
+						</View>
+
+						<FilledButton
+							onButtonPress={() => console.log("dummy")}
+						>
+							Dummy
+						</FilledButton>
+					</View>
+					<View style={styles.userSettingsItem}>
+						<View style={styles.userSettingsText}>
+							<BodyText
+								large={true}
+								style={{ color: currentTheme.onSurface }}
+							>
+								Dummy
+							</BodyText>
+						</View>
+
+						<FilledButton
+							onButtonPress={() => console.log("dummy")}
+						>
+							Dummy
+						</FilledButton>
+					</View>
+					<View style={styles.userSettingsItem}>
+						<View style={styles.userSettingsText}>
+							<BodyText
+								large={true}
+								style={{ color: currentTheme.onSurface }}
+							>
+								Dummy
+							</BodyText>
+						</View>
+
+						<FilledButton
+							onButtonPress={() => console.log("dummy")}
+						>
+							Dummy
+						</FilledButton>
+					</View>
+					<View style={styles.userSettingsItem}>
+						<View style={styles.userSettingsText}>
+							<BodyText
+								large={true}
+								style={{ color: currentTheme.onSurface }}
+							>
+								Dummy
+							</BodyText>
+						</View>
+
+						<FilledButton
+							onButtonPress={() => console.log("dummy")}
+						>
+							Dummy
+						</FilledButton>
+					</View>
+					<View style={styles.userSettingsItem}>
+						<View style={styles.userSettingsText}>
+							<BodyText
+								large={true}
+								style={{ color: currentTheme.onSurface }}
+							>
+								Dummy
+							</BodyText>
+						</View>
+
+						<FilledButton
+							onButtonPress={() => console.log("dummy")}
+						>
+							Dummy
+						</FilledButton>
+					</View>
+
 				</View>
 				{/* <View style={styles.userSettingsItem}>
 					<BodyText large={true} style={styles.text}>
@@ -343,7 +482,7 @@ const UserSettingsScreen = (props) => {
 						ios_backgroundColor={currentTheme.primary}
 					/>
 				</View> */}
-			</View>
+			</ScrollView>
 		</View>
 	);
 };
@@ -361,6 +500,7 @@ const getStyles = (theme) => {
 		},
 		userSettingsList: {
 			width: "100%",
+			flex:1,
 			paddingHorizontal: 24,
 			marginTop: 10,
 		},
