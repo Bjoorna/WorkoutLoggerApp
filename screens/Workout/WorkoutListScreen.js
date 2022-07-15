@@ -26,7 +26,7 @@ import BottomSheet from "@gorhom/bottom-sheet";
 import WorkoutListItem from "../../components/WorkoutListItem";
 
 import FilterSelect from "../../components/FilterSelect";
-import AddWorkoutDialogScreen from "../../components/UI/AddWorkoutDialogScreen";
+import AddWorkoutcreen from "./AddWorkoutScreen";
 
 import { transformObjectToWorkout } from "../../shared/utils/UtilFunctions";
 import { getWorkoutByUserID } from "../../redux/slices/workoutSlice";
@@ -61,6 +61,10 @@ const WorkoutListScreen = (props) => {
 	const [isScrolling, setIsScrolling] = useState(false);
 
 	const [showModal, setShowModal] = useState(false);
+
+	// layout
+	// const [fabPosition, setFabPosition] = useState({x: 0, y: 0});
+
 
 	// BottomSheet stuff
 	const bottomSheetRef = useRef(null);
@@ -115,7 +119,6 @@ const WorkoutListScreen = (props) => {
 		}
 	}, [filterToggle]);
 
-
 	const onRefresh = useCallback(() => {
 		console.log(userID);
 		setRefreshing(true);
@@ -146,12 +149,19 @@ const WorkoutListScreen = (props) => {
 		props.navigation.navigate("AddWorkout");
 	};
 
-	const onNavigateToCalculator = ()=> {
+	const onNavigateToCalculator = () => {
 		dispatch(setHideTabBar(true));
-		props.navigation.navigate("Calculator")
+		props.navigation.navigate("Calculator");
+	};
+
+	const onFabLayout = event => {
+		// console.log(event.nativeEvent);
+		// const layout = event.nativeEvent.layout;
+		// const fabWidth = layout.width;
+		// const fabHeight = layout.height;
+		// setFabPosition({x: 16, y: 0})
+
 	}
-
-
 	return (
 		<View style={styles.container}>
 			{/* <Modal
@@ -166,16 +176,17 @@ const WorkoutListScreen = (props) => {
 			</Modal> */}
 			{!showFilter && (
 				<FabButton
-					onButtonPress={navigateToAddNewWorkout}
+					onPress={navigateToAddNewWorkout}
 					iconName="add"
 					style={{
 						...styles.fabButtonPlacement,
-						left: width - 160,
-						top: height - 100,
+						right: 16,
+						bottom: 16,
 					}}
-				>
-					New Workout
-				</FabButton>
+					title="New Workout"
+					onLayout={onFabLayout}
+				/>
+				
 			)}
 			<TopAppBar
 				headlineText="Workouts"

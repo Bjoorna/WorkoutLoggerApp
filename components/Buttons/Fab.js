@@ -1,4 +1,4 @@
-import { MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 
@@ -8,7 +8,7 @@ import { Pressable, StyleSheet, Text, View, Vibration } from "react-native";
 import { Themes } from "../../shared/Theme";
 import LabelText from "../Text/Label";
 
-const FabButton = (props) => {
+const FabButton = ({title, onPress, iconName, style, backgroundColor, iconColor, onLayout }) => {
 	// Themes
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
 	const [styles, setStyles] = useState(
@@ -34,10 +34,11 @@ const FabButton = (props) => {
 		<Pressable
 			onPressIn={handleOnPressIn}
 			onPressOut={() => setIsPressed(false)}
-			onPress={props.onButtonPress}
-			style={{ ...styles.fabButtonStyle, ...props.style }}
+			onPress={onPress}
+			style={{ ...styles.fabButtonStyle, ...style }}
+			onLayout={event => onLayout(event)}
 		>
-			{props.iconName && (
+			{iconName && (
 				<View
 					style={{
 						flexDirection: "row",
@@ -45,19 +46,20 @@ const FabButton = (props) => {
 						alignItems: "center",
 					}}
 				>
-					<MaterialIcons
+					<Ionicons name={iconName} size={24} color={iconColor ? iconColor: currentTheme.onPrimaryContainer} />
+					{/* <MaterialIcons
 						color={currentTheme.onPrimaryContainer}
-						name={props.iconName}
+						name={iconName}
 						size={24}
-					/>
+					/> */}
 					<LabelText large={true} style={styles.text}>
-						{props.children}
+						{title}
 					</LabelText>
 				</View>
 			)}
-			{!props.iconName && (
+			{!iconName && (
 				<LabelText large={true} style={styles.text}>
-					{props.children}
+					{title}
 				</LabelText>
 			)}
 		</Pressable>
@@ -69,7 +71,7 @@ const getStyles = theme => {
 	return StyleSheet.create({
 		fabButtonStyle: {
 			height: 56,
-			minWidth: 80,
+			minWidth: 56,
 			borderRadius: 16,
 			overflow: "hidden",
 			backgroundColor: theme.primaryContainer,

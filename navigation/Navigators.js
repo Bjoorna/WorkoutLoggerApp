@@ -15,7 +15,7 @@ import WorkoutAnalysisScreen from "../screens/Workout/WorkoutAnalysisScreen";
 import NewUserScreen from "../screens/User/NewUserScreen";
 import NewUserDetailScreen from "../screens/User/NewUserDetailScreen";
 import WorkoutDetailScreen from "../screens/Workout/WorkoutDetailScreen";
-import AddWorkoutDialogScreen from "../components/UI/AddWorkoutDialogScreen";
+import AddWorkoutScreen from "../screens/Workout/AddWorkoutScreen";
 import CustomTabBar from "../components/UI/CustomTabBar";
 import CalendarScreen from "../screens/CalendarScreen";
 import SplashScreen from "../screens/SplashScreen";
@@ -148,11 +148,11 @@ export const WorkoutStackScreen = () => {
 
 				<WorkoutStackNavigator.Screen
 					name="AddWorkout"
-					component={AddWorkoutDialogScreen}
+					component={AddWorkoutScreen}
 					options={{
 						...getDefaultStyleOptions(currentTheme),
 						headerShown: false,
-						presentation: "modal"
+						presentation: "card"
 					}}
 				/>
 			</WorkoutStackNavigator.Group>

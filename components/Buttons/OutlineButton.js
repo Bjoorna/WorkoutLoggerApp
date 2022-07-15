@@ -47,15 +47,15 @@ const OutlineButton = (props) => {
 		);
 	} else {
 		return (
-			<View style={{ borderRadius: 20, overflow: "hidden" }}>
+			// <View style={{ borderRadius: 20, overflow: "hidden" }}>
 				<Pressable
-					android_ripple={{
-						borderless: false,
-						radius: 200,
-						color: currentTheme.primary,
-						// color: `rgba(${rippleColor[0]}, ${rippleColor[1]}, ${rippleColor[2]}, 1 )`,
-						foreground: false,
-					}}
+					// android_ripple={{
+					// 	borderless: false,
+					// 	radius: 200,
+					// 	color: currentTheme.primary,
+					// 	// color: `rgba(${rippleColor[0]}, ${rippleColor[1]}, ${rippleColor[2]}, 1 )`,
+					// 	foreground: false,
+					// }}
 					style={{ ...styles.baseButtonStyle, ...props.style }}
 					onPressIn={handleOnPressIn}
 					onPressOut={() => setIsPressed(false)}
@@ -65,7 +65,7 @@ const OutlineButton = (props) => {
 						{props.children}
 					</LabelText>
 				</Pressable>
-			</View>
+			// </View>
 		);
 	}
 };
