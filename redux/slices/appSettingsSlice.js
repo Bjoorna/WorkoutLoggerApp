@@ -1,4 +1,5 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { firebaseGetExerciseTypes } from "../../firebase/firebase";
 
 const initialState = {
 	hideTabBar: false,
@@ -15,8 +16,9 @@ export const appSettingsSlice = createSlice({
 		},
 		setHideTabBar: (state, action) => {
 			state.hideTabBar = action.payload;
-		}
+		},
 	},
+
 });
 
 export const { setUseDarkMode, setHideTabBar } = appSettingsSlice.actions;

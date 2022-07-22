@@ -12,6 +12,7 @@ import {
 	Platform,
 	ScrollView,
 	BackHandler,
+	useWindowDimensions,
 } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { Themes } from "../../shared/Theme";
@@ -39,7 +40,7 @@ import TopAppBar from "../../components/UI/TopAppBarComponent";
 import { Menu, Divider } from "react-native-paper";
 import { setHideTabBar } from "../../redux/slices/appSettingsSlice";
 import { nanoid } from "@reduxjs/toolkit";
-import AddWorkoutDialog from "../../components/UI/AddWorkoutEntryDialog";
+import AddExerciseDialog from "../../components/UI/AddExerciseDialog";
 import FabButton from "../../components/Buttons/Fab";
 import { useDimensions } from "@react-native-community/hooks";
 
@@ -102,9 +103,9 @@ const workoutReducer = (state, action) => {
 			return { ...state, workout: newState };
 		}
 		case ADD_NOTE: {
-			const newWoState = {...state.workout};
+			const newWoState = { ...state.workout };
 			newWoState.note = action.note;
-			return {...state, workout: newWoState}
+			return { ...state, workout: newWoState };
 		}
 
 		default:
@@ -219,8 +220,8 @@ const AddWorkoutDialogScreen = (props) => {
 	});
 
 	// layoutStuff
-	const {width, height} = useDimensions().window;
-	// const [fabPosition, setFabPosition] = useState();
+	const { width, height } = useWindowDimensions();
+	const [fabPosition, setFabPosition] = useState({x: 0, y: 0});
 
 	const [isLoading, setIsLoading] = useState(false);
 
@@ -243,6 +244,11 @@ const AddWorkoutDialogScreen = (props) => {
 	};
 
 	useEffect(() => {
+		const fabXPos = (width /2 ) - (56/2)
+		console.log(fabXPos);
+		// const fabHeight = layout.height;
+		setFabPosition({x:fabXPos, y: 16})
+
 		// onAddTempData();
 		BackHandler.addEventListener("hardwareBackPress", backAction);
 		return () => {
@@ -301,59 +307,59 @@ const AddWorkoutDialogScreen = (props) => {
 		setShowExerciseModal(false);
 	};
 
-	const saveExercise = () => {
-		const exerciseValues = exerciseState.exercise;
-		const newExerciseName = exerciseValues.exerciseName.value;
+	// const saveExercise = () => {
+	// 	const exerciseValues = exerciseState.exercise;
+	// 	const newExerciseName = exerciseValues.exerciseName.value;
 
-		if (checkIfWorkoutContainsSameExercise(newExerciseName)) {
-			const sets = exerciseValues.sets.value;
-			const onExercise = workoutState.workout.exercises.find(
-				(exercise) =>
-					exercise.exerciseName == exerciseValues.exerciseName.value
-			);
-			if (onExercise) {
-				console.log("FOUND EXERCISE: ", onExercise);
-			}
-			const newSet = {
-				weight: exerciseValues.weight.value,
-				reps: exerciseValues.reps.value,
-				rpe: exerciseValues.rpe.value,
-			};
-			dispatchWorkout({
-				type: ADD_SET_TO_EXERCISE,
-				set: newSet,
-				exerciseName: newExerciseName,
-			});
-		} else {
-			const sets = exerciseValues.sets.value;
-			console.log(sets);
-			let onSet = 1;
-			const newSetObject = {};
+	// 	if (checkIfWorkoutContainsSameExercise(newExerciseName)) {
+	// 		const sets = exerciseValues.sets.value;
+	// 		const onExercise = workoutState.workout.exercises.find(
+	// 			(exercise) =>
+	// 				exercise.exerciseName == exerciseValues.exerciseName.value
+	// 		);
+	// 		if (onExercise) {
+	// 			console.log("FOUND EXERCISE: ", onExercise);
+	// 		}
+	// 		const newSet = {
+	// 			weight: exerciseValues.weight.value,
+	// 			reps: exerciseValues.reps.value,
+	// 			rpe: exerciseValues.rpe.value,
+	// 		};
+	// 		dispatchWorkout({
+	// 			type: ADD_SET_TO_EXERCISE,
+	// 			set: newSet,
+	// 			exerciseName: newExerciseName,
+	// 		});
+	// 	} else {
+	// 		const sets = exerciseValues.sets.value;
+	// 		console.log(sets);
+	// 		let onSet = 1;
+	// 		const newSetObject = {};
 
-			if (sets > 1) {
-				while (onSet <= sets) {
-					newSetObject[onSet] = {
-						weight: exerciseValues.weight.value,
-						reps: exerciseValues.reps.value,
-						rpe: exerciseValues.rpe.value,
-					};
-					onSet++;
-				}
-			} else {
-				newSetObject[1] = {
-					weight: exerciseValues.weight.value,
-					reps: exerciseValues.reps.value,
-					rpe: exerciseValues.rpe.value,
-				};
-			}
+	// 		if (sets > 1) {
+	// 			while (onSet <= sets) {
+	// 				newSetObject[onSet] = {
+	// 					weight: exerciseValues.weight.value,
+	// 					reps: exerciseValues.reps.value,
+	// 					rpe: exerciseValues.rpe.value,
+	// 				};
+	// 				onSet++;
+	// 			}
+	// 		} else {
+	// 			newSetObject[1] = {
+	// 				weight: exerciseValues.weight.value,
+	// 				reps: exerciseValues.reps.value,
+	// 				rpe: exerciseValues.rpe.value,
+	// 			};
+	// 		}
 
-			const newExercise = {
-				exerciseName: exerciseValues.exerciseName.value,
-				sets: newSetObject,
-			};
-			dispatchWorkout({ type: ADD_EXERCISE, exercise: newExercise });
-		}
-	};
+	// 		const newExercise = {
+	// 			exerciseName: exerciseValues.exerciseName.value,
+	// 			sets: newSetObject,
+	// 		};
+	// 		dispatchWorkout({ type: ADD_EXERCISE, exercise: newExercise });
+	// 	}
+	// };
 
 	const checkIfWorkoutContainsSameExercise = (exerciseName) => {
 		const currentExercisesInWorkout = workoutState.workout.exercises;
@@ -402,13 +408,19 @@ const AddWorkoutDialogScreen = (props) => {
 		dispatchWorkout({ type: ADD_EXERCISE, exercise: ex7 });
 	};
 
+	const onAddExercise = (exerciseToAdd) => {
+		exerciseToAdd.listID = nanoid();
+		dispatchWorkout({ type: ADD_EXERCISE, exercise: exerciseToAdd });
+		onCloseAddWorkoutModal();
+	};
+
 	const onShowAddWorkoutModal = () => {
 		setAddExerciseModalVisible(true);
 	};
 
-	const onCloseAddWorkoutModal =()=> {
+	const onCloseAddWorkoutModal = () => {
 		setAddExerciseModalVisible(false);
-	}
+	};
 
 	const onNavigateBack = () => {
 		props.navigation.goBack();
@@ -426,27 +438,40 @@ const AddWorkoutDialogScreen = (props) => {
 	const onNoteEditingEnd = (event) => {
 		const noteText = event.nativeEvent.text;
 		console.log("note end: ", noteText);
-		dispatchWorkout({type: ADD_NOTE, note: noteText});
+		dispatchWorkout({ type: ADD_NOTE, note: noteText });
 	};
 
-	const onFabLayout = event => {
+	const onFabLayout = (event) => {
 		// console.log(event.nativeEvent);
 		// const layout = event.nativeEvent.layout;
+		// console.log(layout);
 		// const fabWidth = layout.width;
-		// const fabHeight = layout.height;
-		// // setFabPosition({x: 16+fabWidth, y: 16})
-	}
+	};
 
 	return (
 		<View style={styles.container}>
-			<FabButton onPress={()=> setAddExerciseModalVisible(true)} onLayout={onFabLayout} iconName="add" style={{position: "absolute", zIndex: 1000, right:16, bottom: 80+16 }} />
+			<FabButton
+				onPress={() => setAddExerciseModalVisible(true)}
+				onLayout={onFabLayout}
+				iconName="add"
+				style={{
+					position: "absolute",
+					zIndex: 1000,
+					left: fabPosition.x,
+					bottom: 16,
+				}}
+			/>
 			<Modal
 				animationType="slide"
 				visible={addExerciseModalVisible}
 				transparent={true}
 				onRequestClose={() => setAddExerciseModalVisible(false)}
 			>
-				<AddWorkoutDialog closeDialog={onCloseAddWorkoutModal} currentTheme={currentTheme} />
+				<AddExerciseDialog
+					closeDialog={onCloseAddWorkoutModal}
+					currentTheme={currentTheme}
+					onAddExercise={onAddExercise}
+				/>
 			</Modal>
 			<Modal
 				visible={showCloseDialogModal}
@@ -710,7 +735,7 @@ const ExerciseView = ({
 				>
 					{exerciseData.exerciseName}
 				</TitleText>
-				<Menu
+				{/* <Menu
 					theme={{ version: 3 }}
 					visible={showMenu}
 					onDismiss={onCloseMenu}
@@ -729,7 +754,7 @@ const ExerciseView = ({
 						title="Delete"
 						titleStyle={{ color: currentTheme.onSurface }}
 					/>
-				</Menu>
+				</Menu> */}
 			</View>
 			<View style={styles.exerciseDisplay}>
 				{setView.map((set) => {
@@ -752,7 +777,7 @@ const ExerciseView = ({
 									}}
 									large={true}
 								>
-									{setData[1][0]}kg
+									{setData[1][0]}kg *
 								</BodyText>
 								<BodyText
 									style={{
@@ -760,6 +785,7 @@ const ExerciseView = ({
 									}}
 									large={true}
 								>
+									{" "}
 									{setData[1][1]}reps
 								</BodyText>
 								<BodyText
@@ -768,12 +794,25 @@ const ExerciseView = ({
 									}}
 									large={true}
 								>
-									{setData[1][2]}rpe
+									{" "}
+									@{setData[1][2]}
 								</BodyText>
 							</View>
 						</View>
 					);
 				})}
+			</View>
+			<View style={styles.buttonRow}>
+				<IconButton
+					name="trash-outline"
+					iconColor={currentTheme.onSurfaceVariant}
+					onPress={() => console.log("deleteexercise")}
+				/>
+				<IconButton
+					name="add"
+					iconColor={currentTheme.onSurfaceVariant}
+					onPress={() => console.log("deleteexercise")}
+				/>
 			</View>
 		</View>
 	);
@@ -793,6 +832,13 @@ const getExerciseViewStyle = (theme) => {
 			// borderWidth: 1,
 			// borderColor: theme.outline,
 		},
+		buttonRow: {
+			flexDirection: "row",
+			justifyContent: "flex-end",
+			// height: 60,
+			width: "100%",
+			// backgroundColor: theme.error
+		},
 		exerciseHeader: {
 			flexDirection: "row",
 			justifyContent: "space-between",
@@ -806,6 +852,7 @@ const getExerciseViewStyle = (theme) => {
 		},
 		setView: {
 			flexDirection: "row",
+			alignItems: "center",
 			paddingVertical: 4,
 			paddingHorizontal: 8,
 			// height: 100,
@@ -814,8 +861,9 @@ const getExerciseViewStyle = (theme) => {
 		setNumber: { width: 50 },
 		setValues: {
 			flex: 1,
-			flexDirection: "column",
-			alignItems: "flex-end",
+			flexDirection: "row",
+			justifyContent: "flex-end",
+			alignItems: "baseline",
 			// marginRight: 15,
 		},
 	});

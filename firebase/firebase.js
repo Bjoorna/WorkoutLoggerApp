@@ -379,6 +379,16 @@ export const getWorkoutOnDay = async (userID, dayStart, dayEnd) => {
 	}
 };
 
+export const firebaseGetExerciseTypes = async() => {
+	try {
+		const docRef = doc(database, "defaultData", "exerciseTypes");
+		const docSnap = await getDoc(docRef);
+		return docSnap.data();
+	} catch (error) {
+		throw new Error(error)
+	}
+}
+
 // export const writeDocumentToCollection = async (
 // 	document,
 // 	dbCollection,

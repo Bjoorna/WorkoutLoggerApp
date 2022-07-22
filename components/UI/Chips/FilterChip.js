@@ -12,10 +12,10 @@ const theme = Themes.dark;
  * 
  * @param {boolean} selected - Set the selected state of the chip
  * @param {function} onChipPress - Pass a reference to the function being called when user presses the chip
- * @param {string} children - The text between tags
+ * @param {string} text - Text to display
  */
 
-const FilterChip = ({selected, onChipPress, children}) => {
+const FilterChip = ({selected, onPress, text}) => {
 	// Themes
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
 	const [styles, setStyles] = useState(
@@ -31,9 +31,10 @@ const FilterChip = ({selected, onChipPress, children}) => {
 	}, [useDarkMode]);
 	const [isSelected, setIsSelected] = useState(selected);
 
-    const onPress =() => {
-        onChipPress();
-    }
+    // const onPress =() => {
+    //     onPress();
+    // }
+	
 	useEffect(()=> {
 		setIsSelected(selected);
 	},[selected])
@@ -55,7 +56,7 @@ const FilterChip = ({selected, onChipPress, children}) => {
 					large={true}
 					style={{ color: currentTheme.onSurfaceVariant }}
 				>
-					{children}
+					{text}
 				</LabelText>
 			</Pressable>
 		);
@@ -70,7 +71,7 @@ const FilterChip = ({selected, onChipPress, children}) => {
 					large={true}
 					style={{ color: currentTheme.onSurfaceVariant }}
 				>
-					{children}
+					{text}
 				</LabelText>
 			</Pressable>
 		);

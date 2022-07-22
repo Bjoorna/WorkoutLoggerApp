@@ -6,13 +6,29 @@ import {
 	firebaseSaveWorkout,
 	firebaseGetUserWorkouts,
 	firebaseGetExercisesByTypes,
+	firebaseGetExerciseTypes
 } from "../../firebase/firebase";
 
 const initialState = {
 	workouts: {},
 	exercises: {},
 	filteredExercises: {}, // set exercises that the user has filtered by here
+	exerciseTypes: {}
 };
+
+export const getExerciseTypes = createAsyncThunk(
+	"appSettings/getExerciseTypes",
+	async (_, thunkAPI) => {
+		try {
+			const exerciseData = await firebaseGetExerciseTypes();
+			console.log(exerciseData);
+			return exerciseData
+		} catch (error) {
+			console.log(error);
+		}
+	}
+);
+
 
 export const getWorkoutByUserID = createAsyncThunk(
 	"workout/getUserWorkouts",
@@ -163,6 +179,14 @@ export const workoutSlice = createSlice({
 				});
 			}
 		});
+
+		builder.addCase(getExerciseTypes.fulfilled, (state, action) => {
+			if(action.payload){
+				console.log(action.payload);
+				state.exerciseTypes = action.payload;
+			}
+		})
+
 	},
 });
 

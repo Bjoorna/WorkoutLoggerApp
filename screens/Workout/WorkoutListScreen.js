@@ -29,7 +29,7 @@ import FilterSelect from "../../components/FilterSelect";
 import AddWorkoutcreen from "./AddWorkoutScreen";
 
 import { transformObjectToWorkout } from "../../shared/utils/UtilFunctions";
-import { getWorkoutByUserID } from "../../redux/slices/workoutSlice";
+import { getExerciseTypes, getWorkoutByUserID } from "../../redux/slices/workoutSlice";
 import { setHideTabBar } from "../../redux/slices/appSettingsSlice";
 import TopAppBar from "../../components/UI/TopAppBarComponent";
 
@@ -88,6 +88,7 @@ const WorkoutListScreen = (props) => {
 		setRefreshing(true);
 		if (userID) {
 			dispatch(getWorkoutByUserID(userID));
+			dispatch(getExerciseTypes());
 		}
 	}, []);
 

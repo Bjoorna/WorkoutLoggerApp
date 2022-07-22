@@ -6,7 +6,7 @@ import {
 	firebaseSignOutUser,
 } from "../../firebase/firebase";
 import { getUserData, resetUser } from "./userSlice";
-import { resetWorkoutState } from "./workoutSlice";
+import { getExerciseTypes, resetWorkoutState } from "./workoutSlice";
 
 
 const initialState = {

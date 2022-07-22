@@ -18,8 +18,10 @@ import IconButton from "../../components/Buttons/IconButton";
 import { getUserData, updateUserField } from "../../redux/slices/userSlice";
 
 import { Snackbar, Menu } from "react-native-paper";
+import { getExerciseTypes } from "../../redux/slices/workoutSlice";
 const UserSettingsScreen = (props) => {
 	const userStoreRef = useSelector((state) => state.user);
+	const workoutStoreRef = useSelector(state => state.workout);
 	const userID = useSelector((state) => state.auth.userID);
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
 	const isMondayFirstDay = useSelector(
@@ -50,6 +52,10 @@ const UserSettingsScreen = (props) => {
 			dispatch(setHideTabBar(false));
 		};
 	}, []);
+	useEffect(() => {
+		console.log(workoutStoreRef.exerciseTypes)
+	}, [workoutStoreRef]);
+
 
 	// initialize userSettingsValues
 	useEffect(() => {
@@ -120,6 +126,9 @@ const UserSettingsScreen = (props) => {
 		setShowMenu(false);
 	};
 
+	const onGetExerciseTypes = ()=> {
+		dispatch(getExerciseTypes())
+	}
 
 	const onScroll = ()=> {
 
@@ -300,144 +309,17 @@ const UserSettingsScreen = (props) => {
 								large={true}
 								style={{ color: currentTheme.onSurface }}
 							>
-								Dummy
+								Get Exercise Types
 							</BodyText>
 						</View>
 
 						<FilledButton
-							onButtonPress={() => console.log("dummy")}
+							onButtonPress={onGetExerciseTypes}
 						>
-							Dummy
+							Get
 						</FilledButton>
 					</View>
-					<View style={styles.userSettingsItem}>
-						<View style={styles.userSettingsText}>
-							<BodyText
-								large={true}
-								style={{ color: currentTheme.onSurface }}
-							>
-								Dummy
-							</BodyText>
-						</View>
-
-						<FilledButton
-							onButtonPress={() => console.log("dummy")}
-						>
-							Dummy
-						</FilledButton>
-					</View>
-					<View style={styles.userSettingsItem}>
-						<View style={styles.userSettingsText}>
-							<BodyText
-								large={true}
-								style={{ color: currentTheme.onSurface }}
-							>
-								Dummy
-							</BodyText>
-						</View>
-
-						<FilledButton
-							onButtonPress={() => console.log("dummy")}
-						>
-							Dummy
-						</FilledButton>
-					</View>
-					<View style={styles.userSettingsItem}>
-						<View style={styles.userSettingsText}>
-							<BodyText
-								large={true}
-								style={{ color: currentTheme.onSurface }}
-							>
-								Dummy
-							</BodyText>
-						</View>
-
-						<FilledButton
-							onButtonPress={() => console.log("dummy")}
-						>
-							Dummy
-						</FilledButton>
-					</View>
-					<View style={styles.userSettingsItem}>
-						<View style={styles.userSettingsText}>
-							<BodyText
-								large={true}
-								style={{ color: currentTheme.onSurface }}
-							>
-								Dummy
-							</BodyText>
-						</View>
-
-						<FilledButton
-							onButtonPress={() => console.log("dummy")}
-						>
-							Dummy
-						</FilledButton>
-					</View>
-					<View style={styles.userSettingsItem}>
-						<View style={styles.userSettingsText}>
-							<BodyText
-								large={true}
-								style={{ color: currentTheme.onSurface }}
-							>
-								Dummy
-							</BodyText>
-						</View>
-
-						<FilledButton
-							onButtonPress={() => console.log("dummy")}
-						>
-							Dummy
-						</FilledButton>
-					</View>
-					<View style={styles.userSettingsItem}>
-						<View style={styles.userSettingsText}>
-							<BodyText
-								large={true}
-								style={{ color: currentTheme.onSurface }}
-							>
-								Dummy
-							</BodyText>
-						</View>
-
-						<FilledButton
-							onButtonPress={() => console.log("dummy")}
-						>
-							Dummy
-						</FilledButton>
-					</View>
-					<View style={styles.userSettingsItem}>
-						<View style={styles.userSettingsText}>
-							<BodyText
-								large={true}
-								style={{ color: currentTheme.onSurface }}
-							>
-								Dummy
-							</BodyText>
-						</View>
-
-						<FilledButton
-							onButtonPress={() => console.log("dummy")}
-						>
-							Dummy
-						</FilledButton>
-					</View>
-					<View style={styles.userSettingsItem}>
-						<View style={styles.userSettingsText}>
-							<BodyText
-								large={true}
-								style={{ color: currentTheme.onSurface }}
-							>
-								Dummy
-							</BodyText>
-						</View>
-
-						<FilledButton
-							onButtonPress={() => console.log("dummy")}
-						>
-							Dummy
-						</FilledButton>
-					</View>
+				
 
 				</View>
 				{/* <View style={styles.userSettingsItem}>
