@@ -37,6 +37,14 @@ export const convertMass = (value, fromPounds) => {
 	}
 };
 
+export const convertKiloToPound = (weight) => {
+	return weight * 2.205;
+};
+
+export const convertPoundToKilo = (weight) => {
+	return weight / 2.205;
+};
+
 export const convertImperialHeightToMetric = ({ feet, inch }) => {
 	const inchToCentimeters = Math.round(inch * 2.54);
 	const feetToCentimeters = Math.round(feet * 30.48);
@@ -49,6 +57,22 @@ export const convertMetricHeightToImperial = (cm) => {
 	const inches = Math.round(cm / 2.54);
 	return { feet: Math.floor(inches / 12), inches: inches % 12 };
 };
+
+export 	const inputValueValidityCheck = (type, value) => {
+	if (type === "rpe") {
+		if (value >= 6.5 && value <= 10) {
+			return true;
+		} else {
+			return false;
+		}
+	} else {
+		if (value > 0 && value != null) {
+			return true;
+		}
+		return false;
+	}
+};
+
 
 /**
  *

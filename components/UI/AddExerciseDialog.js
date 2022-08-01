@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { TextInput as PaperInput, HelperText } from "react-native-paper";
 import { useSelector } from "react-redux";
+import { convertPoundToKilo } from "../../shared/utils/UtilFunctions";
 import IconButton from "../Buttons/IconButton";
 import OutlineButton from "../Buttons/OutlineButton";
 import TextButton from "../Buttons/TextButton";
@@ -63,7 +64,6 @@ const SelectExerciseListItem = ({
 	useEffect(() => {
 		// console.log(data);
 		const sortData = data.data.sort((a, b) => a.localeCompare(b));
-		console.log(sortData);
 		setSortedList(sortData);
 	}, []);
 
@@ -84,21 +84,13 @@ const SelectExerciseListItem = ({
 					))}
 				</View>
 			</ScrollView>
-			{/* <FlatList
-				data={data.data}
-				horizontal={true}
-				// contentContainerStyle={{flexDirection: "row"}}
-				// horizontal={true}
-				keyExtractor={() => nanoid()}
-				
-				renderItem={(itemData) => (<FilterChip onPress={()=>onPress(itemData.item)} selected={false} text={itemData.item} />)}
-			/> */}
 		</View>
 	);
 };
 
 const AddExerciseDialog = ({ onAddExercise, currentTheme, closeDialog }) => {
 	const exerciseTypes = useSelector((state) => state.workout.exerciseTypes);
+	const isMetric = useSelector((state) => state.user.user.useMetric);
 	const [exerciseState, dispatchExercise] = useReducer(exerciseReducer, {
 		exercise: baseExerciseState,
 	});
@@ -132,6 +124,8 @@ const AddExerciseDialog = ({ onAddExercise, currentTheme, closeDialog }) => {
 		}
 		// console.log(data);
 		setExerciseTypesList(data);
+		onUnselectExercise();
+		console.log(isMetric);
 	}, []);
 
 	useEffect(() => {
@@ -248,7 +242,9 @@ const AddExerciseDialog = ({ onAddExercise, currentTheme, closeDialog }) => {
 		if (nrOfSets > 1) {
 			while (onSet <= nrOfSets) {
 				newSetObject[onSet] = {
-					weight: exerciseValues.weight.value,
+					weight: isMetric
+						? exerciseValues.weight.value
+						: convertPoundToKilo(exerciseValues.weight.value),
 					reps: exerciseValues.reps.value,
 					rpe: exerciseValues.rpe.value,
 				};
@@ -256,7 +252,9 @@ const AddExerciseDialog = ({ onAddExercise, currentTheme, closeDialog }) => {
 			}
 		} else {
 			newSetObject[1] = {
-				weight: exerciseValues.weight.value,
+				weight: isMetric
+					? exerciseValues.weight.value
+					: convertPoundToKilo(exerciseValues.weight.value),
 				reps: exerciseValues.reps.value,
 				rpe: exerciseValues.rpe.value,
 			};
@@ -270,8 +268,11 @@ const AddExerciseDialog = ({ onAddExercise, currentTheme, closeDialog }) => {
 		const exerciseToAdd = {
 			exerciseName: exerciseState.exercise.exerciseName.value,
 			sets: newSetObject,
+			id: nanoid()
 		};
-		console.log(exerciseToAdd);
+		console.log("AddExerciusdialog 273: ",exerciseToAdd);
+		onUnselectExercise();
+
 		onAddExercise(exerciseToAdd);
 	};
 
@@ -420,7 +421,9 @@ const AddExerciseDialog = ({ onAddExercise, currentTheme, closeDialog }) => {
 									>
 										{inputState.inputs["weight"].error
 											? "Must be positive"
-											: "Kg"}
+											: isMetric
+											? "kg"
+											: "lbs"}
 									</HelperText>
 								</View>
 								<View style={{ flex: 1 }}>

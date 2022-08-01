@@ -43,165 +43,19 @@ import { nanoid } from "@reduxjs/toolkit";
 import AddExerciseDialog from "../../components/UI/AddExerciseDialog";
 import FabButton from "../../components/Buttons/Fab";
 import { useDimensions } from "@react-native-community/hooks";
+import {
+	convertKiloToPound,
+	inputValueValidityCheck,
+} from "../../shared/utils/UtilFunctions";
 
 const windowWidth = Dimensions.get("screen").width;
 const textFieldWidth = Math.floor((windowWidth - 24 * 2 - 8) / 2);
 
-const ADD_EXERCISE = "ADD_EXERCISE";
-const ADD_SET_TO_EXERCISE = "ADD_SET_TO_EXERCISE";
-const REMOVE_EXERCISE = "REMOVE_EXERCISE";
-const RERENDER = "RERENDER";
-const ADD_NOTE = "ADD_NOTE";
-
-const workoutReducer = (state, action) => {
-	switch (action.type) {
-		case ADD_EXERCISE: {
-			// const newEArray = [...state.workout.exercises];
-			// newEArray.pus
-			console.log(action.exercise);
-			const newWorkoutState = { ...state.workout };
-			const eArrayCopy = [...newWorkoutState.exercises];
-			eArrayCopy.push(action.exercise);
-			newWorkoutState.exercises = eArrayCopy;
-			return { ...state, workout: newWorkoutState };
-		}
-		case REMOVE_EXERCISE: {
-			const exerciseToRemove = action.exercise;
-			let exerciseArray = [...state.workout.exercises];
-			exerciseArray = exerciseArray.filter(
-				(exercise) => exercise !== exerciseToRemove
-			);
-			const workoutWithRemovedExercise = { ...state.workout };
-			workoutWithRemovedExercise.exercises = exerciseArray;
-
-			return { ...state, workout: workoutWithRemovedExercise };
-		}
-
-		case ADD_SET_TO_EXERCISE: {
-			const newWorkoutState = { ...state.workout };
-			const newExerciseName = action.exerciseName;
-			const setToAdd = action.set;
-
-			const existingExercise = newWorkoutState.exercises.find(
-				(ex) => ex.exerciseName == newExerciseName
-			);
-
-			// avoid undefined
-			if (existingExercise) {
-				const sets = { ...existingExercise.sets };
-				const keys = Object.keys(sets);
-				const nextSetNumber = keys.length + 1;
-				sets[nextSetNumber] = setToAdd;
-				console.log("Sets after adding: ", sets);
-
-				existingExercise.sets = sets;
-				return { ...state, workout: newWorkoutState };
-			}
-		}
-		case RERENDER: {
-			const newState = { ...state.workout };
-			return { ...state, workout: newState };
-		}
-		case ADD_NOTE: {
-			const newWoState = { ...state.workout };
-			newWoState.note = action.note;
-			return { ...state, workout: newWoState };
-		}
-
-		default:
-			return state;
-	}
-};
-
-const ADD_VALUE = "ADD_VALUE";
-const exerciseReducer = (state, action) => {
-	switch (action.type) {
-		case ADD_VALUE:
-			const newState = { ...state };
-			newState.exercise[action.field] = action.newValue;
-			return newState;
-	}
-};
-
-const baseExerciseState = {
-	exerciseName: { value: null, error: false },
-	weight: { value: null, error: false },
-	reps: { value: null, error: false },
-	sets: { value: null, error: false },
-	rpe: { value: null, error: false },
-};
-
-const ex1 = {
-	exerciseName: "Sumo-DL",
-	listID: nanoid(),
-
-	sets: {
-		1: { weight: 100, reps: 5, rpe: 7 },
-		2: { weight: 110, reps: 5, rpe: 8 },
-		3: { weight: 110, reps: 5, rpe: 8 },
-		4: { weight: 110, reps: 5, rpe: 8 },
-		5: { weight: 110, reps: 5, rpe: 8 },
-	},
-};
-
-const ex2 = {
-	exerciseName: "Squat",
-	listID: nanoid(),
-
-	sets: {
-		1: { weight: 100, reps: 5, rpe: 7 },
-		2: { weight: 110, reps: 5, rpe: 8 },
-	},
-};
-
-const ex3 = {
-	exerciseName: "RDL",
-	listID: nanoid(),
-
-	sets: {
-		1: { weight: 100, reps: 5, rpe: 7 },
-		2: { weight: 110, reps: 5, rpe: 8 },
-	},
-};
-
-const ex4 = {
-	exerciseName: "Deadlift",
-	listID: nanoid(),
-	sets: {
-		1: { weight: 100, reps: 5, rpe: 7 },
-		2: { weight: 110, reps: 5, rpe: 8 },
-	},
-};
-const ex5 = {
-	exerciseName: "TEST",
-	listID: nanoid(),
-	sets: {
-		1: { weight: 100, reps: 5, rpe: 7 },
-		2: { weight: 110, reps: 5, rpe: 8 },
-	},
-};
-
-const ex6 = {
-	exerciseName: "TES2",
-	listID: nanoid(),
-	sets: {
-		1: { weight: 100, reps: 5, rpe: 7 },
-		2: { weight: 110, reps: 5, rpe: 8 },
-	},
-};
-
-const ex7 = {
-	exerciseName: "TEST4",
-	listID: nanoid(),
-	sets: {
-		1: { weight: 100, reps: 5, rpe: 7 },
-		2: { weight: 110, reps: 5, rpe: 8 },
-	},
-};
-
 const AddWorkoutDialogScreen = (props) => {
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
 	const dispatch = useDispatch();
+	const isMetric = useSelector((state) => state.user.user.useMetric);
+
 	const [styles, setStyles] = useState(
 		getStyles(useDarkMode ? Themes.dark : Themes.light)
 	);
@@ -211,25 +65,19 @@ const AddWorkoutDialogScreen = (props) => {
 	const userID = useSelector((state) => state.auth.userID);
 	// const userData = useSelector((state) => state.user);
 
-	const [workoutState, dispatchWorkout] = useReducer(workoutReducer, {
-		workout: new Workout([], Date.now(), false, "", userID),
-	});
-
-	const [exerciseState, dispatchExercise] = useReducer(exerciseReducer, {
-		exercise: baseExerciseState,
-	});
-
 	// layoutStuff
 	const { width, height } = useWindowDimensions();
-	const [fabPosition, setFabPosition] = useState({x: 0, y: 0});
+	const [fabPosition, setFabPosition] = useState({ x: 0, y: 0 });
 
 	const [isLoading, setIsLoading] = useState(false);
 
 	// datePickerModal
 	const [datePickerModalVisible, setDatePickerModalVisible] = useState(false);
-	const [selectedDate, setSelectedDate] = useState(new Date());
 
-	const [exerciseListDisplay, setExerciseListDisplay] = useState([]);
+	// workoutStates
+	const [exercises, setExercises] = useState([]);
+	const [workoutNote, setWorkoutNote] = useState("");
+	const [selectedDate, setSelectedDate] = useState(new Date());
 
 	const [showCloseDialogModal, setShowCloseDialogModal] = useState(false);
 
@@ -244,12 +92,13 @@ const AddWorkoutDialogScreen = (props) => {
 	};
 
 	useEffect(() => {
-		const fabXPos = (width /2 ) - (56/2)
+		const fabXPos = width / 2 - 56 / 2;
 		console.log(fabXPos);
 		// const fabHeight = layout.height;
-		setFabPosition({x:fabXPos, y: 16})
+		setFabPosition({ x: fabXPos, y: 16 });
 
 		// onAddTempData();
+
 		BackHandler.addEventListener("hardwareBackPress", backAction);
 		return () => {
 			BackHandler.removeEventListener("hardwareBackPress", backAction);
@@ -262,133 +111,38 @@ const AddWorkoutDialogScreen = (props) => {
 		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
 	}, [useDarkMode]);
 
-	// useEffect(() => {
-	// 	let isFormValid = true;
-	// 	for (const [key, value] of Object.entries(exerciseState.exercise)) {
-	// 		if (value.error === true || value.value == null) {
-	// 			isFormValid = false;
-	// 			break;
-	// 		}
-	// 		// isFormValid = true
-	// 	}
-	// 	setIsFormValid(isFormValid);
-	// }, [exerciseState]);
-
-	useEffect(() => {
-		// const listDisplay = workoutState.workout.exercises.map((exercise) => {
-		// 	return (
-		// 		<ExerciseView
-		// 			key={nanoid()}
-		// 			exerciseData={exercise}
-		// 			currentTheme={currentTheme}
-		// 			isDarkMode={useDarkMode}
-		// 			removeExercise={removeExercise}
-		// 		/>
-		// 	);
-		// });
-		// setExerciseListDisplay(listDisplay);
-		setExerciseListDisplay(workoutState.workout.exercises);
-		console.log(workoutState);
-		// console.log(workoutState);
-	}, [workoutState]);
-
 	// when the user wants to exit the screen
 	const handleBackBehavior = () => {
 		// setShowCloseDialogModal(true);
 		// props.toggleModal();
 	};
 
-	const onExerciseSelected = (value, error) => {
-		dispatchExercise({
-			type: ADD_VALUE,
-			field: "exerciseName",
-			newValue: { value: value, error: error },
-		});
-		setShowExerciseModal(false);
-	};
-
-	// const saveExercise = () => {
-	// 	const exerciseValues = exerciseState.exercise;
-	// 	const newExerciseName = exerciseValues.exerciseName.value;
-
-	// 	if (checkIfWorkoutContainsSameExercise(newExerciseName)) {
-	// 		const sets = exerciseValues.sets.value;
-	// 		const onExercise = workoutState.workout.exercises.find(
-	// 			(exercise) =>
-	// 				exercise.exerciseName == exerciseValues.exerciseName.value
-	// 		);
-	// 		if (onExercise) {
-	// 			console.log("FOUND EXERCISE: ", onExercise);
-	// 		}
-	// 		const newSet = {
-	// 			weight: exerciseValues.weight.value,
-	// 			reps: exerciseValues.reps.value,
-	// 			rpe: exerciseValues.rpe.value,
-	// 		};
-	// 		dispatchWorkout({
-	// 			type: ADD_SET_TO_EXERCISE,
-	// 			set: newSet,
-	// 			exerciseName: newExerciseName,
-	// 		});
-	// 	} else {
-	// 		const sets = exerciseValues.sets.value;
-	// 		console.log(sets);
-	// 		let onSet = 1;
-	// 		const newSetObject = {};
-
-	// 		if (sets > 1) {
-	// 			while (onSet <= sets) {
-	// 				newSetObject[onSet] = {
-	// 					weight: exerciseValues.weight.value,
-	// 					reps: exerciseValues.reps.value,
-	// 					rpe: exerciseValues.rpe.value,
-	// 				};
-	// 				onSet++;
-	// 			}
-	// 		} else {
-	// 			newSetObject[1] = {
-	// 				weight: exerciseValues.weight.value,
-	// 				reps: exerciseValues.reps.value,
-	// 				rpe: exerciseValues.rpe.value,
-	// 			};
-	// 		}
-
-	// 		const newExercise = {
-	// 			exerciseName: exerciseValues.exerciseName.value,
-	// 			sets: newSetObject,
-	// 		};
-	// 		dispatchWorkout({ type: ADD_EXERCISE, exercise: newExercise });
-	// 	}
-	// };
-
-	const checkIfWorkoutContainsSameExercise = (exerciseName) => {
-		const currentExercisesInWorkout = workoutState.workout.exercises;
-		for (let exercise of currentExercisesInWorkout) {
-			if (exercise.exerciseName == exerciseName) {
-				return true;
-			}
-		}
-		return false;
-	};
-
-	const removeExercise = (exerciseToRemove) => {
-		dispatchWorkout({ type: REMOVE_EXERCISE, exercise: exerciseToRemove });
+	const onRemoveExercise = (exerciseToRemove) => {
+		// dispatchWorkout({ type: REMOVE_EXERCISE, exercise: exerciseToRemove });
+		const prevExerciseState = [...exercises];
+		const nextExerciseState = prevExerciseState.filter(
+			(exercise) => exercise !== exerciseToRemove
+		);
+		setExercises(nextExerciseState);
 	};
 
 	const onSaveWorkout = async () => {
 		setIsLoading(true);
-		const currentWorkoutState = workoutState.workout;
+		const exerciseToSave = exercises;
+		for (let exercise of exerciseToSave) {
+			delete exercise.id;
+		}
 		const newWorkout = new Workout(
-			currentWorkoutState.exercises,
+			exerciseToSave,
 			selectedDate,
 			true,
-			"Note",
+			workoutNote,
 			userID
 		);
 		dispatch(saveWorkout({ workout: newWorkout, userID: userID }));
 		setIsLoading(false);
 		console.log("WorkoutSaved");
-		props.toggleModal();
+		props.navigation.goBack();
 	};
 
 	const onDateChange = (event, newDate) => {
@@ -397,20 +151,10 @@ const AddWorkoutDialogScreen = (props) => {
 		setSelectedDate(currentDate);
 	};
 
-	const onAddTempData = () => {
-		// setAddExerciseModalVisible(true);
-		dispatchWorkout({ type: ADD_EXERCISE, exercise: ex1 });
-		dispatchWorkout({ type: ADD_EXERCISE, exercise: ex2 });
-		dispatchWorkout({ type: ADD_EXERCISE, exercise: ex3 });
-		dispatchWorkout({ type: ADD_EXERCISE, exercise: ex4 });
-		dispatchWorkout({ type: ADD_EXERCISE, exercise: ex5 });
-		dispatchWorkout({ type: ADD_EXERCISE, exercise: ex6 });
-		dispatchWorkout({ type: ADD_EXERCISE, exercise: ex7 });
-	};
-
 	const onAddExercise = (exerciseToAdd) => {
-		exerciseToAdd.listID = nanoid();
-		dispatchWorkout({ type: ADD_EXERCISE, exercise: exerciseToAdd });
+		const newExerciseState = [...exercises];
+		newExerciseState.push(exerciseToAdd);
+		setExercises(newExerciseState);
 		onCloseAddWorkoutModal();
 	};
 
@@ -438,7 +182,7 @@ const AddWorkoutDialogScreen = (props) => {
 	const onNoteEditingEnd = (event) => {
 		const noteText = event.nativeEvent.text;
 		console.log("note end: ", noteText);
-		dispatchWorkout({ type: ADD_NOTE, note: noteText });
+		setWorkoutNote(noteText);
 	};
 
 	const onFabLayout = (event) => {
@@ -446,6 +190,23 @@ const AddWorkoutDialogScreen = (props) => {
 		// const layout = event.nativeEvent.layout;
 		// console.log(layout);
 		// const fabWidth = layout.width;
+	};
+
+	const onAddSetToExercise = (nameOfExercise, set) => {
+		const existingExercise = exercises.find(
+			({ exerciseName }) => exerciseName === nameOfExercise
+		);
+		if (existingExercise != undefined) {
+			const indexOfExercise = exercises.findIndex(
+				(exercise) => exercise === existingExercise
+			);
+			const setsInExercise = Object.keys(existingExercise.sets).length;
+			const nextExerciseState = { ...existingExercise };
+			nextExerciseState.sets[setsInExercise + 1] = set;
+			const nextExercisesState = [...exercises];
+			nextExercisesState[indexOfExercise] = nextExerciseState;
+			setExercises(nextExercisesState);
+		}
 	};
 
 	return (
@@ -525,23 +286,13 @@ const AddWorkoutDialogScreen = (props) => {
 					/>
 				}
 				trailingIcons={[
-					<TextButton onButtonPress={onAddTempData}>EX</TextButton>,
-
-					// <TextButton onButtonPress={onShowAddWorkoutModal}>
-					// 	Temp
-					// </TextButton>,
 					<TextButton
 						onButtonPress={onSaveWorkout}
-						disabled={
-							workoutState.workout.exercises.length === 0
-								? true
-								: false
-						}
+						disabled={exercises.length === 0 ? true : false}
 					>
 						Save
 					</TextButton>,
 				]}
-				// optionalStyle={{ }}
 				backgroundColor={
 					isScrolling ? currentTheme.surfaceE2 : currentTheme.surface
 				}
@@ -618,18 +369,11 @@ const AddWorkoutDialogScreen = (props) => {
 					label="Note"
 					multiline={true}
 					onEndEditing={(event) => onNoteEditingEnd(event)}
+					keyboardType="default"
 				/>
 			</View>
 
 			<View style={styles.exerciseSummary}>
-				{/* <View style={styles.exerciseSummaryHeader}>
-					<TitleText
-						large={true}
-						style={{ color: currentTheme.onSurface }}
-					>
-						Exercises
-					</TitleText>
-				</View> */}
 				<FlatList
 					onScroll={(event) => scrollHandler(event)}
 					ItemSeparatorComponent={() => {
@@ -653,14 +397,15 @@ const AddWorkoutDialogScreen = (props) => {
 							</TitleText>
 						</View>
 					}
-					keyExtractor={(item) => item.listID}
-					data={exerciseListDisplay}
+					data={exercises}
 					renderItem={(itemData) => (
 						<ExerciseView
 							exerciseData={itemData.item}
 							isDarkMode={useDarkMode}
 							currentTheme={currentTheme}
-							removeExercise={removeExercise}
+							removeExercise={onRemoveExercise}
+							isMetric={isMetric}
+							onAddSetToExercise={onAddSetToExercise}
 						/>
 					)}
 				/>
@@ -674,6 +419,8 @@ const ExerciseView = ({
 	isDarkMode,
 	currentTheme,
 	removeExercise,
+	isMetric,
+	onAddSetToExercise,
 }) => {
 	const [styles, setStyles] = useState(
 		getExerciseViewStyle(isDarkMode ? Themes.dark : Themes.light)
@@ -682,6 +429,13 @@ const ExerciseView = ({
 	const [setView, setSetView] = useState([]);
 
 	const [showMenu, setShowMenu] = useState(false);
+
+	const [addSet, setAddSet] = useState(false);
+
+	// inputState
+	const [weight, setWeight] = useState({ value: 0, error: false });
+	const [reps, setReps] = useState({ value: 0, error: false });
+	const [rpe, setRpe] = useState({ value: 0, error: false });
 
 	useEffect(() => {
 		return () => {
@@ -710,10 +464,6 @@ const ExerciseView = ({
 		}
 	}, [exerciseData]);
 
-	useEffect(() => {
-		// console.log("Test", setView.length);
-	}, [setView]);
-
 	const onCloseMenu = () => {
 		setShowMenu(false);
 	};
@@ -724,6 +474,45 @@ const ExerciseView = ({
 	const onRemoveExercise = () => {
 		onCloseMenu();
 		removeExercise(exerciseData);
+	};
+
+	const onAddSet = () => {
+		const newSet = {
+			weight: weight.value,
+			reps: reps.value,
+			rpe: rpe.value,
+		};
+
+		console.log(exerciseData.id);
+		onAddSetToExercise(exerciseData.exerciseName, newSet);
+		onToggleAddSet();
+	};
+
+	const onToggleAddSet = () => {
+		setAddSet((state) => !state);
+	};
+
+	const onValueEntered = (event, type) => {
+		const value = event.nativeEvent.text;
+		const sanitizedValue = Number(value.replace(/,/g, "."));
+		const isValid = inputValueValidityCheck(type, sanitizedValue);
+		if (isValid) {
+			if (type === "weight") {
+				setWeight({ value: sanitizedValue, error: false });
+			} else if (type === "reps") {
+				setReps({ value: sanitizedValue, error: false });
+			} else {
+				setRpe({ value: sanitizedValue, error: false });
+			}
+		} else {
+			if (type === "weight") {
+				setWeight({ value: sanitizedValue, error: true });
+			} else if (type === "reps") {
+				setReps({ value: sanitizedValue, error: true });
+			} else {
+				setRpe({ value: sanitizedValue, error: true });
+			}
+		}
 	};
 
 	return (
@@ -759,6 +548,9 @@ const ExerciseView = ({
 			<View style={styles.exerciseDisplay}>
 				{setView.map((set) => {
 					const setData = set;
+					const displayWeight = isMetric
+						? setData[1][0]
+						: Math.round(convertKiloToPound(setData[1][0]));
 					return (
 						<View style={styles.setView} key={nanoid()}>
 							<View style={styles.setNumber}>
@@ -777,7 +569,7 @@ const ExerciseView = ({
 									}}
 									large={true}
 								>
-									{setData[1][0]}kg *
+									{displayWeight} {isMetric ? "kg" : "lbs"} *
 								</BodyText>
 								<BodyText
 									style={{
@@ -802,8 +594,16 @@ const ExerciseView = ({
 					);
 				})}
 			</View>
-			<View style={styles.buttonRow}>
-				<IconButton
+			{!addSet && (
+				<View style={styles.buttonRow}>
+					<TextButton onButtonPress={onRemoveExercise}>
+						Delete
+					</TextButton>
+					<TextButton onButtonPress={onToggleAddSet}>
+						Add set
+					</TextButton>
+
+					{/* <IconButton
 					name="trash-outline"
 					iconColor={currentTheme.onSurfaceVariant}
 					onPress={() => console.log("deleteexercise")}
@@ -812,8 +612,130 @@ const ExerciseView = ({
 					name="add"
 					iconColor={currentTheme.onSurfaceVariant}
 					onPress={() => console.log("deleteexercise")}
-				/>
-			</View>
+				/> */}
+				</View>
+			)}
+			{addSet && (
+				<View style={{ width: "100%", flexDirection: "column" }}>
+					<View style={styles.addSetRow}>
+						<View style={{ flex: 1, marginRight: 6 }}>
+							<PaperInput
+								mode="outlined"
+								keyboardType="numeric"
+								style={{
+									backgroundColor: currentTheme.surface,
+								}}
+								activeOutlineColor={
+									weight.error
+										? currentTheme.error
+										: currentTheme.primary
+								}
+								outlineColor={
+									weight.error
+										? currentTheme.error
+										: currentTheme.outline
+								}
+								theme={{
+									colors: {
+										text: weight.error
+											? currentTheme.error
+											: currentTheme.onSurface,
+										placeholder: weight.error
+											? currentTheme.error
+											: currentTheme.onSurface,
+									},
+								}}
+								onEndEditing={(event) =>
+									onValueEntered(event, "weight")
+								}
+								label="Weight"
+							/>
+						</View>
+						<View style={{ flex: 1, marginRight: 6 }}>
+							<PaperInput
+								mode="outlined"
+								keyboardType="numeric"
+								style={{
+									backgroundColor: currentTheme.surface,
+								}}
+								activeOutlineColor={
+									reps.error
+										? currentTheme.error
+										: currentTheme.primary
+								}
+								outlineColor={
+									reps.error
+										? currentTheme.error
+										: currentTheme.outline
+								}
+								theme={{
+									colors: {
+										text: reps.error
+											? currentTheme.error
+											: currentTheme.onSurface,
+										placeholder: reps.error
+											? currentTheme.error
+											: currentTheme.onSurface,
+									},
+								}}
+								onEndEditing={(event) =>
+									onValueEntered(event, "reps")
+								}
+								label="Reps"
+							/>
+						</View>
+						<View style={{ flex: 1 }}>
+							<PaperInput
+								mode="outlined"
+								keyboardType="numeric"
+								style={{
+									backgroundColor: currentTheme.surface,
+								}}
+								activeOutlineColor={
+									rpe.error
+										? currentTheme.error
+										: currentTheme.primary
+								}
+								outlineColor={
+									rpe.error
+										? currentTheme.error
+										: currentTheme.outline
+								}
+								theme={{
+									colors: {
+										text: rpe.error
+											? currentTheme.error
+											: currentTheme.onSurface,
+										placeholder: rpe.error
+											? currentTheme.error
+											: currentTheme.onSurface,
+									},
+								}}
+								onEndEditing={(event) =>
+									onValueEntered(event, "rpe")
+								}
+								label="RPE"
+							/>
+						</View>
+					</View>
+					<View
+						style={{
+							flex: 1,
+							flexDirection: "row",
+							justifyContent: "space-around",
+							alignItems: "center",
+							marginTop: 10,
+						}}
+					>
+						<TextButton onButtonPress={onToggleAddSet}>
+							Discard
+						</TextButton>
+						<OutlineButton onButtonPress={onAddSet}>
+							Add set
+						</OutlineButton>
+					</View>
+				</View>
+			)}
 		</View>
 	);
 };
@@ -865,6 +787,10 @@ const getExerciseViewStyle = (theme) => {
 			justifyContent: "flex-end",
 			alignItems: "baseline",
 			// marginRight: 15,
+		},
+		addSetRow: {
+			flexDirection: "row",
+			width: "100%",
 		},
 	});
 };

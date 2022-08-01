@@ -21,7 +21,6 @@ export const getExerciseTypes = createAsyncThunk(
 	async (_, thunkAPI) => {
 		try {
 			const exerciseData = await firebaseGetExerciseTypes();
-			console.log(exerciseData);
 			return exerciseData
 		} catch (error) {
 			console.log(error);
@@ -182,7 +181,6 @@ export const workoutSlice = createSlice({
 
 		builder.addCase(getExerciseTypes.fulfilled, (state, action) => {
 			if(action.payload){
-				console.log(action.payload);
 				state.exerciseTypes = action.payload;
 			}
 		})
