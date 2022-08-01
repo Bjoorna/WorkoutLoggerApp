@@ -93,7 +93,6 @@ const AddWorkoutDialogScreen = (props) => {
 
 	useEffect(() => {
 		const fabXPos = width / 2 - 56 / 2;
-		console.log(fabXPos);
 		// const fabHeight = layout.height;
 		setFabPosition({ x: fabXPos, y: 16 });
 
@@ -397,6 +396,8 @@ const AddWorkoutDialogScreen = (props) => {
 							</TitleText>
 						</View>
 					}
+					ListFooterComponent={<View></View>}
+					ListFooterComponentStyle={{ height: 80 }}
 					data={exercises}
 					renderItem={(itemData) => (
 						<ExerciseView
@@ -445,9 +446,7 @@ const ExerciseView = ({
 
 	useEffect(() => {
 		if (exerciseData) {
-			// console.log("ExerciseData changed: ", exerciseData.exerciseName);
 			const newSetView = [];
-			// const sets = exerciseData.sets;
 			for (const [setNumber, setData] of Object.entries(
 				exerciseData.sets
 			)) {
@@ -483,7 +482,6 @@ const ExerciseView = ({
 			rpe: rpe.value,
 		};
 
-		console.log(exerciseData.id);
 		onAddSetToExercise(exerciseData.exerciseName, newSet);
 		onToggleAddSet();
 	};
@@ -602,17 +600,6 @@ const ExerciseView = ({
 					<TextButton onButtonPress={onToggleAddSet}>
 						Add set
 					</TextButton>
-
-					{/* <IconButton
-					name="trash-outline"
-					iconColor={currentTheme.onSurfaceVariant}
-					onPress={() => console.log("deleteexercise")}
-				/>
-				<IconButton
-					name="add"
-					iconColor={currentTheme.onSurfaceVariant}
-					onPress={() => console.log("deleteexercise")}
-				/> */}
 				</View>
 			)}
 			{addSet && (

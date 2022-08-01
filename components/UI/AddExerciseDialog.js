@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { TextInput as PaperInput, HelperText } from "react-native-paper";
 import { useSelector } from "react-redux";
-import { convertPoundToKilo } from "../../shared/utils/UtilFunctions";
+import { convertPoundToKilo, inputValueValidityCheck } from "../../shared/utils/UtilFunctions";
 import IconButton from "../Buttons/IconButton";
 import OutlineButton from "../Buttons/OutlineButton";
 import TextButton from "../Buttons/TextButton";
@@ -62,7 +62,6 @@ const SelectExerciseListItem = ({
 	const [sortedList, setSortedList] = useState([]);
 
 	useEffect(() => {
-		// console.log(data);
 		const sortData = data.data.sort((a, b) => a.localeCompare(b));
 		setSortedList(sortData);
 	}, []);
@@ -106,26 +105,19 @@ const AddExerciseDialog = ({ onAddExercise, currentTheme, closeDialog }) => {
 	const [hasSelectedExercise, setHasSelectedExercise] = useState(false);
 
 	useEffect(() => {
-		// console.log(exerciseTypes)
 		const data = [];
 		for (let [key, value] of Object.entries(exerciseTypes)) {
-			// console.log(key);
-			// console.log(value);
 			const dataObject = {};
 			dataObject.title = key;
-			// console.log(dataObject);
 			const exerciseList = [];
 			for (let ex of Object.values(value)) {
-				// console.log(ex);
 				exerciseList.push(ex.value);
 			}
 			dataObject.data = exerciseList;
 			data.push(dataObject);
 		}
-		// console.log(data);
 		setExerciseTypesList(data);
 		onUnselectExercise();
-		console.log(isMetric);
 	}, []);
 
 	useEffect(() => {
@@ -141,48 +133,9 @@ const AddExerciseDialog = ({ onAddExercise, currentTheme, closeDialog }) => {
 	}, [exerciseState]);
 
 	useEffect(() => {
-		// console.log("InputState"), console.log(inputState);
 		setCanSubmit(checkCanSubmit());
 	}, [inputState]);
 
-	// const onValueEntered = (ref, type) => {
-	// 	const value = ref.current.value();
-
-	// 	// replace comma with dot
-	// 	const sanitizedValue = Number(value.replace(/,/g, "."));
-	// 	// console.log(sanitizedValue);
-
-	// 	// check if value is valid
-	// 	const isValid = inputValueValidityCheck(type, sanitizedValue);
-	// 	if (isValid) {
-	// 		dispatchExercise({
-	// 			type: ADD_VALUE,
-	// 			field: type,
-	// 			newValue: { value: sanitizedValue, error: false },
-	// 		});
-	// 	} else {
-	// 		dispatchExercise({
-	// 			type: ADD_VALUE,
-	// 			field: type,
-	// 			newValue: { value: sanitizedValue, error: true },
-	// 		});
-	// 	}
-	// };
-
-	// const inputValueValidityCheck = (type, value) => {
-	// 	if (type === "rpe") {
-	// 		if (value >= 6.5 && value <= 10) {
-	// 			return true;
-	// 		} else {
-	// 			return false;
-	// 		}
-	// 	} else {
-	// 		if (value > 0 && value != null) {
-	// 			return true;
-	// 		}
-	// 		return false;
-	// 	}
-	// };
 
 	const onSelectExercise = (exercise) => {
 		dispatchExercise({
@@ -203,7 +156,9 @@ const AddExerciseDialog = ({ onAddExercise, currentTheme, closeDialog }) => {
 	const onValueEntered = (event, type) => {
 		const value = event.nativeEvent.text;
 		const sanitizedValue = Number(value.replace(/,/g, "."));
+		// const isValid = inputValueValidityCheck(type, sanitizedValue);
 		const isValid = inputValueValidityCheck(type, sanitizedValue);
+
 		if (isValid) {
 			dispatchInput({
 				type: ADD_VALUE,
@@ -216,21 +171,6 @@ const AddExerciseDialog = ({ onAddExercise, currentTheme, closeDialog }) => {
 				field: type,
 				newValue: { value: sanitizedValue, error: true },
 			});
-		}
-	};
-
-	const inputValueValidityCheck = (type, value) => {
-		if (type === "rpe") {
-			if (value >= 6.5 && value <= 10) {
-				return true;
-			} else {
-				return false;
-			}
-		} else {
-			if (value > 0 && value != null) {
-				return true;
-			}
-			return false;
 		}
 	};
 
@@ -259,7 +199,6 @@ const AddExerciseDialog = ({ onAddExercise, currentTheme, closeDialog }) => {
 				rpe: exerciseValues.rpe.value,
 			};
 		}
-		console.log(newSetObject);
 		dispatchExercise({
 			type: ADD_VALUE,
 			field: "sets",
@@ -268,9 +207,8 @@ const AddExerciseDialog = ({ onAddExercise, currentTheme, closeDialog }) => {
 		const exerciseToAdd = {
 			exerciseName: exerciseState.exercise.exerciseName.value,
 			sets: newSetObject,
-			id: nanoid()
+			id: nanoid(),
 		};
-		console.log("AddExerciusdialog 273: ",exerciseToAdd);
 		onUnselectExercise();
 
 		onAddExercise(exerciseToAdd);
@@ -291,9 +229,7 @@ const AddExerciseDialog = ({ onAddExercise, currentTheme, closeDialog }) => {
 	return (
 		<KeyboardAvoidingView behavior="height" style={styles.modalContainer}>
 			<Pressable
-				onPress={() => {
-					console.log("Scrim");
-				}}
+				onPress={closeDialog}
 				style={{ flex: 1 }}
 			></Pressable>
 			<View style={styles.modalContent}>
@@ -701,23 +637,3 @@ const getStyles = (theme) => {
 
 export default AddExerciseDialog;
 
-{
-	/* <SectionList
-					horizontal={true}
-						// style={{flexDirection: "row"}}
-						sections={exerciseTypesList}
-						keyExtractor={() => nanoid()}
-						renderItem={({ item }) => (
-							<FilterChip
-								selected={false}
-								onPress={() =>
-									console.log("Pressed chip: ", item)
-								}
-								text={item}
-							/>
-						)}
-						renderSectionHeader={({ section: { title } }) => (
-							<LabelText>{title}</LabelText>
-						)}
-					/> */
-}
