@@ -3,6 +3,40 @@ import Asyncstorage from "@react-native-async-storage/async-storage";
 import { nanoid } from "nanoid";
 import Workout from "../../models/workout";
 
+export const getIntensity = (rpe, reps) => {
+	const intensity10 = [100, 96, 92, 89, 86, 84, 81, 79, 76, 74];
+	const intensity95 = [98, 94, 91, 88, 85, 82, 80, 77, 75, 72];
+	const intensity9 = [96, 92, 89, 86, 84, 81, 79, 76, 74, 71];
+	const intensity85 = [94, 91, 88, 85, 82, 80, 77, 75, 72, 69];
+	const intensity8 = [92, 89, 86, 84, 81, 79, 76, 74, 71, 68];
+	const intensity75 = [91, 88, 85, 82, 80, 77, 75, 72, 69, 67];
+	const intensity7 = [89, 86, 84, 81, 79, 76, 74, 71, 68, 65];
+	const intensity65 = [88, 85, 82, 80, 77, 75, 72, 69, 67, 64];
+
+	switch (rpe) {
+		case 6.5:
+			return intensity65[reps - 1];
+
+		case 7:
+			return intensity7[reps - 1];
+
+		case 7.5:
+			return intensity75[reps - 1];
+		case 8:
+			return intensity8[reps - 1];
+		case 8.5:
+			return intensity85[reps - 1];
+		case 9:
+			return intensity9[reps - 1];
+		case 9.5:
+			return intensity95[reps - 1];
+		case 10:
+			return intensity10[reps - 1];
+		default:
+			return -1;
+	}
+};
+
 export const hexToRGB = (hex) => {
 	let r = 0,
 		g = 0,
@@ -58,7 +92,7 @@ export const convertMetricHeightToImperial = (cm) => {
 	return { feet: Math.floor(inches / 12), inches: inches % 12 };
 };
 
-export 	const inputValueValidityCheck = (type, value) => {
+export const inputValueValidityCheck = (type, value) => {
 	if (type === "rpe") {
 		if (value >= 6.5 && value <= 10) {
 			return true;
@@ -72,7 +106,6 @@ export 	const inputValueValidityCheck = (type, value) => {
 		return false;
 	}
 };
-
 
 /**
  *

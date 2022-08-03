@@ -29,7 +29,10 @@ import FilterSelect from "../../components/FilterSelect";
 import AddWorkoutcreen from "./AddWorkoutScreen";
 
 import { transformObjectToWorkout } from "../../shared/utils/UtilFunctions";
-import { getExerciseTypes, getWorkoutByUserID } from "../../redux/slices/workoutSlice";
+import {
+	getExerciseTypes,
+	getWorkoutByUserID,
+} from "../../redux/slices/workoutSlice";
 import { setHideTabBar } from "../../redux/slices/appSettingsSlice";
 import TopAppBar from "../../components/UI/TopAppBarComponent";
 
@@ -64,7 +67,6 @@ const WorkoutListScreen = (props) => {
 
 	// layout
 	// const [fabPosition, setFabPosition] = useState({x: 0, y: 0});
-
 
 	// BottomSheet stuff
 	const bottomSheetRef = useRef(null);
@@ -155,14 +157,13 @@ const WorkoutListScreen = (props) => {
 		props.navigation.navigate("Calculator");
 	};
 
-	const onFabLayout = event => {
+	const onFabLayout = (event) => {
 		// console.log(event.nativeEvent);
 		// const layout = event.nativeEvent.layout;
 		// const fabWidth = layout.width;
 		// const fabHeight = layout.height;
 		// setFabPosition({x: 16, y: 0})
-
-	}
+	};
 	return (
 		<View style={styles.container}>
 			{/* <Modal
@@ -187,7 +188,6 @@ const WorkoutListScreen = (props) => {
 					title="New Workout"
 					onLayout={onFabLayout}
 				/>
-				
 			)}
 			<TopAppBar
 				headlineText="Workouts"
@@ -210,6 +210,20 @@ const WorkoutListScreen = (props) => {
 					data={workouts}
 					keyExtractor={(item) => item.id}
 					onScroll={(e) => scrollHandler(e)}
+					ListFooterComponent={<View></View>}
+					ListFooterComponentStyle={{ height: 80 }}
+
+					ItemSeparatorComponent={() => {
+						return (
+							<View
+								style={{
+									width: "100%",
+									borderBottomWidth: 1,
+									borderBottomColor: currentTheme.outline,
+								}}
+							></View>
+						);
+					}}
 					refreshControl={
 						<RefreshControl
 							refreshing={refreshing}

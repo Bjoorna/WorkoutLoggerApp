@@ -15,88 +15,149 @@ import Exercise from "../models/Exercise";
 import LabelText from "./Text/Label";
 import { FlatList } from "react-native-gesture-handler";
 import { useNavigation } from "@react-navigation/core";
-import UtilFunctions from "../shared/utils/UtilFunctions";
 import { getExercisesInWorkout } from "../redux/slices/workoutSlice";
-import { setHideTabBar, setUseDarkMode } from "../redux/slices/appSettingsSlice";
+import {
+	setHideTabBar,
+	setUseDarkMode,
+} from "../redux/slices/appSettingsSlice";
+import { nanoid } from "@reduxjs/toolkit";
+import TitleText from "./Text/Title";
+import { getIntensity } from "../shared/utils/UtilFunctions";
 // const theme = Themes.dark;
 
-const ExerciseItem = (props) => {
-	const exercise = props.exercise;
+const ExerciseItem = ({ exercise, currentTheme }) => {
 	// const isMetric = useSelector(state => state.user.user.useMetric);
-	const [currentTheme, setCurrentTheme] = useState(props.currentTheme);
+	// const [currentTheme, setCurrentTheme] = useState(currentTheme);
 	const [exerciseStyles, setExerciseStyles] = useState(
 		getExerciseStyles(currentTheme)
 	);
+
+	const [topSet, setTopSet] = useState({ weight: 0 });
+	const [avgIntensity, setAvgIntensity] = useState(0);
 	// const currentTheme = props.ocurrentTheme;
 
 	useEffect(() => {
-		setCurrentTheme(props.currentTheme);
-	}, [props]);
+		findTopSet();
+		calcAvgIntensity();
+	}, [exercise]);
 
 	useEffect(() => {
 		setExerciseStyles(getExerciseStyles(currentTheme));
 	}, [currentTheme]);
+
+	const findTopSet = () => {
+		console.log(exercise);
+
+		let topSetCandidate = exercise.sets[1];
+
+		for (let [set, setValue] of Object.entries(exercise.sets)) {
+			console.log(set);
+			console.log(setValue);
+			if (setValue.weight > topSetCandidate.weight) {
+				topSetCandidate = setValue;
+			}
+		}
+
+		setTopSet(topSetCandidate);
+	};
+
+	const calcAvgIntensity = () => {
+		let nrOfSets = 1;
+		let intensitySum = 0;
+		for (let set of Object.values(exercise.sets)) {
+			intensitySum += getIntensity(set.rpe, set.reps);
+			nrOfSets++;
+		}
+		console.log(nrOfSets);
+		console.log(intensitySum);
+		const avgInt = intensitySum / nrOfSets
+		setAvgIntensity(avgInt);
+		// const intensity = getIntensity(set1.rpe, set1.reps);
+
+	};
+
 	return (
 		<View style={exerciseStyles.exerciseItem}>
-			<View style={exerciseStyles.exerciseValues}>
+			<View style={{ alignItems: "flex-start", marginBottom: 6 }}>
 				<BodyText
 					style={{
-						color: currentTheme.onSecondaryContainer,
+						color: currentTheme.onSurface,
 						height: 20,
 						overflow: "hidden",
 					}}
+					large={true}
 				>
-					{exercise.exercise}
+					{exercise.exerciseName}
 				</BodyText>
-				<LabelText style={{ color: currentTheme.onSecondaryContainer }}>
-					{/* {isMetric ? exercise.weight : UtilFunctions.convertMass(exercise.weight, false)} {isMetric? "kg":"lbs"} */}
-					{exercise.weight}kg
+			</View>
+			<View style={{ alignItems: "flex-start", marginBottom: 6 }}>
+				<LabelText style={{ color: currentTheme.onSurfaceVariant }}>
+					Top set
 				</LabelText>
-				<LabelText style={{ color: currentTheme.onSecondaryContainer }}>
-					{exercise.reps} reps
+				<BodyText
+					large={true}
+					style={{ color: currentTheme.onSurface }}
+				>
+					{topSet.weight}kg * {topSet.reps}reps
+				</BodyText>
+			</View>
+			<View style={{ alignItems: "flex-start" }}>
+				<LabelText style={{ color: currentTheme.onSurfaceVariant }}>
+					Avg intensity
 				</LabelText>
-				<LabelText style={{ color: currentTheme.onSecondaryContainer }}>
-					{exercise.sets} sets
-				</LabelText>
-				<LabelText style={{ color: currentTheme.onSecondaryContainer }}>
-					{exercise.rpe} RPE
-				</LabelText>
+				<BodyText
+					large={true}
+					style={{ color: currentTheme.onSurface }}
+				>
+					{Math.round(avgIntensity)}%
+				</BodyText>
 			</View>
 		</View>
+
+		// <View style={exerciseStyles.exerciseItem}>
+		// 	<View style={exerciseStyles.exerciseValues}>
+		// 		<BodyText
+		// 			style={{
+		// 				color: currentTheme.onSecondaryContainer,
+		// 				height: 20,
+		// 				overflow: "hidden",
+		// 			}}
+		// 		>
+		// 			{exercise.exercise}
+		// 		</BodyText>
+		// 		<LabelText style={{ color: currentTheme.onSecondaryContainer }}>
+		// 			{/* {isMetric ? exercise.weight : UtilFunctions.convertMass(exercise.weight, false)} {isMetric? "kg":"lbs"} */}
+		// 			{exercise.weight}kg
+		// 		</LabelText>
+		// 		<LabelText style={{ color: currentTheme.onSecondaryContainer }}>
+		// 			{exercise.reps} reps
+		// 		</LabelText>
+		// 		<LabelText style={{ color: currentTheme.onSecondaryContainer }}>
+		// 			{exercise.sets} sets
+		// 		</LabelText>
+		// 		<LabelText style={{ color: currentTheme.onSecondaryContainer }}>
+		// 			{exercise.rpe} RPE
+		// 		</LabelText>
+		// 	</View>
+		// </View>
 	);
 };
 
 const getExerciseStyles = (theme) => {
 	return StyleSheet.create({
 		exerciseItem: {
-			width: 100,
-			height: 100,
-			borderRadius: 5,
-			padding: 5,
-			backgroundColor: theme.secondaryContainer,
-			marginHorizontal: 3,
+			minWidth: 100,
+			marginRight: 12,
+			// height: 100,
+			flexDirection: "column",
+			justifyContent: "flex-start",
+			marginBottom: 12,
 		},
 		exerciseValues: {
-			alignItems: "center",
-			paddingHorizontal: 4,
+			alignItems: "flex-start",
 		},
 	});
 };
-
-// const exerciseStyles = StyleSheet.create({
-// 	exerciseItem: {
-// 		width: 100,
-// 		height: 100,
-// 		borderRadius: 5,
-// 		padding: 5,
-// 		backgroundColor: theme.secondaryContainer,
-// 		marginHorizontal: 3,
-// 	},
-// 	exerciseValues: {
-// 		alignItems: "center",
-// 		paddingHorizontal: 4
-// 	}
-// });
 
 const WorkoutListItem = ({ workoutID, userID }) => {
 	const dispatch = useDispatch();
@@ -106,7 +167,9 @@ const WorkoutListItem = ({ workoutID, userID }) => {
 
 	const [exercises, setExercises] = useState([]);
 
-	const [dateObject, setDateObject] = useState(workout ? new Date(workout.date): new Date());
+	const [dateObject, setDateObject] = useState(
+		workout ? new Date(workout.date) : new Date()
+	);
 
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
 
@@ -122,23 +185,23 @@ const WorkoutListItem = ({ workoutID, userID }) => {
 		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
 	}, [useDarkMode]);
 
-	// fetch exercises 
+	// fetch exercises
 	useEffect(() => {
 		if (workout) {
+			console.log(workout);
 			const requestPayload = {
 				userID: userID,
 				exerciseIDs: workout.exercises,
 			};
 			dispatch(getExercisesInWorkout(requestPayload));
-		}else {
+		} else {
 			setDateObject(new Date());
 		}
-
 	}, [workout]);
 
 	// when store is updated, get the exercises from store
 	useEffect(() => {
-		if(workout){
+		if (workout) {
 			const updatedArrayOfExercises = [];
 			// inefficient ?????
 			for (let exerciseID of workout.exercises) {
@@ -146,17 +209,16 @@ const WorkoutListItem = ({ workoutID, userID }) => {
 					updatedArrayOfExercises.push(exercisesInStore[exerciseID]);
 				}
 			}
-	
+
 			setExercises(updatedArrayOfExercises);
-	
 		}
 	}, [exercisesInStore]);
 
 	const navigateToDetailPage = () => {
 		// hide TabBar
-		dispatch(setHideTabBar(true));
-		Vibration.vibrate(50);
-		navigation.navigate("WorkoutDetail", { workoutID: workout.id });
+		// dispatch(setHideTabBar(true));
+		// Vibration.vibrate(50);
+		// navigation.navigate("WorkoutDetail", { workoutID: workout.id });
 	};
 
 	return (
@@ -167,28 +229,49 @@ const WorkoutListItem = ({ workoutID, userID }) => {
 			>
 				<View style={styles.workoutItemLayout}>
 					<View style={styles.workoutItemHeader}>
-						<LabelText style={{ color: currentTheme.secondary }}>
-							{dateObject.toISOString()}
+						<BodyText
+							large={true}
+							style={{ color: currentTheme.onSurface }}
+						>
+							Weightlifting
+						</BodyText>
+						<LabelText
+							style={{ color: currentTheme.onSurfaceVariant }}
+						>
+							{dateObject.getUTCDate()}/
+							{dateObject.getUTCMonth() + 1}/
+							{dateObject.getUTCFullYear()}
 						</LabelText>
 					</View>
 					<View style={styles.workoutItemExerciseContainer}>
-							{/* <View>
+						{/* {exercises.map((exercise) => {
+							console.log(exercise);
+							return (
+								<ExerciseItem
+									key={nanoid()}
+									currentTheme={currentTheme}
+									exercise={exercise}
+								/>
+							);
+						})} */}
+						{/* <View>
 								<ActivityIndicator
 									size="small"
 									color={currentTheme.primary}
 								/>
 							</View> */}
-							<FlatList
-								keyExtractor={(item) => item.id}
-								horizontal={true}
-								data={exercises}
-								renderItem={(itemData) => (
-									<ExerciseItem
-										currentTheme={currentTheme}
-										exercise={itemData.item}
-									/>
-								)}
-							/>
+						<FlatList
+							keyExtractor={(item) => item.id}
+							horizontal={false}
+							numColumns={3}
+							data={exercises}
+							renderItem={(itemData) => (
+								<ExerciseItem
+									currentTheme={currentTheme}
+									exercise={itemData.item}
+								/>
+							)}
+						/>
 					</View>
 				</View>
 			</Pressable>
@@ -201,13 +284,15 @@ const getStyles = (theme) => {
 		workoutItemContainer: {
 			width: "90%",
 			alignSelf: "center",
-			minHeight: 130,
-			borderRadius: 12,
-			overflow: "hidden",
-			borderColor: theme.outline,
-			borderStyle: "solid",
-			borderWidth: 1,
-			marginVertical: 5,
+			minHeight: 150,
+			paddingVertical: 6,
+			marginBottom: 12,
+			// borderRadius: 12,
+			// overflow: "hidden",
+			// borderColor: theme.outline,
+			// borderStyle: "solid",
+			// borderWidth: 1,
+			// marginVertical: 5,
 		},
 		pressableView: {
 			flex: 1,
@@ -220,11 +305,15 @@ const getStyles = (theme) => {
 			paddingHorizontal: 10,
 		},
 		workoutItemHeader: {
+			flexDirection: "column",
 			width: "100%",
-			height: 20,
-			alignItems: "flex-end",
+			// height: 20,
+			alignItems: "flex-start",
+			marginBottom: 6,
 		},
-		workoutItemExerciseContainer: {},
+		workoutItemExerciseContainer: {
+			flexDirection: "row",
+		},
 	});
 };
 
