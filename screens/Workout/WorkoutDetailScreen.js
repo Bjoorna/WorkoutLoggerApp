@@ -64,8 +64,6 @@ const WorkoutDetailScreen = (props) => {
 
 	useEffect(() => {
 		const onWorkout = reduxWorkoutsRef[workoutID];
-		// console.log("OnWorkoout: ");
-		// console.log(onWorkout);
 		setWorkout(onWorkout);
 	}, []);
 
@@ -83,13 +81,6 @@ const WorkoutDetailScreen = (props) => {
 		}
 	}, [workout]);
 
-	useEffect(() => {
-		// console.log(exercises);
-	}, [exercises]);
-
-	useEffect(() => {
-		console.log(updatedNote);
-	}, [updatedNote]);
 
 	useEffect(() => {
 		setStyles(useDarkMode ? Themes.dark : Themes.light);
@@ -115,11 +106,6 @@ const WorkoutDetailScreen = (props) => {
 		setSummaryData(newSummaryData);
 	};
 
-	const calcIntensity = (rpe, reps) => {
-		console.log("RPE: " + rpe);
-		console.log("REPS: " + reps);
-		return 3;
-	};
 
 	useLayoutEffect(() => {
 		// BandAid to fix react rendering without the stylesheet on changes
@@ -133,8 +119,6 @@ const WorkoutDetailScreen = (props) => {
 			const workoutDeleted = await dispatch(
 				deleteWorkout(workout)
 			).unwrap();
-			console.log("workout and exercises deleted");
-			console.log(workoutDeleted);
 			showModalHandler(false);
 			props.navigation.goBack();
 		}
@@ -152,10 +136,6 @@ const WorkoutDetailScreen = (props) => {
 			return () => onCloseScreen();
 		}, [props.navigation])
 	);
-	const onNoteEditingEnd = (event) => {
-		console.log(event);
-		// setUpdatedNote(event)
-	};
 
 	const onUpdateNote = () => {
 		const payload = { workoutID: workout.id, field: { note: updatedNote } };
@@ -223,9 +203,6 @@ const WorkoutDetailScreen = (props) => {
 									label="Note"
 									multiline={true}
 									onChangeText={setUpdatedNote}
-									onEndEditing={(event) =>
-										onNoteEditingEnd(event)
-									}
 									keyboardType="default"
 									defaultValue={
 										workout.note !== "" ? workout.note : ""
