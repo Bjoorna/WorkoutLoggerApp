@@ -22,11 +22,11 @@ import {
 } from "../redux/slices/appSettingsSlice";
 import { nanoid } from "@reduxjs/toolkit";
 import TitleText from "./Text/Title";
-import { getIntensity } from "../shared/utils/UtilFunctions";
+import { convertKiloToPound, getIntensity } from "../shared/utils/UtilFunctions";
 // const theme = Themes.dark;
 
 const ExerciseItem = ({ exercise, currentTheme }) => {
-	// const isMetric = useSelector(state => state.user.user.useMetric);
+	const isMetric = useSelector((state) => state.user.user.useMetric);
 	// const [currentTheme, setCurrentTheme] = useState(currentTheme);
 	const [exerciseStyles, setExerciseStyles] = useState(
 		getExerciseStyles(currentTheme)
@@ -46,13 +46,10 @@ const ExerciseItem = ({ exercise, currentTheme }) => {
 	}, [currentTheme]);
 
 	const findTopSet = () => {
-		console.log(exercise);
 
 		let topSetCandidate = exercise.sets[1];
 
 		for (let [set, setValue] of Object.entries(exercise.sets)) {
-			console.log(set);
-			console.log(setValue);
 			if (setValue.weight > topSetCandidate.weight) {
 				topSetCandidate = setValue;
 			}
@@ -68,12 +65,9 @@ const ExerciseItem = ({ exercise, currentTheme }) => {
 			intensitySum += getIntensity(set.rpe, set.reps);
 			nrOfSets++;
 		}
-		console.log(nrOfSets);
-		console.log(intensitySum);
-		const avgInt = intensitySum / nrOfSets
+		const avgInt = intensitySum / nrOfSets;
 		setAvgIntensity(avgInt);
 		// const intensity = getIntensity(set1.rpe, set1.reps);
-
 	};
 
 	return (
@@ -94,12 +88,22 @@ const ExerciseItem = ({ exercise, currentTheme }) => {
 				<LabelText style={{ color: currentTheme.onSurfaceVariant }}>
 					Top set
 				</LabelText>
-				<BodyText
-					large={true}
-					style={{ color: currentTheme.onSurface }}
-				>
-					{topSet.weight}kg * {topSet.reps}reps
-				</BodyText>
+				{isMetric && (
+					<BodyText
+						large={true}
+						style={{ color: currentTheme.onSurface }}
+					>
+						{topSet.weight}kg * {topSet.reps}reps
+					</BodyText>
+				)}
+				{!isMetric && (
+					<BodyText
+						large={true}
+						style={{ color: currentTheme.onSurface }}
+					>
+						{Math.round(convertKiloToPound(topSet.weight))}lbs * {topSet.reps}reps
+					</BodyText>
+				)}
 			</View>
 			<View style={{ alignItems: "flex-start" }}>
 				<LabelText style={{ color: currentTheme.onSurfaceVariant }}>
@@ -148,7 +152,6 @@ const getExerciseStyles = (theme) => {
 		exerciseItem: {
 			minWidth: 100,
 			marginRight: 12,
-			// height: 100,
 			flexDirection: "column",
 			justifyContent: "flex-start",
 			marginBottom: 12,
@@ -188,7 +191,6 @@ const WorkoutListItem = ({ workoutID, userID }) => {
 	// fetch exercises
 	useEffect(() => {
 		if (workout) {
-			console.log(workout);
 			const requestPayload = {
 				userID: userID,
 				exerciseIDs: workout.exercises,
@@ -216,9 +218,8 @@ const WorkoutListItem = ({ workoutID, userID }) => {
 
 	const navigateToDetailPage = () => {
 		// hide TabBar
-		// dispatch(setHideTabBar(true));
-		// Vibration.vibrate(50);
-		// navigation.navigate("WorkoutDetail", { workoutID: workout.id });
+		dispatch(setHideTabBar(true));
+		navigation.navigate("WorkoutDetail", { workoutID: workout.id });
 	};
 
 	return (

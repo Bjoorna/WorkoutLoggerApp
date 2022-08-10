@@ -11,6 +11,7 @@ import {
 	Pressable,
 	ScrollView,
 	StatusBar,
+	FlatList,
 } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { useFocusEffect } from "@react-navigation/core";
@@ -21,18 +22,22 @@ import LabelText from "../../components/Text/Label";
 import HeadlineText from "../../components/Text/Headline";
 import TextButton from "../../components/Buttons/TextButton";
 import IconButton from "../../components/Buttons/IconButton";
-import { hexToRGB, transformObjectToWorkout } from "../../shared/utils/UtilFunctions";
-
-import Workout from "../../models/workout";
+import {
+	hexToRGB,
+	transformObjectToWorkout,
+} from "../../shared/utils/UtilFunctions";
+import { TextInput as PaperInput } from "react-native-paper";
 import { setHideTabBar } from "../../redux/slices/appSettingsSlice";
 import { deleteWorkout } from "../../redux/slices/workoutSlice";
+import TopAppBar from "../../components/UI/TopAppBarComponent";
+import DetailedExerciseListItem from "../../components/DetailedExerciseListItem";
 
 const WorkoutDetailScreen = (props) => {
 	const dispatch = useDispatch();
 	const workoutID = props.route.params.workoutID;
 	const userID = useSelector((state) => state.auth.userID);
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
-	const reduxWorkoutRef = useSelector((state) => state.workout.workouts);
+	const reduxWorkoutsRef = useSelector((state) => state.workout.workouts);
 	const reduxExercisesRef = useSelector((state) => state.workout.exercises);
 
 	const [styles, setStyles] = useState(
@@ -42,19 +47,21 @@ const WorkoutDetailScreen = (props) => {
 		useDarkMode ? Themes.dark : Themes.light
 	);
 
-	const [workout, setWorkout] = useState();
+	const [workout, setWorkout] = useState(null);
 	const [exercises, setExercises] = useState(null);
 	const [summaryData, setSummaryData] = useState(null);
 	const [showModal, setShowModal] = useState(false);
+	const [showNote, setShowNote] = useState(false);
+	const [editNote, setEditNote] = useState(false);
+	const [updatedNote, setUpdatedNote] = useState("");
 	const [modalBackdropHex, setModalBackdropHex] = useState(
 		hexToRGB(currentTheme.surface)
 	);
 
-
 	useEffect(() => {
-		const onWorkout = reduxWorkoutRef[workoutID];
-		console.log("OnWorkoout: ");
-		console.log(onWorkout);
+		const onWorkout = reduxWorkoutsRef[workoutID];
+		// console.log("OnWorkoout: ");
+		// console.log(onWorkout);
 		setWorkout(onWorkout);
 	}, []);
 
@@ -72,20 +79,30 @@ const WorkoutDetailScreen = (props) => {
 	}, [workout]);
 
 	useEffect(() => {
+		// console.log(exercises);
+	}, [exercises]);
+
+	useEffect(() => {
 		setStyles(useDarkMode ? Themes.dark : Themes.light);
 		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
 		setModalBackdropHex(hexToRGB(currentTheme.surface));
 	}, [useDarkMode]);
 
 	const calculateSummary = (exercises) => {
-		let tonnage = 0;
+		let totalTonnage = 0;
 		for (let exercise of exercises) {
-			const repWeight = exercise.weight;
-			const reps = exercise.reps;
-			const sets = exercise.sets;
-			tonnage += repWeight * reps * sets;
+			const sets = Object.values(exercise.sets);
+			for (let set of sets) {
+				const repWeight = set.weight;
+				const repReps = set.reps;
+				totalTonnage += repWeight * repReps;
+			}
+			// const repWeight = exercise.weight;
+			// const reps = exercise.reps;
+			// const sets = exercise.sets;
+			// totalTonnage += repWeight * reps * sets;
 		}
-		const newSummaryData = { ["tonnage"]: tonnage };
+		const newSummaryData = { ["tonnage"]: totalTonnage };
 		setSummaryData(newSummaryData);
 	};
 
@@ -95,7 +112,6 @@ const WorkoutDetailScreen = (props) => {
 		return 3;
 	};
 
-	
 	useLayoutEffect(() => {
 		// BandAid to fix react rendering without the stylesheet on changes
 		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
@@ -105,7 +121,9 @@ const WorkoutDetailScreen = (props) => {
 		if (workout) {
 			console.log(workout);
 
-			const workoutDeleted = await dispatch(deleteWorkout(workout)).unwrap();
+			const workoutDeleted = await dispatch(
+				deleteWorkout(workout)
+			).unwrap();
 			console.log("workout and exercises deleted");
 			console.log(workoutDeleted);
 			showModalHandler(false);
@@ -125,8 +143,97 @@ const WorkoutDetailScreen = (props) => {
 			return () => onCloseScreen();
 		}, [props.navigation])
 	);
+	const onNoteEditingEnd = (event) => {};
 	return (
 		<View style={styles.screen}>
+			<Modal
+				visible={showNote}
+				animationType="fade"
+				transparent={true}
+				onRequestClose={() => setShowNote(false)}
+			>
+				<Pressable
+					onPress={() => {
+						setShowNote(false);
+					}}
+					style={{
+						...styles.modalView,
+						backgroundColor: `rgba(${modalBackdropHex[0]}, ${modalBackdropHex[1]}, ${modalBackdropHex[2]}, 0.8)`,
+					}}
+				>
+					<Pressable style={styles.modalContent}>
+						<View style={styles.modalHeader}>
+							<HeadlineText
+								large={false}
+								style={{ color: currentTheme.onSurface }}
+							>
+								{editNote ? "Edit note" : "Note"}
+							</HeadlineText>
+						</View>
+						{editNote && (
+							<View style={[styles.modalBody]}>
+								<PaperInput
+									style={{
+										maxWidth: "100%",
+										backgroundColor: currentTheme.surfaceE3,
+									}}
+									activeOutlineColor={currentTheme.primary}
+									outlineColor={currentTheme.outline}
+									theme={{
+										colors: {
+											text: currentTheme.onSurface,
+											placeholder: currentTheme.onSurface,
+										},
+									}}
+									mode="outlined"
+									label="Note"
+									multiline={true}
+									onEndEditing={(event) =>
+										onNoteEditingEnd(event)
+									}
+									keyboardType="default"
+									defaultValue={
+										workout.note !== "" ? workout.note : ""
+									}
+								/>
+							</View>
+						)}
+						{!editNote && (
+							<View style={styles.modalBody}>
+								{workout != null && (
+									<BodyText
+										large={false}
+										style={{
+											color: currentTheme.onSurfaceVariant,
+										}}
+									>
+										{workout.note}
+									</BodyText>
+								)}
+							</View>
+						)}
+						<View style={styles.modalActions}>
+							<TextButton
+								textStyle={{ color: currentTheme.primary }}
+								disabled={false}
+								onButtonPress={() => {
+									setShowNote(false);
+								}}
+							>
+								Close
+							</TextButton>
+							<TextButton
+								textStyle={{ color: currentTheme.primary }}
+								disabled={false}
+								onButtonPress={() => setEditNote(true)}
+							>
+								Edit
+							</TextButton>
+						</View>
+					</Pressable>
+				</Pressable>
+			</Modal>
+
 			<Modal
 				visible={showModal}
 				animationType="fade"
@@ -180,34 +287,29 @@ const WorkoutDetailScreen = (props) => {
 					</Pressable>
 				</Pressable>
 			</Modal>
-			<View style={styles.appBarContainer}>
-				<View style={styles.appBarBackButton}>
+			<TopAppBar
+				navigationButton={
 					<IconButton
+						onPress={() => props.navigation.goBack()}
 						name="arrow-back"
 						iconColor={currentTheme.onSurface}
-						onPress={() => props.navigation.goBack()}
 					/>
-				</View>
-				<View style={styles.appBarTitle}>
-					{workout && (
-						<TitleText
-							large={true}
-							style={{ color: currentTheme.onSurface }}
-						>
-							{new Date(
-								workout.date
-							).toDateString()}
-						</TitleText>
-					)}
-				</View>
-				<View style={styles.appBarTrailingIcons}>
+				}
+				headlineText="Weightlifting"
+				backgroundColor={currentTheme.surfaceE2}
+				trailingIcons={[
+					<IconButton
+						name="document-text-outline"
+						iconColor={currentTheme.onSurfaceVariant}
+						onPress={() => setShowNote(true)}
+					/>,
 					<IconButton
 						name="trash-outline"
 						iconColor={currentTheme.onSurfaceVariant}
 						onPress={() => setShowModal(true)}
-					/>
-				</View>
-			</View>
+					/>,
+				]}
+			/>
 			<View style={styles.contentView}>
 				<View style={styles.overviewContainer}>
 					<TitleText large={false} style={styles.titleText}>
@@ -223,7 +325,7 @@ const WorkoutDetailScreen = (props) => {
 											color: currentTheme.onSurfaceVariant,
 										}}
 									>
-										Tonnage:
+										Tonnage:{" "}
 									</LabelText>
 									<BodyText
 										large={false}
@@ -240,203 +342,82 @@ const WorkoutDetailScreen = (props) => {
 					</View>
 				</View>
 				<View style={styles.exerciseListContainer}>
-					<View style={styles.exerciseListHeader}>
-						<HeadlineText style={{ color: currentTheme.onSurface }}>
-							Exercises
-						</HeadlineText>
-					</View>
-					{exercises && (
-						<View style={styles.exerciseListList}>
-							<ScrollView>
-								{exercises.map((exercise) => {
-									return (
-										<View
-											key={exercise.id}
-											style={
-												styles.exerciseListItemContainer
-											}
-										>
-											<View
-												style={{
-													...styles.exerciseListItem,
-													alignSelf: "flex-start",
-												}}
-											>
-												<LabelText
-													style={{
-														color: currentTheme.onSurface,
-													}}
-												>
-													Exercise name
-												</LabelText>
-												<BodyText
-													style={{
-														color: currentTheme.onSurface,
-													}}
-												>
-													{exercise.exercise}
-												</BodyText>
-											</View>
-											<View
-												style={styles.exerciseListItem}
-											>
-												<LabelText
-													style={{
-														color: currentTheme.onSurface,
-														alignSelf: "flex-end",
-													}}
-												>
-													Weight
-												</LabelText>
-												<BodyText
-													style={{
-														color: currentTheme.onSurface,
-													}}
-												>
-													{exercise.weight} kg
-												</BodyText>
-											</View>
-											<View
-												style={styles.exerciseListItem}
-											>
-												<LabelText
-													style={{
-														color: currentTheme.onSurface,
-													}}
-												>
-													Reps
-												</LabelText>
-												<BodyText
-													style={{
-														color: currentTheme.onSurface,
-													}}
-												>
-													{exercise.reps}
-												</BodyText>
-											</View>
-											<View
-												style={styles.exerciseListItem}
-											>
-												<LabelText
-													style={{
-														color: currentTheme.onSurface,
-													}}
-												>
-													Sets
-												</LabelText>
-												<BodyText
-													style={{
-														color: currentTheme.onSurface,
-													}}
-												>
-													{exercise.sets}
-												</BodyText>
-											</View>
-											<View
-												style={styles.exerciseListItem}
-											>
-												<LabelText
-													style={{
-														color: currentTheme.onSurface,
-													}}
-												>
-													RPE
-												</LabelText>
-												<BodyText
-													style={{
-														color: currentTheme.onSurface,
-													}}
-												>
-													{exercise.rpe}
-												</BodyText>
-											</View>
-											{/* {exercise.rpe >= 6.5 &&
-												exercise.rpe <= 10 &&
-												exercise.reps >= 1 &&
-												exercise.reps <= 10 && (
-													<View
-														style={
-															styles.exerciseListItem
-														}
-													>
-														<LabelText
-															style={{
-																color: currentTheme.onSurface,
-															}}
-														>
-															Intensity
-														</LabelText>
-														<BodyText
-															style={{
-																color: currentTheme.onSurface,
-															}}
-														>
-															{calcIntensity(exercise.rpe, exercise.reps)}
-														</BodyText>
-													</View>
-												)} */}
-										</View>
-									);
-								})}
-							</ScrollView>
-						</View>
-					)}
+					<FlatList
+						data={exercises}
+						contentContainerStyle={{ width: "100%" }}
+						ItemSeparatorComponent={() => {
+							return (
+								<View
+									style={{
+										width: "100%",
+										borderBottomWidth: 1,
+										borderBottomColor: currentTheme.outline,
+									}}
+								></View>
+							);
+						}}
+						ListHeaderComponent={
+							<TitleText
+								large={true}
+								style={{ color: currentTheme.onSurface }}
+							>
+								Exercises
+							</TitleText>
+						}
+						ListHeaderComponentStyle={{ paddingHorizontal: 24 }}
+						renderItem={(itemData) => (
+							<DetailedExerciseListItem
+								exerciseID={itemData.item.id}
+							/>
+						)}
+					/>
 				</View>
 			</View>
 		</View>
 	);
 };
 
-const getStyles = (theme) => {
+const getStyles = (theme, scrimColor) => {
 	return StyleSheet.create({
 		screen: {
 			flex: 1,
 		},
-		appBarContainer: {
-			flexDirection: "row",
-			paddingTop: StatusBar.currentHeight,
-			paddingHorizontal: 16,
-			height: 64 + StatusBar.currentHeight,
-			width: "100%",
-			backgroundColor: theme.surfaceE2,
-			alignItems: "center",
-		},
-		appBarBackButton: {
-			paddingRight: 16,
-		},
-		appBarTrailingIcons: {
-			marginLeft: "auto",
-			flexDirection: "row",
-		},
 		contentView: {
-			width: "100%",
-			alignItems: "center",
+			flex: 1,
 		},
 		overviewContainer: {
-			height: 200,
+			minHeight: 200,
+			// flex:1,
 			// marginTop: 10,
 			// width: "90%",
 			backgroundColor: theme.surfaceE2,
 			// borderRadius: 12,
-			paddingHorizontal: 16,
+			paddingHorizontal: 24,
 			paddingVertical: 6,
 		},
 		overviewContent: {
 			flexDirection: "row",
+			flex: 1,
 		},
 		overviewRow: {
 			height: 60,
 			flexDirection: "row",
 			alignItems: "baseline",
 			width: "100%",
-			paddingHorizontal: 4,
+			// paddingHorizontal: 4,
 			paddingVertical: 2,
 		},
 		exerciseListContainer: {
-			marginTop: 30,
-			width: "100%",
-			height: "60%",
+			// marginTop: 30,
+			flex: 1,
+			// paddingHorizontal: 24,
+			// paddingVertical: 12,
+			// width: "100%",
+			// height: "60%",
 			flexDirection: "column",
+			justifyContent: "center",
+			// alignItems: "center"
+			// backgroundColor: "red",
 
 			// paddingHorizontal: 16,
 		},
@@ -473,13 +454,15 @@ const getStyles = (theme) => {
 			backgroundColor: theme.surface,
 		},
 		modalContent: {
-			height: 200,
+			minHeight: 100,
 			minWidth: 280,
 			maxWidth: 560,
 			borderRadius: 28,
 			padding: 24,
 			backgroundColor: theme.surfaceE3,
 		},
+		modalContentEditMode: {},
+
 		modalHeader: {
 			marginBottom: 16,
 		},

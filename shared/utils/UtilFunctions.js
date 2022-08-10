@@ -1,5 +1,6 @@
 import { async } from "@firebase/util";
 import Asyncstorage from "@react-native-async-storage/async-storage";
+import { getIn } from "immutable";
 import { nanoid } from "nanoid";
 import Workout from "../../models/workout";
 
@@ -35,6 +36,38 @@ export const getIntensity = (rpe, reps) => {
 		default:
 			return -1;
 	}
+};
+
+export const calculateAverageIntensity = (sets) => {
+	let nrOfSets = 1;
+	let intensitySum = 0;
+	for (let set of Object.values(sets)) {
+		intensitySum += getIntensity(set.rpe, set.reps);
+		nrOfSets++;
+	}
+	return intensitySum / nrOfSets;
+};
+
+export const calculateE1RM = set => {
+	const reps = set.reps;
+	const rpe = set.rpe;
+	if(reps >= 1 && reps <=10 && rpe >= 6.5 && rpe <= 10){
+		const intensity = getIntensity(rpe, reps);
+		const e1RM = set.weight / (intensity/100);
+		return e1RM;
+	}
+}
+
+export const findTopSetInExercise = (sets) => {
+	let topSetCandidate = sets[1];
+
+	for (let [set, setValue] of Object.entries(sets)) {
+		if (setValue.weight > topSetCandidate.weight) {
+			topSetCandidate = setValue;
+		}
+	}
+
+	return topSetCandidate;
 };
 
 export const hexToRGB = (hex) => {
