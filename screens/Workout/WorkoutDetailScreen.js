@@ -28,7 +28,10 @@ import {
 } from "../../shared/utils/UtilFunctions";
 import { TextInput as PaperInput } from "react-native-paper";
 import { setHideTabBar } from "../../redux/slices/appSettingsSlice";
-import { deleteWorkout } from "../../redux/slices/workoutSlice";
+import {
+	deleteWorkout,
+	updateWorkoutField,
+} from "../../redux/slices/workoutSlice";
 import TopAppBar from "../../components/UI/TopAppBarComponent";
 import DetailedExerciseListItem from "../../components/DetailedExerciseListItem";
 
@@ -54,6 +57,7 @@ const WorkoutDetailScreen = (props) => {
 	const [showNote, setShowNote] = useState(false);
 	const [editNote, setEditNote] = useState(false);
 	const [updatedNote, setUpdatedNote] = useState("");
+	const [noteTextFieldMaxWidth, setNoteTextFieldMaxWidth] = useState(-1);
 	const [modalBackdropHex, setModalBackdropHex] = useState(
 		hexToRGB(currentTheme.surface)
 	);
@@ -66,6 +70,7 @@ const WorkoutDetailScreen = (props) => {
 	}, []);
 
 	useEffect(() => {
+		console.log("Workout Changed");
 		if (workout) {
 			const exerciseIDs = workout.exercises;
 			const exerciseArray = [];
@@ -81,6 +86,10 @@ const WorkoutDetailScreen = (props) => {
 	useEffect(() => {
 		// console.log(exercises);
 	}, [exercises]);
+
+	useEffect(() => {
+		console.log(updatedNote);
+	}, [updatedNote]);
 
 	useEffect(() => {
 		setStyles(useDarkMode ? Themes.dark : Themes.light);
@@ -143,7 +152,24 @@ const WorkoutDetailScreen = (props) => {
 			return () => onCloseScreen();
 		}, [props.navigation])
 	);
-	const onNoteEditingEnd = (event) => {};
+	const onNoteEditingEnd = (event) => {
+		console.log(event);
+		// setUpdatedNote(event)
+	};
+
+	const onUpdateNote = () => {
+		const payload = { workoutID: workout.id, field: { note: updatedNote } };
+		dispatch(updateWorkoutField(payload));
+		setEditNote(false);
+		setShowNote(false);
+	};
+
+	const onNoteModalLayout = (event) => {
+		const widthOnOpen = event.nativeEvent.layout.width;
+		if (noteTextFieldMaxWidth === -1) {
+			setNoteTextFieldMaxWidth(widthOnOpen);
+		}
+	};
 	return (
 		<View style={styles.screen}>
 			<Modal
@@ -171,7 +197,15 @@ const WorkoutDetailScreen = (props) => {
 							</HeadlineText>
 						</View>
 						{editNote && (
-							<View style={[styles.modalBody]}>
+							<View
+								style={[
+									styles.modalBody,
+									noteTextFieldMaxWidth !== -1
+										? { width: noteTextFieldMaxWidth }
+										: {},
+								]}
+								onLayout={(event) => onNoteModalLayout(event)}
+							>
 								<PaperInput
 									style={{
 										maxWidth: "100%",
@@ -188,6 +222,7 @@ const WorkoutDetailScreen = (props) => {
 									mode="outlined"
 									label="Note"
 									multiline={true}
+									onChangeText={setUpdatedNote}
 									onEndEditing={(event) =>
 										onNoteEditingEnd(event)
 									}
@@ -212,24 +247,46 @@ const WorkoutDetailScreen = (props) => {
 								)}
 							</View>
 						)}
-						<View style={styles.modalActions}>
-							<TextButton
-								textStyle={{ color: currentTheme.primary }}
-								disabled={false}
-								onButtonPress={() => {
-									setShowNote(false);
-								}}
-							>
-								Close
-							</TextButton>
-							<TextButton
-								textStyle={{ color: currentTheme.primary }}
-								disabled={false}
-								onButtonPress={() => setEditNote(true)}
-							>
-								Edit
-							</TextButton>
-						</View>
+						{!editNote && (
+							<View style={styles.modalActions}>
+								<TextButton
+									textStyle={{ color: currentTheme.primary }}
+									disabled={false}
+									onButtonPress={() => {
+										setShowNote(false);
+									}}
+								>
+									Close
+								</TextButton>
+								<TextButton
+									textStyle={{ color: currentTheme.primary }}
+									disabled={false}
+									onButtonPress={() => setEditNote(true)}
+								>
+									Edit
+								</TextButton>
+							</View>
+						)}
+						{editNote && (
+							<View style={styles.modalActions}>
+								<TextButton
+									textStyle={{ color: currentTheme.primary }}
+									disabled={false}
+									onButtonPress={() => {
+										setEditNote(false);
+									}}
+								>
+									Cancel
+								</TextButton>
+								<TextButton
+									textStyle={{ color: currentTheme.primary }}
+									disabled={false}
+									onButtonPress={onUpdateNote}
+								>
+									Save
+								</TextButton>
+							</View>
+						)}
 					</Pressable>
 				</Pressable>
 			</Modal>

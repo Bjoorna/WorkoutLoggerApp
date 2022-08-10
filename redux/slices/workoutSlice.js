@@ -6,14 +6,16 @@ import {
 	firebaseSaveWorkout,
 	firebaseGetUserWorkouts,
 	firebaseGetExercisesByTypes,
-	firebaseGetExerciseTypes
+	firebaseGetExerciseTypes,
+	firebaseUpdateWorkout,
+	firebaseGetWorkoutByID,
 } from "../../firebase/firebase";
 
 const initialState = {
 	workouts: {},
 	exercises: {},
 	filteredExercises: {}, // set exercises that the user has filtered by here
-	exerciseTypes: {}
+	exerciseTypes: {},
 };
 
 export const getExerciseTypes = createAsyncThunk(
@@ -21,13 +23,12 @@ export const getExerciseTypes = createAsyncThunk(
 	async (_, thunkAPI) => {
 		try {
 			const exerciseData = await firebaseGetExerciseTypes();
-			return exerciseData
+			return exerciseData;
 		} catch (error) {
 			console.log(error);
 		}
 	}
 );
-
 
 export const getWorkoutByUserID = createAsyncThunk(
 	"workout/getUserWorkouts",
@@ -104,6 +105,29 @@ export const getWorkoutsFilteredByExerciseType = createAsyncThunk(
 	async (payload, thunkAPI) => {}
 );
 
+export const updateWorkoutField = createAsyncThunk(
+	"workout/updateWorkoutField",
+	async (payload, thunkAPI) => {
+		try {
+			console.log("UpdateWorkoutField");
+			await firebaseUpdateWorkout(payload.workoutID, payload.field);
+			thunkAPI.dispatch(getWorkoutByWorkoutID(payload.workoutID));
+		} catch (error) {
+			console.log(error);
+		}
+	}
+);
+
+export const getWorkoutByWorkoutID = createAsyncThunk(
+	"workout/getWorkoutByWorkoutID",
+	async (workoutID, thunkAPI) => {
+		try {
+			const workout = await firebaseGetWorkoutByID(workoutID);
+			return workout;
+		} catch (error) {}
+	}
+);
+
 export const workoutSlice = createSlice({
 	name: "workout",
 	initialState,
@@ -116,6 +140,13 @@ export const workoutSlice = createSlice({
 		},
 	},
 	extraReducers: (builder) => {
+		builder.addCase(getWorkoutByWorkoutID.fulfilled, (state, action) => {
+			const workout = action.payload;
+			const workoutID = workout.id;
+			workout.date = workout.date.seconds * 1000;
+			state.workouts[workoutID] = workout;
+		});
+
 		// Workouts
 		builder.addCase(getWorkoutByUserID.fulfilled, (state, action) => {
 			const snapshot = action.payload;
@@ -180,14 +211,14 @@ export const workoutSlice = createSlice({
 		});
 
 		builder.addCase(getExerciseTypes.fulfilled, (state, action) => {
-			if(action.payload){
+			if (action.payload) {
 				state.exerciseTypes = action.payload;
 			}
-		})
-
+		});
 	},
 });
 
-export const { resetFilteredExercises, resetWorkoutState } = workoutSlice.actions;
+export const { resetFilteredExercises, resetWorkoutState } =
+	workoutSlice.actions;
 
 export default workoutSlice.reducer;

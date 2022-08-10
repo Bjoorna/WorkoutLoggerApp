@@ -24,11 +24,12 @@ import {
 } from "firebase/auth";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyAf6yOGx_V5wXyVUzot1sDgsICKPbDVgIs",
-    authDomain: "workoutlogger-48f71.firebaseapp.com",
-    databaseURL: "https://workoutlogger-48f71-default-rtdb.europe-west1.firebasedatabase.app/",
-    storageBucket: "gs://workoutlogger-48f71.appspot.com",
-    projectId: "workoutlogger-48f71"
+	apiKey: "AIzaSyAf6yOGx_V5wXyVUzot1sDgsICKPbDVgIs",
+	authDomain: "workoutlogger-48f71.firebaseapp.com",
+	databaseURL:
+		"https://workoutlogger-48f71-default-rtdb.europe-west1.firebasedatabase.app/",
+	storageBucket: "gs://workoutlogger-48f71.appspot.com",
+	projectId: "workoutlogger-48f71",
 };
 
 // import * as firebaseConfig from "./config";
@@ -91,11 +92,10 @@ export const firebaseInitSaveUserData = async (userData, userID) => {
 // 	}
 // };
 
-export const firebaseUpdateUserField = async (userID, test) => {
+export const firebaseUpdateUserField = async (userID, data) => {
 	try {
 		const userDocRef = doc(database, "users", userID);
-		await updateDoc(userDocRef, test);
-		return;
+		await updateDoc(userDocRef, data);
 	} catch (error) {
 		throw new Error(error.code);
 	}
@@ -203,6 +203,15 @@ export const firebaseSaveWorkout = async (workout, userID) => {
 	}
 };
 
+export const firebaseUpdateWorkout = async (workoutID, update) => {
+	try {
+		const workoutRef = doc(database, "workouts", workoutID);
+		await updateDoc(workoutRef, update);
+	} catch (error) {
+		throw new Error(error.code);
+	}
+};
+
 export const firebaseGetWorkoutByID = async (workoutID) => {
 	try {
 		const docRef = doc(database, "workouts", workoutID);
@@ -239,7 +248,12 @@ export const firebaseWriteExercisesToDatabase = async (
 			// 	owner: userID,
 			// 	workoutID: workoutID,
 			// };
-			const exerciseTransform = {...exercise, date: timestamp, owner: userID, workoutID: workoutID }
+			const exerciseTransform = {
+				...exercise,
+				date: timestamp,
+				owner: userID,
+				workoutID: workoutID,
+			};
 			arrayOfExerciseIDs.push(exerciseID);
 			batch.set(newExerciseRef, exerciseTransform);
 		}
@@ -299,7 +313,7 @@ export const firebaseGetUserWorkouts = async (userID) => {
 		const q = query(
 			collection(database, "workouts"),
 			where("owner", "==", userID),
-			orderBy("date", "desc"),
+			orderBy("date", "desc")
 			// limit(3)
 		);
 		const querySnapshot = await getDocs(q);
@@ -379,15 +393,15 @@ export const getWorkoutOnDay = async (userID, dayStart, dayEnd) => {
 	}
 };
 
-export const firebaseGetExerciseTypes = async() => {
+export const firebaseGetExerciseTypes = async () => {
 	try {
 		const docRef = doc(database, "defaultData", "exerciseTypes");
 		const docSnap = await getDoc(docRef);
 		return docSnap.data();
 	} catch (error) {
-		throw new Error(error)
+		throw new Error(error);
 	}
-}
+};
 
 // export const writeDocumentToCollection = async (
 // 	document,
@@ -461,11 +475,9 @@ export const firebaseLoginWithEmailAndPassword = async (email, password) => {
 
 export const firebaseGetCurrentUser = () => {
 	return auth.currentUser;
-}
+};
 
-export const firebaseReloadUser = async()=> {
-
-}
+export const firebaseReloadUser = async () => {};
 
 export const firebaseSignOutUser = async () => {
 	await signOut(auth);

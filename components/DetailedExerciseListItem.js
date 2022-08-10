@@ -39,8 +39,6 @@ const DetailedExerciseListItem = ({ exerciseID }) => {
 
 	useEffect(() => {
 		if (exercise) {
-			console.log("has Exercise");
-			console.log(exercise);
 			prepareSetsDisplay();
 			setAvgInt(calculateAverageIntensity(exercise.sets));
 			setTopSet(findTopSetInExercise(exercise.sets));
@@ -85,14 +83,11 @@ const DetailedExerciseListItem = ({ exerciseID }) => {
 			(ex) => ex.exerciseName === exercise.exerciseName
 		);
 		const sortByDate = sameAsExercise.sort((a, b) => a.date + b.date);
-		console.log(sortByDate);
 		const removeFutureExercises = sortByDate.filter(
 			(ex) => ex.date < exercise.date
 		);
 		for (let test of removeFutureExercises) {
-			console.log(new Date(test.date));
 		}
-		console.log(sameAsExercise.length + " of " + exercise.exerciseName);
 	};
 
 	const getNumberOfReps = () => {
@@ -229,7 +224,6 @@ const DetailedExerciseListItem = ({ exerciseID }) => {
 							{tonnage}kg
 						</BodyText>
 					</View>
-
 				</View>
 			</View>
 			{isPR && (
