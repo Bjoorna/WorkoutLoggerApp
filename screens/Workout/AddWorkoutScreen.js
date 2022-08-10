@@ -68,6 +68,7 @@ const AddWorkoutDialogScreen = (props) => {
 	// layoutStuff
 	const { width, height } = useWindowDimensions();
 	const [fabPosition, setFabPosition] = useState({ x: 0, y: 0 });
+	const [hideFAB, setHideFAB] = useState(false);
 
 	const [isLoading, setIsLoading] = useState(false);
 
@@ -165,6 +166,14 @@ const AddWorkoutDialogScreen = (props) => {
 		setAddExerciseModalVisible(false);
 	};
 
+	const onHideFAB = () => {
+		setHideFAB(true);
+	};
+
+	const onShowFAB = () => {
+		setHideFAB(false);
+	};
+
 	const onNavigateBack = () => {
 		props.navigation.goBack();
 	};
@@ -210,22 +219,24 @@ const AddWorkoutDialogScreen = (props) => {
 
 	return (
 		<View style={styles.container}>
-			<FabButton
-				onPress={() => setAddExerciseModalVisible(true)}
-				onLayout={onFabLayout}
-				iconName="add"
-				style={{
-					position: "absolute",
-					zIndex: 1000,
-					left: fabPosition.x,
-					bottom: 16,
-				}}
-			/>
+			{!hideFAB && (
+				<FabButton
+					onPress={onShowAddWorkoutModal}
+					onLayout={onFabLayout}
+					iconName="add"
+					style={{
+						position: "absolute",
+						zIndex: 1000,
+						left: fabPosition.x,
+						bottom: 16,
+					}}
+				/>
+			)}
 			<Modal
 				animationType="slide"
 				visible={addExerciseModalVisible}
 				transparent={true}
-				onRequestClose={() => setAddExerciseModalVisible(false)}
+				onRequestClose={onCloseAddWorkoutModal}
 			>
 				<AddExerciseDialog
 					closeDialog={onCloseAddWorkoutModal}
@@ -407,6 +418,8 @@ const AddWorkoutDialogScreen = (props) => {
 							removeExercise={onRemoveExercise}
 							isMetric={isMetric}
 							onAddSetToExercise={onAddSetToExercise}
+							onHideFAB={onHideFAB}
+							onShowFAB={onShowFAB}
 						/>
 					)}
 				/>
@@ -422,6 +435,8 @@ const ExerciseView = ({
 	removeExercise,
 	isMetric,
 	onAddSetToExercise,
+	onHideFAB,
+	onShowFAB,
 }) => {
 	const [styles, setStyles] = useState(
 		getExerciseViewStyle(isDarkMode ? Themes.dark : Themes.light)
@@ -487,7 +502,13 @@ const ExerciseView = ({
 	};
 
 	const onToggleAddSet = () => {
-		setAddSet((state) => !state);
+		const addSetVisible = addSet;
+		if (addSetVisible) {
+			onShowFAB();
+		} else {
+			onHideFAB();
+		}
+		setAddSet(!addSetVisible);
 	};
 
 	const onValueEntered = (event, type) => {
