@@ -2,7 +2,7 @@ import "react-native-gesture-handler";
 import "react-native-get-random-values";
 
 // React
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
 // react native
 import { StyleSheet, View, Dimensions, Appearance } from "react-native";
@@ -33,17 +33,16 @@ const theme = Themes.dark;
 // Expo
 import AppLoading from "expo-app-loading";
 import * as Font from "expo-font";
+import * as SplashScreen from 'expo-splash-screen'
 
 // react native paper
-import {  DefaultTheme, Provider as PaperProvider } from "react-native-paper";
-
-
-
+import { DefaultTheme, Provider as PaperProvider } from "react-native-paper";
 
 import authReducer from "./redux/slices/authSlice";
 import appSettingsReducer from "./redux/slices/appSettingsSlice";
 import workoutReducer from "./redux/slices/workoutSlice";
 import userReducer from "./redux/slices/userSlice";
+import { async } from "validate.js";
 // import store from "./redux/store/store";
 
 // const rootReducer = combineReducers({
@@ -60,18 +59,12 @@ const reducer = {
 	workout: workoutReducer,
 	user: userReducer,
 };
-// const store = store;
+
 const store = configureStore({
 	reducer: reducer,
 	middleware: (getDefaultMiddleware) =>
 		getDefaultMiddleware({ serializableCheck: false }),
 });
-const loadFonts = () => {
-	return Font.loadAsync({
-		"roboto-400": require("./assets/fonts/Roboto-Regular.ttf"),
-		"roboto-500": require("./assets/fonts/Roboto-Medium.ttf"),
-	});
-};
 
 const paperTheme = {
 	...DefaultTheme,
@@ -79,23 +72,37 @@ const paperTheme = {
 };
 
 export default function App() {
-	const [fontLoaded, setFontLoaded] = useState(false);
-	// const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
+	const [isAppReady, setIsAppReady] = useState(false);
 	const [styles, setStyles] = useState(getStyles(Themes.dark));
 
-	if (!fontLoaded) {
-		return (
-			<AppLoading
-				startAsync={loadFonts}
-				onFinish={() => setFontLoaded(true)}
-				onError={(err) => console.log(err)}
-			/>
-		);
+	useEffect(() => {
+		const prepare = async () => {
+			try {
+				await Font.loadAsync({
+					"roboto-400": require("./assets/fonts/Roboto-Regular.ttf"),
+					"roboto-500": require("./assets/fonts/Roboto-Medium.ttf"),
+				});
+			} catch (error) {
+				console.warn(error);
+			} finally {
+				setIsAppReady(true);
+			}
+		};
+		prepare();
+	}, []);
+	const onLayoutRootView = useCallback(async()=> {
+		if(isAppReady){
+			await SplashScreen.hideAsync();
+		}
+	}, [isAppReady])
+
+	if(!isAppReady){
+		return null
 	}
 	return (
 		<Provider store={store}>
 			<PaperProvider theme={paperTheme}>
-				<View style={styles.baseScreen}>
+				<View style={styles.baseScreen} onLayout={onLayoutRootView}>
 					<StatusBarWrapper />
 					<BaseScreen />
 				</View>
