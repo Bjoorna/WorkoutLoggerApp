@@ -126,7 +126,7 @@ export const convertMetricHeightToImperial = (cm) => {
 };
 
 export const inputValueValidityCheck = (type, value) => {
-	if (type === "rpe") {
+	if (type === "rpe" || type==="knownRPE" || type==="wantRPE") {
 		if (value >= 6.5 && value <= 10) {
 			return true;
 		} else {

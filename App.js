@@ -31,9 +31,8 @@ import StatusBarWrapper from "./components/UI/StatusBarWrapper";
 const theme = Themes.dark;
 
 // Expo
-import AppLoading from "expo-app-loading";
 import * as Font from "expo-font";
-import * as SplashScreen from 'expo-splash-screen'
+import * as SplashScreen from "expo-splash-screen";
 
 // react native paper
 import { DefaultTheme, Provider as PaperProvider } from "react-native-paper";
@@ -90,14 +89,14 @@ export default function App() {
 		};
 		prepare();
 	}, []);
-	const onLayoutRootView = useCallback(async()=> {
-		if(isAppReady){
+	const onLayoutRootView = useCallback(async () => {
+		if (isAppReady) {
 			await SplashScreen.hideAsync();
 		}
-	}, [isAppReady])
+	}, [isAppReady]);
 
-	if(!isAppReady){
-		return null
+	if (!isAppReady) {
+		return null;
 	}
 	return (
 		<Provider store={store}>

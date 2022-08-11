@@ -23,8 +23,12 @@ import DisplayText from "../../components/Text/Display";
 import TextButton from "../../components/Buttons/TextButton";
 import HeadlineText from "../../components/Text/Headline";
 import IconButton from "../../components/Buttons/IconButton";
-import { FilledTextField } from "rn-material-ui-textfield";
-import { hexToRGB } from "../../shared/utils/UtilFunctions";
+import { TextInput as PaperInput, HelperText } from "react-native-paper";
+import {
+	getIntensity,
+	hexToRGB,
+	inputValueValidityCheck,
+} from "../../shared/utils/UtilFunctions";
 import { setHideTabBar } from "../../redux/slices/appSettingsSlice";
 import TopAppBar from "../../components/UI/TopAppBarComponent";
 
@@ -88,12 +92,11 @@ const WeightCalculatorScreen = (props) => {
 		hexToRGB(currentTheme.surface)
 	);
 	useEffect(() => {
-
 		return () => {
 			dispatch(setHideTabBar(false));
 		};
 	}, []);
-	
+
 	useEffect(() => {
 		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
 		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
@@ -101,7 +104,7 @@ const WeightCalculatorScreen = (props) => {
 
 	useEffect(() => {
 		let validValue = true;
-		for (const [key, value] of Object.entries(calculatorState)) {
+		for (const value of Object.values(calculatorState)) {
 			if (value.error === true || value.value === null) {
 				validValue = false;
 				break;
@@ -123,14 +126,14 @@ const WeightCalculatorScreen = (props) => {
 
 	const calculcateValue = () => {
 		if (isFormValid) {
-			const intensity = rpeCalc.getIntensity(
+			const intensity = getIntensity(
 				calculatorState["knownRPE"].value,
 				calculatorState["knownReps"].value
 			);
 			const e1RM = Math.round(
 				calculatorState["knownWeight"].value / (intensity / 100)
 			);
-			const wantedIntensity = rpeCalc.getIntensity(
+			const wantedIntensity = getIntensity(
 				calculatorState["wantRPE"].value,
 				calculatorState["wantReps"].value
 			);
@@ -141,11 +144,10 @@ const WeightCalculatorScreen = (props) => {
 		}
 	};
 
-	const onValueEntered = (ref, type) => {
-		const value = ref.current.value();
-
+	const onValueEntered = (text, type) => {
+		// const value = event.nativeEvent.text;
+		const value = text;
 		const sanitizedValue = Number(value.replace(/,/g, "."));
-
 		const isValid = inputValueValidityCheck(type, sanitizedValue);
 		if (isValid) {
 			dispatchCalculator({
@@ -163,27 +165,12 @@ const WeightCalculatorScreen = (props) => {
 	};
 
 	const onResetForm = () => {
-		knownWeightRef.current.setValue(null);
-		knownRepsRef.current.setValue(null);
-		knownRpeRef.current.setValue(null);
-		wantedRepsRef.current.setValue(null);
-		wantedRpeRef.current.setValue(null);
+		knownWeightRef.current.clear();
+		knownRepsRef.current.clear();
+		knownRpeRef.current.clear();
+		wantedRepsRef.current.clear();
+		wantedRpeRef.current.clear();
 		dispatchCalculator({ type: RESET });
-	};
-
-	const inputValueValidityCheck = (type, value) => {
-		if (type === "knownRPE" || type === "wantRPE") {
-			if (value >= 6.5 && value <= 10) {
-				return true;
-			} else {
-				return false;
-			}
-		} else {
-			if (value > 0 && value != null) {
-				return true;
-			}
-			return false;
-		}
 	};
 
 	const handleContainerPress = () => {
@@ -201,6 +188,13 @@ const WeightCalculatorScreen = (props) => {
 						onPress={() => navigation.goBack()}
 					/>
 				}
+				trailingIcons={[
+					<IconButton
+						onPress={() => setModalVisible(true)}
+						iconColor={currentTheme.onSurfaceVariant}
+						name="information-circle-outline"
+					/>,
+				]}
 			/>
 			<Modal
 				visible={modalVisible}
@@ -278,70 +272,210 @@ const WeightCalculatorScreen = (props) => {
 				</View>
 				<View style={styles.knownInputContainer}>
 					<View style={styles.knownInputItem}>
-						<FilledTextField
+						<PaperInput
 							ref={knownWeightRef}
-							label="Weight"
-							keyboardType="numeric"
-							textColor={currentTheme.onSurfaceVariant}
-							baseColor={currentTheme.onSurfaceVariant}
-							tintColor={currentTheme.primary}
-							inputContainerStyle={{
-								backgroundColor: currentTheme.surfaceVariant,
-							}}
-							errorColor={currentTheme.error}
-							onBlur={() =>
-								onValueEntered(knownWeightRef, "knownWeight")
+							value={
+								calculatorState["knownWeight"].value === null
+									? ""
+									: calculatorState[
+											"knownWeight"
+									  ].value.toString()
 							}
-							error={
+							mode="outlined"
+							keyboardType="numeric"
+							style={{
+								backgroundColor: currentTheme.surface,
+							}}
+							activeOutlineColor={
 								calculatorState["knownWeight"].error
-									? "Must be positive"
-									: ""
+									? currentTheme.error
+									: currentTheme.primary
 							}
+							outlineColor={
+								calculatorState["knownWeight"].error
+									? currentTheme.error
+									: currentTheme.outline
+							}
+							theme={{
+								colors: {
+									text: calculatorState["knownWeight"].error
+										? currentTheme.error
+										: currentTheme.onSurface,
+									placeholder: calculatorState["knownWeight"]
+										.error
+										? currentTheme.error
+										: currentTheme.onSurface,
+								},
+							}}
+							onChangeText={(text) =>
+								onValueEntered(text, "knownWeight")
+							}
+							// onEndEditing={(event) =>
+							// 	onValueEntered(event, "knownWeight")
+							// }
+							label="Weight"
 						/>
+						<HelperText
+							theme={{
+								colors: {
+									error: currentTheme.error,
+									text: calculatorState["knownWeight"].error
+										? currentTheme.error
+										: currentTheme.onSurfaceVariant,
+									placeholder: calculatorState["knownWeight"]
+										.error
+										? currentTheme.error
+										: currentTheme.onSurface,
+								},
+							}}
+							type={
+								calculatorState["knownWeight"].error
+									? "error"
+									: "info"
+							}
+						>
+							{calculatorState["knownWeight"].error
+								? "Must be positive"
+								: useMetric
+								? "kg"
+								: "lbs"}
+						</HelperText>
 					</View>
 					<View style={styles.knownInputItem}>
-						<FilledTextField
+						<PaperInput
 							ref={knownRepsRef}
-							label="Reps"
+							value={
+								calculatorState["knownReps"].value === null
+									? ""
+									: calculatorState[
+											"knownReps"
+									  ].value.toString()
+							}
+							mode="outlined"
 							keyboardType="numeric"
-							textColor={currentTheme.onSurfaceVariant}
-							baseColor={currentTheme.onSurfaceVariant}
-							tintColor={currentTheme.primary}
-							inputContainerStyle={{
-								backgroundColor: currentTheme.surfaceVariant,
+							style={{
+								backgroundColor: currentTheme.surface,
 							}}
-							errorColor={currentTheme.error}
-							onBlur={() =>
-								onValueEntered(knownRepsRef, "knownReps")
-							}
-							error={
+							activeOutlineColor={
 								calculatorState["knownReps"].error
-									? "Must be positive"
-									: ""
+									? currentTheme.error
+									: currentTheme.primary
 							}
+							outlineColor={
+								calculatorState["knownReps"].error
+									? currentTheme.error
+									: currentTheme.outline
+							}
+							theme={{
+								colors: {
+									text: calculatorState["knownReps"].error
+										? currentTheme.error
+										: currentTheme.onSurface,
+									placeholder: calculatorState["knownReps"]
+										.error
+										? currentTheme.error
+										: currentTheme.onSurface,
+								},
+							}}
+							onChangeText={(text) =>
+								onValueEntered(text, "knownReps")
+							}
+							// onEndEditing={(event) =>
+							// 	onValueEntered(event, "knownReps")
+							// }
+							label="Reps"
 						/>
+						<HelperText
+							theme={{
+								colors: {
+									error: currentTheme.error,
+									text: calculatorState["knownReps"].error
+										? currentTheme.error
+										: currentTheme.onSurfaceVariant,
+									placeholder: calculatorState["knownReps"]
+										.error
+										? currentTheme.error
+										: currentTheme.onSurface,
+								},
+							}}
+							type={
+								calculatorState["knownReps"].error
+									? "error"
+									: "info"
+							}
+						>
+							{calculatorState["knownReps"].error
+								? "Must be positive"
+								: ""}
+						</HelperText>
 					</View>
 					<View style={styles.knownInputItem}>
-						<FilledTextField
+						<PaperInput
 							ref={knownRpeRef}
-							label="RPE"
+							value={
+								calculatorState["knownRPE"].value === null
+									? ""
+									: calculatorState[
+											"knownRPE"
+									  ].value.toString()
+							}
+							mode="outlined"
 							keyboardType="numeric"
-							textColor={currentTheme.onSurfaceVariant}
-							baseColor={currentTheme.onSurfaceVariant}
-							tintColor={currentTheme.primary}
-							inputContainerStyle={{
-								backgroundColor: currentTheme.surfaceVariant,
+							style={{
+								backgroundColor: currentTheme.surface,
 							}}
-							errorColor={currentTheme.error}
-							onBlur={() =>
-								onValueEntered(knownRpeRef, "knownRPE")
-							}
-							error={
+							activeOutlineColor={
 								calculatorState["knownRPE"].error
-									? "Between 6.5-10"
-									: ""
+									? currentTheme.error
+									: currentTheme.primary
 							}
+							outlineColor={
+								calculatorState["knownRPE"].error
+									? currentTheme.error
+									: currentTheme.outline
+							}
+							theme={{
+								colors: {
+									text: calculatorState["knownRPE"].error
+										? currentTheme.error
+										: currentTheme.onSurface,
+									placeholder: calculatorState["knownRPE"]
+										.error
+										? currentTheme.error
+										: currentTheme.onSurface,
+								},
+							}}
+							onChangeText={(text) =>
+								onValueEntered(text, "knownRPE")
+							}
+							// onEndEditing={(event) =>
+							// 	onValueEntered(event, "knownRPE")
+							// }
+							label="RPE"
 						/>
+						<HelperText
+							theme={{
+								colors: {
+									error: currentTheme.error,
+									text: calculatorState["knownRPE"].error
+										? currentTheme.error
+										: currentTheme.onSurfaceVariant,
+									placeholder: calculatorState["knownRPE"]
+										.error
+										? currentTheme.error
+										: currentTheme.onSurface,
+								},
+							}}
+							type={
+								calculatorState["knownRPE"].error
+									? "error"
+									: "info"
+							}
+						>
+							{calculatorState["knownRPE"].error
+								? "Number between 6.5-10"
+								: "Number between 6.5-10"}
+						</HelperText>
 					</View>
 				</View>
 				<View style={styles.inputHeader}>
@@ -352,50 +486,142 @@ const WeightCalculatorScreen = (props) => {
 						Enter wanted Rep values
 					</TitleText>
 				</View>
-				<View style={styles.wanthedInputContainer}>
+				<View style={styles.wantedInputContainer}>
 					<View style={styles.wantedInputItem}>
-						<FilledTextField
+						<PaperInput
 							ref={wantedRepsRef}
-							label="Reps"
+							value={
+								calculatorState["wantReps"].value === null
+									? ""
+									: calculatorState[
+											"wantReps"
+									  ].value.toString()
+							}
+							mode="outlined"
 							keyboardType="numeric"
-							textColor={currentTheme.onSurfaceVariant}
-							baseColor={currentTheme.onSurfaceVariant}
-							tintColor={currentTheme.primary}
-							inputContainerStyle={{
-								backgroundColor: currentTheme.surfaceVariant,
+							style={{
+								backgroundColor: currentTheme.surface,
 							}}
-							errorColor={currentTheme.error}
-							onBlur={() =>
-								onValueEntered(wantedRepsRef, "wantReps")
-							}
-							error={
+							activeOutlineColor={
 								calculatorState["wantReps"].error
-									? "Positive number"
-									: ""
+									? currentTheme.error
+									: currentTheme.primary
 							}
+							outlineColor={
+								calculatorState["wantReps"].error
+									? currentTheme.error
+									: currentTheme.outline
+							}
+							theme={{
+								colors: {
+									text: calculatorState["wantReps"].error
+										? currentTheme.error
+										: currentTheme.onSurface,
+									placeholder: calculatorState["wantReps"]
+										.error
+										? currentTheme.error
+										: currentTheme.onSurface,
+								},
+							}}
+							onChangeText={(text) =>
+								onValueEntered(text, "wantReps")
+							}
+							// onEndEditing={(event) =>
+							// 	onValueEntered(event, "wantReps")
+							// }
+							label="Reps"
 						/>
+						<HelperText
+							theme={{
+								colors: {
+									error: currentTheme.error,
+									text: calculatorState["wantReps"].error
+										? currentTheme.error
+										: currentTheme.onSurfaceVariant,
+									placeholder: calculatorState["wantReps"]
+										.error
+										? currentTheme.error
+										: currentTheme.onSurface,
+								},
+							}}
+							type={
+								calculatorState["wantReps"].error
+									? "error"
+									: "info"
+							}
+						>
+							{calculatorState["wantReps"].error
+								? "Must be positive"
+								: ""}
+						</HelperText>
 					</View>
 					<View style={styles.wantedInputItem}>
-						<FilledTextField
+						<PaperInput
 							ref={wantedRpeRef}
-							label="RPE"
+							value={
+								calculatorState["wantRPE"].value === null
+									? ""
+									: calculatorState[
+											"wantRPE"
+									  ].value.toString()
+							}
+							mode="outlined"
 							keyboardType="numeric"
-							textColor={currentTheme.onSurfaceVariant}
-							baseColor={currentTheme.onSurfaceVariant}
-							tintColor={currentTheme.primary}
-							inputContainerStyle={{
-								backgroundColor: currentTheme.surfaceVariant,
+							style={{
+								backgroundColor: currentTheme.surface,
 							}}
-							errorColor={currentTheme.error}
-							onBlur={() =>
-								onValueEntered(wantedRpeRef, "wantRPE")
-							}
-							error={
+							activeOutlineColor={
 								calculatorState["wantRPE"].error
-									? "Between 6.5-10"
-									: ""
+									? currentTheme.error
+									: currentTheme.primary
 							}
+							outlineColor={
+								calculatorState["wantRPE"].error
+									? currentTheme.error
+									: currentTheme.outline
+							}
+							theme={{
+								colors: {
+									text: calculatorState["wantRPE"].error
+										? currentTheme.error
+										: currentTheme.onSurface,
+									placeholder: calculatorState["wantRPE"]
+										.error
+										? currentTheme.error
+										: currentTheme.onSurface,
+								},
+							}}
+							onChangeText={(text) =>
+								onValueEntered(text, "wantRPE")
+							}
+							// onEndEditing={(event) =>
+							// 	onValueEntered(event, "wantRPE")
+							// }
+							label="RPE"
 						/>
+						<HelperText
+							theme={{
+								colors: {
+									error: currentTheme.error,
+									text: calculatorState["wantRPE"].error
+										? currentTheme.error
+										: currentTheme.onSurfaceVariant,
+									placeholder: calculatorState["wantRPE"]
+										.error
+										? currentTheme.error
+										: currentTheme.onSurface,
+								},
+							}}
+							type={
+								calculatorState["wantRPE"].error
+									? "error"
+									: "info"
+							}
+						>
+							{calculatorState["wantRPE"].error
+								? "Number between 6.5-10"
+								: "Number between 6.5-10"}
+						</HelperText>
 					</View>
 				</View>
 			</View>
@@ -455,24 +681,24 @@ const getStyles = (theme) => {
 		inputContainer: {
 			width: "100%",
 			paddingHorizontal: 24,
-			marginTop: 20,
+			// marginTop: 20,
 		},
 		knownInputContainer: {
 			height: 100,
 			width: "100%",
 			flexDirection: "row",
 			justifyContent: "space-around",
-			alignItems: "center",
+			alignItems: "flex-start",
 		},
 		knownInputItem: {
 			width: 100,
 		},
-		wanthedInputContainer: {
-			height: 100,
+		wantedInputContainer: {
+			height: 140,
 			width: "100%",
 			flexDirection: "row",
 			justifyContent: "space-around",
-			alignItems: "center",
+			alignItems: "flex-start",
 		},
 		wantedInputItem: {
 			width: 150,

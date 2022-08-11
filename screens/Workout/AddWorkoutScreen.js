@@ -24,11 +24,6 @@ import HeadlineText from "../../components/Text/Headline";
 import LabelText from "../../components/Text/Label";
 import FilledTonalButton from "../../components/Buttons/FilledTonalButton";
 import OutlineButton from "../../components/Buttons/OutlineButton";
-import {
-	TextField,
-	FilledTextField,
-	OutlinedTextField,
-} from "rn-material-ui-textfield";
 import { TextInput as PaperInput, HelperText } from "react-native-paper";
 import Workout from "../../models/workout";
 import { ExerciseTypes } from "../../shared/utils/ExerciseTypes";
