@@ -70,7 +70,7 @@ const WorkoutListScreen = (props) => {
 
 	// BottomSheet stuff
 	const bottomSheetRef = useRef(null);
-	const snapPoints = useMemo(() => ["25%", "50%"], []);
+	const snapPoints = useMemo(() => ["25%", "50%", "75%"], []);
 	const handleSheetChanges = useCallback((index) => {
 		if (index === -1) {
 			dispatch(setHideTabBar(false));
@@ -166,16 +166,6 @@ const WorkoutListScreen = (props) => {
 	};
 	return (
 		<View style={styles.container}>
-			{/* <Modal
-				visible={showModal}
-				animationType="slide"
-				transparent={true}
-				onRequestClose={() => setShowModal(false)}
-			>
-				<AddWorkoutDialogScreen
-					toggleModal={() => setShowModal(false)}
-				/>
-			</Modal> */}
 			{!showFilter && (
 				<FabButton
 					onPress={navigateToAddNewWorkout}
@@ -248,7 +238,7 @@ const WorkoutListScreen = (props) => {
 				enablePanDownToClose={true}
 				enableOverDrag={false}
 				handleStyle={{
-					backgroundColor: currentTheme.surfaceE4,
+					backgroundColor: currentTheme.surface,
 					borderTopLeftRadius: 10,
 					borderTopRightRadius: 10,
 				}}

@@ -13,6 +13,7 @@ import { Themes } from "../shared/Theme";
 // const theme = Themes.dark;
 
 import { ExerciseTypes } from "../shared/utils/ExerciseTypes";
+import SegmentedButton from "./Buttons/SegmentedButton";
 
 const FilterSelect = (props) => {
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
@@ -35,6 +36,15 @@ const FilterSelect = (props) => {
 
 	const [exerciseFilterState, setExerciseFilterState] = useState([]);
 
+	const [filterSegments, setFilterSegments] = useState([
+		{ text: "Exercise", selected: true },
+		{ text: "Date", selected: false },
+		{ text: "PR", selected: false },
+	]);
+	const [activeFilterSegment, setActiveFilterSegment] = useState(
+		filterSegments.find((segment) => segment.selected === true)
+	);
+
 	useEffect(() => {
 		createExerciseTypeArray();
 		// initFilterState();
@@ -51,6 +61,14 @@ const FilterSelect = (props) => {
 	}, [error]);
 
 	useEffect(() => {}, [exerciseFilterState]);
+	useEffect(() => {
+		console.log(activeFilterSegment);
+	}, [activeFilterSegment]);
+
+
+	useEffect(() => {
+		filterSegments.find((segment) => segment.selected === true);
+	}, [filterSegments]);
 
 	const updateFilterState = (exercise) => {
 		const newState = [...exerciseFilterState];
@@ -114,15 +132,43 @@ const FilterSelect = (props) => {
 		setExerciseFilterState(newFilterState);
 	};
 
+	const onSegmentPress = (segment) => {
+		// console.log("Segment");
+
+		// console.log(segment);
+		if (segment.selected) {
+			return;
+		}
+		const nextState = [...filterSegments];
+		for (let segmentState of nextState) {
+			if (segmentState.text === segment.text) {
+				segmentState.selected = true;
+			} else {
+				segmentState.selected = false;
+			}
+		}
+		setFilterSegments(nextState);
+	};
+
 	return (
 		<View style={styles.container}>
 			<View style={styles.filterBoxContent}>
-				<View style={styles.header}>
-					<TitleText style={{ color: currentTheme.onSurfaceVariant }}>
-						Filter by exercise
+				<View style={styles.selectHeader}>
+					<TitleText
+						style={{
+							color: currentTheme.onSurfaceVariant,
+							marginBottom: 10,
+						}}
+					>
+						Filter by
 					</TitleText>
+					<SegmentedButton
+						onPress={onSegmentPress}
+						multiSelect={false}
+						segments={filterSegments}
+					/>
 				</View>
-				<View style={{ width: "100%" }}>
+				{/* <View style={{ width: "100%" }}>
 					<GestureFlatList // need to use the flatlist from react-native-gesture-handler in order to scroll inside the BottomSheet
 						style={{ marginVertical: 5 }}
 						horizontal={true}
@@ -140,8 +186,8 @@ const FilterSelect = (props) => {
 							</FilterChip>
 						)}
 					/>
-				</View>
-				<View
+				</View> */}
+				{/* <View
 					style={{
 						flexDirection: "row",
 						width: "90%",
@@ -149,15 +195,19 @@ const FilterSelect = (props) => {
 					}}
 				>
 					<OutlineButton
-						style={{ width: "40%", marginRight: 10 }} textStyle={{color: currentTheme.onSurfaceVariant}}
+						style={{ width: "40%", marginRight: 10 }}
+						textStyle={{ color: currentTheme.onSurfaceVariant }}
 						onButtonPress={queryForFilter}
 					>
 						Filter
 					</OutlineButton>
-					<TextButton textStyle={{color: currentTheme.onSurfaceVariant}} onButtonPress={() => clearFilter()}>
+					<TextButton
+						textStyle={{ color: currentTheme.onSurfaceVariant }}
+						onButtonPress={() => clearFilter()}
+					>
 						Clear
 					</TextButton>
-				</View>
+				</View> */}
 			</View>
 		</View>
 	);
@@ -165,15 +215,25 @@ const FilterSelect = (props) => {
 
 const getStyles = (theme) => {
 	return StyleSheet.create({
+		container: {
+			flex: 1,
+			width: "100%",
+			marginTop: 10,
+			// backgroundColor: "red"
+		},
 		filterBoxContainer: {
 			width: "100%",
 			height: 200,
 			alignItems: "center",
 		},
 		filterBoxContent: {
-			height: "90%",
-			padding: 20,
-			borderRadius: 12,
+			height: 300,
+			paddingHorizontal: 24,
+			// borderRadius: 12,
+		},
+		selectHeader: {
+			// flex: 1,
+			// backgroundColor: "red"
 		},
 	});
 };

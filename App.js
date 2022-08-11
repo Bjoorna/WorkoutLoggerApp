@@ -8,7 +8,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { StyleSheet, View, Dimensions, Appearance } from "react-native";
 import { LogBox } from "react-native";
 LogBox.ignoreLogs(["Setting a timer"]);
-LogBox.ignoreLogs(["AsyncStorage has been"]);
+LogBox.ignoreLogs(["AsyncStorage has been extracted from react-native core"]);
 
 // redux
 import { Provider, useSelector } from "react-redux";
