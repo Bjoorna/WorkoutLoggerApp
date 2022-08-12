@@ -177,5 +177,7 @@ export const Themes = {
 
 		// scrim
 		scrim: "rgba(253,252,255, 0.80)",
+		scrimTest: "rgba(253,252,255, 0.10)",
+
 	},
 };

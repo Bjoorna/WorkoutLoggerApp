@@ -21,7 +21,7 @@ import FabButton from "../../components/Buttons/Fab";
 import IconButton from "../../components/Buttons/IconButton";
 import { Themes } from "../../shared/Theme";
 import { useSelector, useDispatch } from "react-redux";
-import BottomSheet from "@gorhom/bottom-sheet";
+import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 
 import WorkoutListItem from "../../components/WorkoutListItem";
 
@@ -35,6 +35,8 @@ import {
 } from "../../redux/slices/workoutSlice";
 import { setHideTabBar } from "../../redux/slices/appSettingsSlice";
 import TopAppBar from "../../components/UI/TopAppBarComponent";
+import { render } from "react-dom";
+import { async } from "validate.js";
 
 if (
 	Platform.OS === "android" &&
@@ -62,6 +64,7 @@ const WorkoutListScreen = (props) => {
 		useDarkMode ? Themes.dark : Themes.light
 	);
 	const [isScrolling, setIsScrolling] = useState(false);
+	const [exerciseTypesAvaliable, setExerciseTypesAvaliable] = useState(false);
 
 	const [showModal, setShowModal] = useState(false);
 
@@ -86,11 +89,19 @@ const WorkoutListScreen = (props) => {
 
 	// load workouts on page open
 	useEffect(() => {
+		const getAsyncInfo = async () => {
+			dispatch(getWorkoutByUserID(userID));
+			const exerciseTypesGot = await dispatch(
+				getExerciseTypes()
+			).unwrap();
+			setExerciseTypesAvaliable(true);
+		};
 		console.log("Page is Loading");
 		setRefreshing(true);
 		if (userID) {
-			dispatch(getWorkoutByUserID(userID));
-			dispatch(getExerciseTypes());
+			getAsyncInfo();
+			// dispatch(getWorkoutByUserID(userID));
+			// dispatch(getExerciseTypes());
 		}
 	}, []);
 
@@ -121,6 +132,10 @@ const WorkoutListScreen = (props) => {
 			bottomSheetRef.current.close();
 		}
 	}, [filterToggle]);
+
+	useEffect(() => {
+		console.log("ExerciseTypes: ", exerciseTypesAvaliable);
+	}, [exerciseTypesAvaliable]);
 
 	const onRefresh = useCallback(() => {
 		console.log(userID);
@@ -164,8 +179,24 @@ const WorkoutListScreen = (props) => {
 		// const fabHeight = layout.height;
 		// setFabPosition({x: 16, y: 0})
 	};
+	const renderBackdrop = useCallback(
+		(props) => (
+			<BottomSheetBackdrop
+				style={{ height: "100%" }}
+				{...props}
+				disappearsOnIndex={1}
+				appearsOnIndex={2}
+				opacity={1}
+			/>
+		),
+		[]
+	);
+
 	return (
 		<View style={styles.container}>
+			{/* <Modal style={{zIndex: 2}} visible={filterToggle} transparent={true} onRequestClose={()=> setFilterToggle(state => !state)} >
+				<View style={{flex: 1, backgroundColor: currentTheme.scrim}}></View>
+			</Modal> */}
 			{!showFilter && (
 				<FabButton
 					onPress={navigateToAddNewWorkout}
@@ -202,7 +233,6 @@ const WorkoutListScreen = (props) => {
 					onScroll={(e) => scrollHandler(e)}
 					ListFooterComponent={<View></View>}
 					ListFooterComponentStyle={{ height: 80 }}
-
 					ItemSeparatorComponent={() => {
 						return (
 							<View
@@ -231,6 +261,7 @@ const WorkoutListScreen = (props) => {
 				/>
 			</View>
 			<BottomSheet
+				style={{ flex: 1 }}
 				ref={bottomSheetRef}
 				index={-1}
 				snapPoints={snapPoints}
@@ -238,7 +269,7 @@ const WorkoutListScreen = (props) => {
 				enablePanDownToClose={true}
 				enableOverDrag={false}
 				handleStyle={{
-					backgroundColor: currentTheme.surface,
+					backgroundColor: currentTheme.surfaceE4,
 					borderTopLeftRadius: 10,
 					borderTopRightRadius: 10,
 				}}
@@ -247,7 +278,7 @@ const WorkoutListScreen = (props) => {
 				}}
 			>
 				<View style={styles.bottomSheetContainer}>
-					<FilterSelect />
+					<FilterSelect exerciseTypesAvaliable={exerciseTypesAvaliable} />
 				</View>
 			</BottomSheet>
 		</View>
@@ -258,12 +289,24 @@ const getStyles = (theme) => {
 	return StyleSheet.create({
 		container: {
 			flex: 1,
-			backgroundColor: theme.surface,
+			// backgroundColor: "red",
+		},
+		transparentOverlay: {
+			position: "absolute",
+			height: "100%",
+			width: "100%",
+
+			left: 0,
+			top: 0,
+			// opacity: .5,
+			backgroundColor: theme.scrim,
+			zIndex: 3,
 		},
 		bottomSheetContainer: {
 			flex: 1,
 			alignItems: "center",
-			backgroundColor: theme.surfaceE4,
+			backgroundColor: theme.surface,
+			zIndex: 1000,
 		},
 		contentView: {
 			flex: 1,

@@ -14,8 +14,14 @@ import { Themes } from "../shared/Theme";
 
 import { ExerciseTypes } from "../shared/utils/ExerciseTypes";
 import SegmentedButton from "./Buttons/SegmentedButton";
+import { nanoid } from "@reduxjs/toolkit";
+import LabelText from "./Text/Label";
 
-const FilterSelect = (props) => {
+import BottomSheet, { BottomSheetFlatList } from "@gorhom/bottom-sheet";
+import SelectExerciseListItem from "./UI/SelectExerciseListItem";
+const FilterSelect = ({ exerciseTypesAvaliable }) => {
+	const exerciseTypes = useSelector((state) => state.workout.exerciseTypes);
+
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
 	const [styles, setStyles] = useState(
 		getStyles(useDarkMode ? Themes.dark : Themes.light)
@@ -31,10 +37,13 @@ const FilterSelect = (props) => {
 
 	const userID = useSelector((state) => state.auth.userID);
 	const dispatch = useDispatch();
-	const [exerciseTypes, setExerciseTypes] = useState([]);
+	// const [exerciseTypes, setExerciseTypes] = useState([]);
 	const [error, setError] = useState(null);
 
-	const [exerciseFilterState, setExerciseFilterState] = useState([]);
+	// const [exerciseFilterState, setExerciseFilterState] = useState([]);
+
+	const [exerciseTypesList, setExerciseTypesList] = useState([]);
+	const [exercisesToFilterBy, setExercisesToFilterBy] = useState([]);
 
 	const [filterSegments, setFilterSegments] = useState([
 		{ text: "Exercise", selected: true },
@@ -46,13 +55,65 @@ const FilterSelect = (props) => {
 	);
 
 	useEffect(() => {
-		createExerciseTypeArray();
-		// initFilterState();
+		const data = [];
+		console.log(exerciseTypes);
+		// for (let [key, value] of Object.entries(exerciseTypes)) {
+		// 	const dataObject = {};
+		// 	dataObject.title = key;
+		// 	const exerciseList = [];
+		// 	for (let ex of Object.values(value)) {
+		// 		exerciseList.push(ex.value);
+		// 	}
+		// 	dataObject.data = exerciseList;
+		// 	data.push(dataObject);
+		// }
+		// setExerciseTypesList(data);
+		// onUnselectExercise();
 	}, []);
+	useEffect(() => {
+		console.log("Etypes aval from FilterSelext: ", exerciseTypesAvaliable);
+		const data = [];
+		for (let [key, value] of Object.entries(exerciseTypes)) {
+			const dataObject = {};
+			dataObject.title = key;
+			const exerciseList = [];
+			for (let ex of Object.values(value)) {
+				exerciseList.push(ex.value);
+			}
+			dataObject.data = exerciseList;
+			data.push(dataObject);
+		}
+		setExerciseTypesList(data);
+	}, [exerciseTypesAvaliable]);
+
+	// useEffect(() => {
+	// 	// createExerciseTypeArray();
+	// 	useEffect(() => {
+	// 		// const data = [];
+	// 		// for (let [key, value] of Object.entries(exerciseTypes)) {
+	// 		// 	const dataObject = {};
+	// 		// 	dataObject.title = key;
+	// 		// 	const exerciseList = [];
+	// 		// 	for (let ex of Object.values(value)) {
+	// 		// 		exerciseList.push(ex.value);
+	// 		// 	}
+	// 		// 	dataObject.data = exerciseList;
+	// 		// 	data.push(dataObject);
+	// 		// }
+	// 		// console.log(data);
+	// 		// setExerciseTypesList(data);
+	// 		// onUnselectExercise();
+	// 	}, []);
+
+	// }, []);
+
+	// useEffect(() => {
+	// 	initFilterState();
+	// }, [exerciseTypes]);
 
 	useEffect(() => {
-		initFilterState();
-	}, [exerciseTypes]);
+		console.log(exerciseTypesList);
+	}, [exerciseTypesList]);
 
 	useEffect(() => {
 		if (error) {
@@ -60,77 +121,87 @@ const FilterSelect = (props) => {
 		}
 	}, [error]);
 
-	useEffect(() => {}, [exerciseFilterState]);
+	// useEffect(() => {}, [exerciseFilterState]);
 	useEffect(() => {
 		console.log(activeFilterSegment);
 	}, [activeFilterSegment]);
 
-
 	useEffect(() => {
-		filterSegments.find((segment) => segment.selected === true);
+		const nextFilter = filterSegments.find(
+			(segment) => segment.selected === true
+		);
+		setActiveFilterSegment(nextFilter);
 	}, [filterSegments]);
 
-	const updateFilterState = (exercise) => {
-		const newState = [...exerciseFilterState];
-		const findEx = newState.find(
-			(arrayItem) => arrayItem.exercise == exercise
-		);
-		if (!findEx) {
-			return;
-		}
-		findEx.selected = !findEx.selected;
-		setExerciseFilterState(newState);
+	// const updateFilterState = (exercise) => {
+	// 	const newState = [...exerciseFilterState];
+	// 	const findEx = newState.find(
+	// 		(arrayItem) => arrayItem.exercise == exercise
+	// 	);
+	// 	if (!findEx) {
+	// 		return;
+	// 	}
+	// 	findEx.selected = !findEx.selected;
+	// 	setExerciseFilterState(newState);
+	// };
+
+	const onUnselectExercise = () => {
+		// dispatchExercise({
+		// 	type: ADD_VALUE,
+		// 	field: "exerciseName",
+		// 	newValue: { value: null, error: false },
+		// });
 	};
 
-	const queryForFilter = async () => {
-		const exerciseFilter = exerciseFilterState
-			.filter((ex) => ex.selected == true)
-			.map((ex) => ex.exercise);
-		try {
-			if (exerciseFilter.length < 1) {
-				// dispatch(WorkoutActions.getUserWorkouts(userID));
-			} else {
-				console.log("Filter is: ");
-				for (let e of exerciseFilter) {
-					console.log(e);
-				}
-				// dispatch(
-				// 	WorkoutActions.getWorkoutFilteredByExerciseType(
-				// 		userID,
-				// 		exerciseFilter
-				// 	)
-				// );
-			}
-		} catch (error) {
-			console.log(error);
-			setError(e.message);
-		}
-	};
+	// const queryForFilter = async () => {
+	// 	const exerciseFilter = exerciseFilterState
+	// 		.filter((ex) => ex.selected == true)
+	// 		.map((ex) => ex.exercise);
+	// 	try {
+	// 		if (exerciseFilter.length < 1) {
+	// 			// dispatch(WorkoutActions.getUserWorkouts(userID));
+	// 		} else {
+	// 			console.log("Filter is: ");
+	// 			for (let e of exerciseFilter) {
+	// 				console.log(e);
+	// 			}
+	// 			// dispatch(
+	// 			// 	WorkoutActions.getWorkoutFilteredByExerciseType(
+	// 			// 		userID,
+	// 			// 		exerciseFilter
+	// 			// 	)
+	// 			// );
+	// 		}
+	// 	} catch (error) {
+	// 		console.log(error);
+	// 		setError(e.message);
+	// 	}
+	// };
 
-	const clearFilter = () => {
-		const newValues = [...exerciseFilterState];
-		newValues.forEach((element) => {
-			element.selected = false;
-		});
-		setExerciseFilterState(newValues);
-	};
+	// const clearFilter = () => {
+	// 	const newValues = [...exerciseFilterState];
+	// 	newValues.forEach((element) => {
+	// 		element.selected = false;
+	// 	});
+	// 	setExerciseFilterState(newValues);
+	// };
 
-	const createExerciseTypeArray = async () => {
-		let finalArray = [];
-		for (let eData of ExerciseTypes) {
-			finalArray = finalArray.concat(eData.data);
-		}
-		setExerciseTypes(finalArray);
-	};
+	// const createExerciseTypeArray = async () => {
+	// 	let finalArray = [];
+	// 	for (let eData of ExerciseTypes) {
+	// 		finalArray = finalArray.concat(eData.data);
+	// 	}
+	// 	setExerciseTypes(finalArray);
+	// };
 
-	const initFilterState = async () => {
-		const newFilterState = [];
-		for (const ex of exerciseTypes) {
-			const exerciseState = { exercise: ex, selected: false };
-			newFilterState.push(exerciseState);
-		}
-		setExerciseFilterState(newFilterState);
-	};
+	// const initFilterState = async () => {
+	// 	const newFilterState = [];
+	// 	for (const ex of exerciseTypes) {
+	// 		const exerciseState = { exercise: ex, selected: false };
+	// 		newFilterState.push(exerciseState);
+	// 	}
+	// 	setExerciseFilterState(newFilterState);
+	// };
 
 	const onSegmentPress = (segment) => {
 		// console.log("Segment");
@@ -150,6 +221,25 @@ const FilterSelect = (props) => {
 		setFilterSegments(nextState);
 	};
 
+	const addExerciseToFilter = (exercise) => {
+		console.log(exercisesToFilterBy);
+		const indexOfExercise = exercisesToFilterBy.indexOf(exercise);
+		console.log(indexOfExercise);
+		if (indexOfExercise === -1) {
+			const newFilter = [...exercisesToFilterBy];
+			newFilter.push(exercise);
+			setExercisesToFilterBy(newFilter);
+		} else {
+			let newFilter = [...exercisesToFilterBy];
+			newFilter = newFilter.filter((ex) => ex !== exercise);
+			setExercisesToFilterBy(newFilter);
+		}
+	};
+
+	const onClearFilter = () => {
+		setExercisesToFilterBy([]);
+	};
+
 	return (
 		<View style={styles.container}>
 			<View style={styles.filterBoxContent}>
@@ -167,6 +257,27 @@ const FilterSelect = (props) => {
 						multiSelect={false}
 						segments={filterSegments}
 					/>
+				</View>
+				{activeFilterSegment.text === "Exercise" && (
+					<View style={styles.selectExerciseContainer}>
+						<BottomSheetFlatList
+							data={exerciseTypesList}
+							keyExtractor={() => nanoid()}
+							renderItem={(itemData) => (
+								<SelectExerciseListItem
+									currentlySelected={exercisesToFilterBy}
+									onPress={addExerciseToFilter}
+									data={itemData.item}
+									currentTheme={currentTheme}
+								/>
+							)}
+							extraData={exercisesToFilterBy}
+						/>
+					</View>
+				)}
+				<View style={styles.buttonRow}>
+					<TextButton onButtonPress={onClearFilter}>Clear</TextButton>
+					<OutlineButton disabled={exercisesToFilterBy.length<1}>Filter</OutlineButton>
 				</View>
 				{/* <View style={{ width: "100%" }}>
 					<GestureFlatList // need to use the flatlist from react-native-gesture-handler in order to scroll inside the BottomSheet
@@ -227,13 +338,25 @@ const getStyles = (theme) => {
 			alignItems: "center",
 		},
 		filterBoxContent: {
-			height: 300,
+			// height: 300,
+			flex: 1,
 			paddingHorizontal: 24,
 			// borderRadius: 12,
 		},
 		selectHeader: {
 			// flex: 1,
 			// backgroundColor: "red"
+		},
+		selectExerciseContainer: {
+			marginTop: 20,
+			flex: 1,
+			flexDirection: "column",
+			// paddingHorizontal: 24,
+		},
+		buttonRow: {
+			flexDirection: "row",
+			height: 100,
+			justifyContent: "space-around",
 		},
 	});
 };
