@@ -50,6 +50,10 @@ const WorkoutListScreen = (props) => {
 	const dispatch = useDispatch();
 	const userID = useSelector((state) => state.auth.userID);
 	const reduxWorkoutRef = useSelector((state) => state.workout.workouts);
+	const reduxFilteredExercises = useSelector(
+		(state) => state.workout.filteredExercises
+	);
+
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
 	const isHidingTabBar = useSelector((state) => state.appSettings.hideTabBar);
 	const [workouts, setWorkouts] = useState([]);
@@ -124,6 +128,10 @@ const WorkoutListScreen = (props) => {
 	}, [isHidingTabBar]);
 
 	useEffect(() => {
+		console.log(reduxFilteredExercises);
+	}, [reduxFilteredExercises]);
+
+	useEffect(() => {
 		setShowFilter(filterToggle);
 		if (filterToggle) {
 			dispatch(setHideTabBar(true));
@@ -134,7 +142,6 @@ const WorkoutListScreen = (props) => {
 	}, [filterToggle]);
 
 	useEffect(() => {
-		console.log("ExerciseTypes: ", exerciseTypesAvaliable);
 	}, [exerciseTypesAvaliable]);
 
 	const onRefresh = useCallback(() => {
@@ -278,7 +285,9 @@ const WorkoutListScreen = (props) => {
 				}}
 			>
 				<View style={styles.bottomSheetContainer}>
-					<FilterSelect exerciseTypesAvaliable={exerciseTypesAvaliable} />
+					<FilterSelect
+						exerciseTypesAvaliable={exerciseTypesAvaliable}
+					/>
 				</View>
 			</BottomSheet>
 		</View>

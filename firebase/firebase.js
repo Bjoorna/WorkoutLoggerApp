@@ -271,7 +271,7 @@ export const firebaseGetExercisesByTypes = async (exerciseTypes, userID) => {
 		const exerciseQuery = query(
 			exerciseCollection,
 			where("owner", "==", userID),
-			where("exercise", "in", exerciseTypes)
+			where("exerciseName", "in", exerciseTypes)
 		);
 		const docs = await getDocs(exerciseQuery);
 		if (!docs.empty) {

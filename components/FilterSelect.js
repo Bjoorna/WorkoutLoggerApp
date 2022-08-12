@@ -8,17 +8,15 @@ import { FlatList as GestureFlatList } from "react-native-gesture-handler";
 import TitleText from "./Text/Title";
 import OutlineButton from "./Buttons/OutlineButton";
 import TextButton from "./Buttons/TextButton";
-import FilterChip from "./UI/Chips/FilterChip";
 import { Themes } from "../shared/Theme";
 // const theme = Themes.dark;
 
-import { ExerciseTypes } from "../shared/utils/ExerciseTypes";
 import SegmentedButton from "./Buttons/SegmentedButton";
 import { nanoid } from "@reduxjs/toolkit";
-import LabelText from "./Text/Label";
 
 import BottomSheet, { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import SelectExerciseListItem from "./UI/SelectExerciseListItem";
+import { getExercisesByType, getExerciseTypes } from "../redux/slices/workoutSlice";
 const FilterSelect = ({ exerciseTypesAvaliable }) => {
 	const exerciseTypes = useSelector((state) => state.workout.exerciseTypes);
 
@@ -107,12 +105,8 @@ const FilterSelect = ({ exerciseTypesAvaliable }) => {
 
 	// }, []);
 
-	// useEffect(() => {
-	// 	initFilterState();
-	// }, [exerciseTypes]);
-
 	useEffect(() => {
-		console.log(exerciseTypesList);
+		// console.log(exerciseTypesList);
 	}, [exerciseTypesList]);
 
 	useEffect(() => {
@@ -127,11 +121,8 @@ const FilterSelect = ({ exerciseTypesAvaliable }) => {
 	}, [activeFilterSegment]);
 
 	useEffect(() => {
-		const nextFilter = filterSegments.find(
-			(segment) => segment.selected === true
-		);
-		setActiveFilterSegment(nextFilter);
-	}, [filterSegments]);
+		console.log(exercisesToFilterBy);
+	}, [exercisesToFilterBy]);
 
 	// const updateFilterState = (exercise) => {
 	// 	const newState = [...exerciseFilterState];
@@ -222,9 +213,7 @@ const FilterSelect = ({ exerciseTypesAvaliable }) => {
 	};
 
 	const addExerciseToFilter = (exercise) => {
-		console.log(exercisesToFilterBy);
 		const indexOfExercise = exercisesToFilterBy.indexOf(exercise);
-		console.log(indexOfExercise);
 		if (indexOfExercise === -1) {
 			const newFilter = [...exercisesToFilterBy];
 			newFilter.push(exercise);
@@ -238,6 +227,15 @@ const FilterSelect = ({ exerciseTypesAvaliable }) => {
 
 	const onClearFilter = () => {
 		setExercisesToFilterBy([]);
+	};
+
+	const onSubmitFilter = () => {
+		dispatch(
+			getExercisesByType({
+				exerciseTypes: exercisesToFilterBy,
+				userID: userID,
+			})
+		);
 	};
 
 	return (
@@ -277,7 +275,12 @@ const FilterSelect = ({ exerciseTypesAvaliable }) => {
 				)}
 				<View style={styles.buttonRow}>
 					<TextButton onButtonPress={onClearFilter}>Clear</TextButton>
-					<OutlineButton disabled={exercisesToFilterBy.length<1}>Filter</OutlineButton>
+					<TextButton
+						onButtonPress={onSubmitFilter}
+						disabled={exercisesToFilterBy.length < 1}
+					>
+						Filter
+					</TextButton>
 				</View>
 				{/* <View style={{ width: "100%" }}>
 					<GestureFlatList // need to use the flatlist from react-native-gesture-handler in order to scroll inside the BottomSheet

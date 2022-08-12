@@ -87,15 +87,19 @@ export const deleteWorkout = createAsyncThunk(
 export const getExercisesByType = createAsyncThunk(
 	"workout/getExercisesByType",
 	async ({ exerciseTypes, userID }, thunkAPI) => {
-		console.log(exerciseTypes);
-		const exercisesResponse = await firebaseGetExercisesByTypes(
-			exerciseTypes,
-			userID
-		);
-		if (exercisesResponse != null) {
-			return exercisesResponse;
-		} else {
-			return null;
+		try {
+			console.log(exerciseTypes);
+			const exercisesResponse = await firebaseGetExercisesByTypes(
+				exerciseTypes,
+				userID
+			);
+			if (exercisesResponse != null) {
+				return exercisesResponse;
+			} else {
+				return null;
+			}
+		} catch (error) {
+			console.log(error);
 		}
 	}
 );
