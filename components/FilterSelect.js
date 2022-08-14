@@ -20,10 +20,11 @@ import {
 	getExercisesByType,
 	getExercisesByTypeForList,
 	getExerciseTypes,
+	getWorkoutsBasedOnDateInterval,
 } from "../redux/slices/workoutSlice";
 import DateSelector from "./UI/DateSelector";
 
-import { isBefore } from "date-fns";
+import { isBefore, addMonths } from "date-fns";
 import LabelText from "./Text/Label";
 
 const FilterSelect = ({ exerciseTypesAvaliable }) => {
@@ -56,7 +57,7 @@ const FilterSelect = ({ exerciseTypesAvaliable }) => {
 	);
 
 	// DateFilter
-	const [fromDate, setFromDate] = useState(new Date());
+	const [fromDate, setFromDate] = useState(addMonths(new Date(), -1));
 	const [toDate, setToDate] = useState(new Date());
 	const [dateFilterValid, onSetDateFilterValid] = useState(false);
 
@@ -88,6 +89,8 @@ const FilterSelect = ({ exerciseTypesAvaliable }) => {
 
 	useEffect(() => {
 		const isValid = verifyDateFilter(fromDate, toDate);
+		onSetDateFilterValid(isValid);
+
 	}, [fromDate, toDate]);
 
 	useEffect(() => {
@@ -171,9 +174,14 @@ const FilterSelect = ({ exerciseTypesAvaliable }) => {
 	};
 
 	const verifyDateFilter = (from, to) => {
-		const isFromDateBefore = isBefore(from, to);
-		onSetDateFilterValid(isFromDateBefore);
+		return isBefore(from, to);
 	};
+
+	const onFilterByDates = ()=> {
+		if(dateFilterValid){
+			dispatch(getWorkoutsBasedOnDateInterval({from: fromDate, to: toDate}));
+		}
+	}
 
 	return (
 		<View style={styles.container}>
@@ -222,7 +230,7 @@ const FilterSelect = ({ exerciseTypesAvaliable }) => {
 					</View>
 				)}
 				{activeFilterSegment.text === "Date" && (
-					<View style={{ flex: 1, flexDirection: "column" }}>
+					<View style={{ flex: 1, flexDirection: "column", marginTop: 12 }}>
 						<View
 							style={{
 								marginBottom: 12,
@@ -265,7 +273,7 @@ const FilterSelect = ({ exerciseTypesAvaliable }) => {
 								Clear
 							</TextButton>
 							<TextButton
-								onButtonPress={onSubmitFilter}
+								onButtonPress={onFilterByDates}
 								disabled={!dateFilterValid}
 							>
 								Filter

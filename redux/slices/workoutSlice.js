@@ -11,6 +11,7 @@ import {
 	firebaseUpdateWorkout,
 	firebaseGetWorkoutByID,
 	firebaseGetWorkoutsBasedOnWorkoutIDs,
+	firebaseFilterWorkoutOnDates,
 } from "../../firebase/firebase";
 
 const initialState = {
@@ -60,7 +61,6 @@ export const getExercisesInWorkout = createAsyncThunk(
 	async (requestPayload, thunkAPI) => {
 		const { userID, exerciseIDs } = requestPayload;
 		// thunkAPI.getState();
-
 		const exerciseRequest = await firebaseGetExercisesInWorkout(
 			exerciseIDs,
 			userID
@@ -172,6 +172,23 @@ export const getWorkoutByWorkoutID = createAsyncThunk(
 	}
 );
 
+export const getWorkoutsBasedOnDateInterval = createAsyncThunk(
+	"workout/getWorkoutsBasedOnDateInterval",
+	async (datePayload, thunkAPI) => {
+		try {
+			const userID = thunkAPI.getState().auth.userID;
+			const workouts = await firebaseFilterWorkoutOnDates(
+				userID,
+				datePayload.from,
+				datePayload.to
+			);
+			return workouts;
+		} catch (error) {
+			console.log("Error workoutslice");
+		}
+	}
+);
+
 export const workoutSlice = createSlice({
 	name: "workout",
 	initialState,
@@ -270,6 +287,26 @@ export const workoutSlice = createSlice({
 					const workouts = action.payload;
 					workouts.forEach((doc) => {
 						console.log(doc.data());
+						const workoutID = doc.id;
+						const workoutData = doc.data();
+						if (workoutData !== undefined) {
+							const timeStampInMillis =
+								workoutData.date.seconds * 1000;
+							workoutData.date = timeStampInMillis;
+							workoutData.id = workoutID;
+							state.filteredWorkouts[workoutID] = workoutData;
+						}
+					});
+				}
+			}
+		);
+
+		builder.addCase(
+			getWorkoutsBasedOnDateInterval.fulfilled,
+			(state, action) => {
+				if (action.payload) {
+					const workouts = action.payload;
+					workouts.forEach((doc) => {
 						const workoutID = doc.id;
 						const workoutData = doc.data();
 						if (workoutData !== undefined) {

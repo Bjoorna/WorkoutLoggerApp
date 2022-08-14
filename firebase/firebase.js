@@ -22,6 +22,7 @@ import {
 	signInWithEmailAndPassword,
 	signOut,
 } from "firebase/auth";
+import { async } from "validate.js";
 
 const firebaseConfig = {
 	apiKey: "AIzaSyAf6yOGx_V5wXyVUzot1sDgsICKPbDVgIs",
@@ -334,7 +335,7 @@ export const firebaseGetWorkoutsBasedOnWorkoutIDs = async (workoutIDs) => {
 	} catch (error) {
 		throw new Error(error);
 	}
-}
+};
 // export const getWorkoutsBasedOnWorkoutIDs = async (workoutIDs) => {
 // 	try {
 // 		const workoutRefs = workoutIDs.map((id) =>
@@ -391,7 +392,8 @@ export const getWorkoutOnDay = async (userID, dayStart, dayEnd) => {
 			workoutRef,
 			where("owner", "==", userID),
 			where("date", ">=", dayStart),
-			where("date", "<=", dayEnd)
+			where("date", "<=", dayEnd),
+
 		);
 		const querySnapshot = await getDocs(q);
 		if (!querySnapshot.empty) {
@@ -401,6 +403,27 @@ export const getWorkoutOnDay = async (userID, dayStart, dayEnd) => {
 		}
 	} catch (error) {
 		throw new Error(error);
+	}
+};
+
+export const firebaseFilterWorkoutOnDates = async (userID, from, to) => {
+	try {
+		const workoutRef = collection(database, "workouts");
+		const fromTimestamp = Timestamp.fromDate(from);
+		const toTimestamp = Timestamp.fromDate(to);
+		const q = query(
+			workoutRef,
+			where("owner", "==", userID),
+			where("date", ">=", fromTimestamp),
+			where("date", "<=", toTimestamp),
+			orderBy("date", "desc")
+
+		);
+		const querySnapshot = await getDocs(q);
+
+		return querySnapshot;
+	} catch (error) {
+		console.log("Firebase datefilter: ", error);
 	}
 };
 
