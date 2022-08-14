@@ -21,6 +21,10 @@ import {
 	getExercisesByTypeForList,
 	getExerciseTypes,
 } from "../redux/slices/workoutSlice";
+import DateSelector from "./UI/DateSelector";
+
+import { isBefore } from "date-fns";
+import LabelText from "./Text/Label";
 
 const FilterSelect = ({ exerciseTypesAvaliable }) => {
 	const exerciseTypes = useSelector((state) => state.workout.exerciseTypes);
@@ -33,18 +37,12 @@ const FilterSelect = ({ exerciseTypesAvaliable }) => {
 		useDarkMode ? Themes.dark : Themes.light
 	);
 
-	useEffect(() => {
-		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
-		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
-	}, [useDarkMode]);
-
 	const userID = useSelector((state) => state.auth.userID);
 	const dispatch = useDispatch();
 	// const [exerciseTypes, setExerciseTypes] = useState([]);
 	const [error, setError] = useState(null);
 
-	// const [exerciseFilterState, setExerciseFilterState] = useState([]);
-
+	// ExerciseFilter
 	const [exerciseTypesList, setExerciseTypesList] = useState([]);
 	const [exercisesToFilterBy, setExercisesToFilterBy] = useState([]);
 
@@ -57,7 +55,16 @@ const FilterSelect = ({ exerciseTypesAvaliable }) => {
 		filterSegments.find((segment) => segment.selected === true)
 	);
 
+	// DateFilter
+	const [fromDate, setFromDate] = useState(new Date());
+	const [toDate, setToDate] = useState(new Date());
+	const [dateFilterValid, onSetDateFilterValid] = useState(false);
+
 	useEffect(() => {}, []);
+	useEffect(() => {
+		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
+		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
+	}, [useDarkMode]);
 
 	useEffect(() => {
 		console.log("Etypes aval from FilterSelext: ", exerciseTypesAvaliable);
@@ -80,6 +87,10 @@ const FilterSelect = ({ exerciseTypesAvaliable }) => {
 	}, [exerciseTypesList]);
 
 	useEffect(() => {
+		const isValid = verifyDateFilter(fromDate, toDate);
+	}, [fromDate, toDate]);
+
+	useEffect(() => {
 		if (error) {
 			Alert.alert("Error on AuthAttempt", error, [{ text: "Dismiss" }]);
 		}
@@ -100,18 +111,6 @@ const FilterSelect = ({ exerciseTypesAvaliable }) => {
 		console.log(exercisesToFilterBy);
 	}, [exercisesToFilterBy]);
 
-	// const updateFilterState = (exercise) => {
-	// 	const newState = [...exerciseFilterState];
-	// 	const findEx = newState.find(
-	// 		(arrayItem) => arrayItem.exercise == exercise
-	// 	);
-	// 	if (!findEx) {
-	// 		return;
-	// 	}
-	// 	findEx.selected = !findEx.selected;
-	// 	setExerciseFilterState(newState);
-	// };
-
 	const onUnselectExercise = () => {
 		// dispatchExercise({
 		// 	type: ADD_VALUE,
@@ -119,56 +118,6 @@ const FilterSelect = ({ exerciseTypesAvaliable }) => {
 		// 	newValue: { value: null, error: false },
 		// });
 	};
-
-	// const queryForFilter = async () => {
-	// 	const exerciseFilter = exerciseFilterState
-	// 		.filter((ex) => ex.selected == true)
-	// 		.map((ex) => ex.exercise);
-	// 	try {
-	// 		if (exerciseFilter.length < 1) {
-	// 			// dispatch(WorkoutActions.getUserWorkouts(userID));
-	// 		} else {
-	// 			console.log("Filter is: ");
-	// 			for (let e of exerciseFilter) {
-	// 				console.log(e);
-	// 			}
-	// 			// dispatch(
-	// 			// 	WorkoutActions.getWorkoutFilteredByExerciseType(
-	// 			// 		userID,
-	// 			// 		exerciseFilter
-	// 			// 	)
-	// 			// );
-	// 		}
-	// 	} catch (error) {
-	// 		console.log(error);
-	// 		setError(e.message);
-	// 	}
-	// };
-
-	// const clearFilter = () => {
-	// 	const newValues = [...exerciseFilterState];
-	// 	newValues.forEach((element) => {
-	// 		element.selected = false;
-	// 	});
-	// 	setExerciseFilterState(newValues);
-	// };
-
-	// const createExerciseTypeArray = async () => {
-	// 	let finalArray = [];
-	// 	for (let eData of ExerciseTypes) {
-	// 		finalArray = finalArray.concat(eData.data);
-	// 	}
-	// 	setExerciseTypes(finalArray);
-	// };
-
-	// const initFilterState = async () => {
-	// 	const newFilterState = [];
-	// 	for (const ex of exerciseTypes) {
-	// 		const exerciseState = { exercise: ex, selected: false };
-	// 		newFilterState.push(exerciseState);
-	// 	}
-	// 	setExerciseFilterState(newFilterState);
-	// };
 
 	const onSegmentPress = (segment) => {
 		// console.log("Segment");
@@ -214,6 +163,18 @@ const FilterSelect = ({ exerciseTypesAvaliable }) => {
 		);
 	};
 
+	const onSetFromDate = (date) => {
+		setFromDate(date);
+	};
+	const onSetToDate = (date) => {
+		setToDate(date);
+	};
+
+	const verifyDateFilter = (from, to) => {
+		const isFromDateBefore = isBefore(from, to);
+		onSetDateFilterValid(isFromDateBefore);
+	};
+
 	return (
 		<View style={styles.container}>
 			<View style={styles.filterBoxContent}>
@@ -247,17 +208,71 @@ const FilterSelect = ({ exerciseTypesAvaliable }) => {
 							)}
 							extraData={exercisesToFilterBy}
 						/>
+						<View style={styles.buttonRow}>
+							<TextButton onButtonPress={onClearFilter}>
+								Clear
+							</TextButton>
+							<TextButton
+								onButtonPress={onSubmitFilter}
+								disabled={exercisesToFilterBy.length < 1}
+							>
+								Filter
+							</TextButton>
+						</View>
 					</View>
 				)}
-				<View style={styles.buttonRow}>
-					<TextButton onButtonPress={onClearFilter}>Clear</TextButton>
-					<TextButton
-						onButtonPress={onSubmitFilter}
-						disabled={exercisesToFilterBy.length < 1}
-					>
-						Filter
-					</TextButton>
-				</View>
+				{activeFilterSegment.text === "Date" && (
+					<View style={{ flex: 1, flexDirection: "column" }}>
+						<View
+							style={{
+								marginBottom: 12,
+							}}
+						>
+							<TitleText
+								style={{
+									color: currentTheme.onSurfaceVariant,
+									marginBottom: 10,
+								}}
+							>
+								From:
+							</TitleText>
+							<DateSelector
+								currentTheme={currentTheme}
+								selectedDate={fromDate}
+								onDateChange={onSetFromDate}
+								text={"From Date"}
+							/>
+						</View>
+						<View>
+							<TitleText
+								style={{
+									color: currentTheme.onSurfaceVariant,
+									marginBottom: 10,
+								}}
+							>
+								To:
+							</TitleText>
+							<DateSelector
+								currentTheme={currentTheme}
+								selectedDate={toDate}
+								onDateChange={onSetToDate}
+								text="To Date"
+							/>
+							{/* <LabelText style={{color: currentTheme.error, marginLeft: 12}}>Must be after From Date</LabelText> */}
+						</View>
+						<View style={styles.buttonRow}>
+							<TextButton onButtonPress={onClearFilter}>
+								Clear
+							</TextButton>
+							<TextButton
+								onButtonPress={onSubmitFilter}
+								disabled={!dateFilterValid}
+							>
+								Filter
+							</TextButton>
+						</View>
+					</View>
+				)}
 				{/* <View style={{ width: "100%" }}>
 					<GestureFlatList // need to use the flatlist from react-native-gesture-handler in order to scroll inside the BottomSheet
 						style={{ marginVertical: 5 }}

@@ -54,6 +54,7 @@ const AddWorkoutDialogScreen = (props) => {
 	const [styles, setStyles] = useState(
 		getStyles(useDarkMode ? Themes.dark : Themes.light)
 	);
+	
 	const [currentTheme, setCurrentTheme] = useState(
 		useDarkMode ? Themes.dark : Themes.light
 	);
