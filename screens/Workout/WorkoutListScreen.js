@@ -53,6 +53,9 @@ const WorkoutListScreen = (props) => {
 	const reduxFilteredExercises = useSelector(
 		(state) => state.workout.filteredExercises
 	);
+	const reduxFilteredWorkouts = useSelector(
+		(state) => state.workout.filteredWorkouts
+	);
 
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
 	const isHidingTabBar = useSelector((state) => state.appSettings.hideTabBar);
@@ -110,6 +113,13 @@ const WorkoutListScreen = (props) => {
 	}, []);
 
 	useEffect(() => {
+		if (reduxFilteredWorkouts !== {}) {
+			const arrayOfWorkouts = Object.values(reduxFilteredWorkouts);
+			setWorkouts(arrayOfWorkouts);
+		}
+	}, [reduxFilteredWorkouts]);
+
+	useEffect(() => {
 		const arrayOfWorkouts = Object.values(reduxWorkoutRef);
 		setWorkouts(arrayOfWorkouts);
 		setRefreshing(false);
@@ -141,8 +151,7 @@ const WorkoutListScreen = (props) => {
 		}
 	}, [filterToggle]);
 
-	useEffect(() => {
-	}, [exerciseTypesAvaliable]);
+	useEffect(() => {}, [exerciseTypesAvaliable]);
 
 	const onRefresh = useCallback(() => {
 		console.log(userID);

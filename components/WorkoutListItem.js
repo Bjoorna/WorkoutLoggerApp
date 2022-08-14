@@ -22,7 +22,10 @@ import {
 } from "../redux/slices/appSettingsSlice";
 import { nanoid } from "@reduxjs/toolkit";
 import TitleText from "./Text/Title";
-import { convertKiloToPound, getIntensity } from "../shared/utils/UtilFunctions";
+import {
+	convertKiloToPound,
+	getIntensity,
+} from "../shared/utils/UtilFunctions";
 // const theme = Themes.dark;
 
 const ExerciseItem = ({ exercise, currentTheme }) => {
@@ -46,7 +49,6 @@ const ExerciseItem = ({ exercise, currentTheme }) => {
 	}, [currentTheme]);
 
 	const findTopSet = () => {
-
 		let topSetCandidate = exercise.sets[1];
 
 		for (let [set, setValue] of Object.entries(exercise.sets)) {
@@ -101,7 +103,8 @@ const ExerciseItem = ({ exercise, currentTheme }) => {
 						large={true}
 						style={{ color: currentTheme.onSurface }}
 					>
-						{Math.round(convertKiloToPound(topSet.weight))}lbs * {topSet.reps}reps
+						{Math.round(convertKiloToPound(topSet.weight))}lbs *{" "}
+						{topSet.reps}reps
 					</BodyText>
 				)}
 			</View>
@@ -227,6 +230,8 @@ const WorkoutListItem = ({ workoutID, userID }) => {
 			<Pressable
 				style={styles.pressableView}
 				onPress={navigateToDetailPage}
+				android_ripple={{ color: currentTheme.onSurface }}
+				unstable_pressDelay={75}
 			>
 				<View style={styles.workoutItemLayout}>
 					<View style={styles.workoutItemHeader}>
@@ -245,22 +250,6 @@ const WorkoutListItem = ({ workoutID, userID }) => {
 						</LabelText>
 					</View>
 					<View style={styles.workoutItemExerciseContainer}>
-						{/* {exercises.map((exercise) => {
-							console.log(exercise);
-							return (
-								<ExerciseItem
-									key={nanoid()}
-									currentTheme={currentTheme}
-									exercise={exercise}
-								/>
-							);
-						})} */}
-						{/* <View>
-								<ActivityIndicator
-									size="small"
-									color={currentTheme.primary}
-								/>
-							</View> */}
 						<FlatList
 							keyExtractor={(item) => item.id}
 							horizontal={false}
@@ -283,11 +272,9 @@ const WorkoutListItem = ({ workoutID, userID }) => {
 const getStyles = (theme) => {
 	return StyleSheet.create({
 		workoutItemContainer: {
-			width: "90%",
+			width: "100%",
 			alignSelf: "center",
 			minHeight: 150,
-			paddingVertical: 6,
-			marginBottom: 12,
 			// borderRadius: 12,
 			// overflow: "hidden",
 			// borderColor: theme.outline,
@@ -300,6 +287,9 @@ const getStyles = (theme) => {
 			// width: "100%",
 			// minHeight: 100,
 			// height: "100%"
+			paddingVertical: 18,
+			// marginBottom: 12,
+			paddingHorizontal: 24,
 		},
 		workoutItemLayout: {
 			flex: 1,

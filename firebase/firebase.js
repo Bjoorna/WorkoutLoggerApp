@@ -324,6 +324,17 @@ export const firebaseGetUserWorkouts = async (userID) => {
 	}
 };
 
+export const firebaseGetWorkoutsBasedOnWorkoutIDs = async (workoutIDs) => {
+	try {
+		const workoutRefs = workoutIDs.map((id) =>
+			getDoc(doc(database, "workouts", id))
+		);
+		const docSnaps = await Promise.all(workoutRefs);
+		return docSnaps;
+	} catch (error) {
+		throw new Error(error);
+	}
+}
 // export const getWorkoutsBasedOnWorkoutIDs = async (workoutIDs) => {
 // 	try {
 // 		const workoutRefs = workoutIDs.map((id) =>

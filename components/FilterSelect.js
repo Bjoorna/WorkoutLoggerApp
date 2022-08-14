@@ -16,7 +16,12 @@ import { nanoid } from "@reduxjs/toolkit";
 
 import BottomSheet, { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import SelectExerciseListItem from "./UI/SelectExerciseListItem";
-import { getExercisesByType, getExerciseTypes } from "../redux/slices/workoutSlice";
+import {
+	getExercisesByType,
+	getExercisesByTypeForList,
+	getExerciseTypes,
+} from "../redux/slices/workoutSlice";
+
 const FilterSelect = ({ exerciseTypesAvaliable }) => {
 	const exerciseTypes = useSelector((state) => state.workout.exerciseTypes);
 
@@ -52,22 +57,8 @@ const FilterSelect = ({ exerciseTypesAvaliable }) => {
 		filterSegments.find((segment) => segment.selected === true)
 	);
 
-	useEffect(() => {
-		const data = [];
-		console.log(exerciseTypes);
-		// for (let [key, value] of Object.entries(exerciseTypes)) {
-		// 	const dataObject = {};
-		// 	dataObject.title = key;
-		// 	const exerciseList = [];
-		// 	for (let ex of Object.values(value)) {
-		// 		exerciseList.push(ex.value);
-		// 	}
-		// 	dataObject.data = exerciseList;
-		// 	data.push(dataObject);
-		// }
-		// setExerciseTypesList(data);
-		// onUnselectExercise();
-	}, []);
+	useEffect(() => {}, []);
+
 	useEffect(() => {
 		console.log("Etypes aval from FilterSelext: ", exerciseTypesAvaliable);
 		const data = [];
@@ -84,27 +75,6 @@ const FilterSelect = ({ exerciseTypesAvaliable }) => {
 		setExerciseTypesList(data);
 	}, [exerciseTypesAvaliable]);
 
-	// useEffect(() => {
-	// 	// createExerciseTypeArray();
-	// 	useEffect(() => {
-	// 		// const data = [];
-	// 		// for (let [key, value] of Object.entries(exerciseTypes)) {
-	// 		// 	const dataObject = {};
-	// 		// 	dataObject.title = key;
-	// 		// 	const exerciseList = [];
-	// 		// 	for (let ex of Object.values(value)) {
-	// 		// 		exerciseList.push(ex.value);
-	// 		// 	}
-	// 		// 	dataObject.data = exerciseList;
-	// 		// 	data.push(dataObject);
-	// 		// }
-	// 		// console.log(data);
-	// 		// setExerciseTypesList(data);
-	// 		// onUnselectExercise();
-	// 	}, []);
-
-	// }, []);
-
 	useEffect(() => {
 		// console.log(exerciseTypesList);
 	}, [exerciseTypesList]);
@@ -119,6 +89,12 @@ const FilterSelect = ({ exerciseTypesAvaliable }) => {
 	useEffect(() => {
 		console.log(activeFilterSegment);
 	}, [activeFilterSegment]);
+
+	useEffect(() => {
+		setActiveFilterSegment(
+			filterSegments.find((segment) => segment.selected === true)
+		);
+	}, [filterSegments]);
 
 	useEffect(() => {
 		console.log(exercisesToFilterBy);
@@ -231,7 +207,7 @@ const FilterSelect = ({ exerciseTypesAvaliable }) => {
 
 	const onSubmitFilter = () => {
 		dispatch(
-			getExercisesByType({
+			getExercisesByTypeForList({
 				exerciseTypes: exercisesToFilterBy,
 				userID: userID,
 			})
