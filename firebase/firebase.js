@@ -331,7 +331,19 @@ export const firebaseGetWorkoutsBasedOnWorkoutIDs = async (workoutIDs) => {
 			getDoc(doc(database, "workouts", id))
 		);
 		const docSnaps = await Promise.all(workoutRefs);
-		return docSnaps;
+		const arrayOfWorkouts = [];
+		docSnaps.forEach((doc) => {
+			if (doc.exists()) {
+				console.log(doc.data());
+				const workout = doc.data();
+				const id = doc.id;
+				workout.id = id;
+				if (workout !== undefined) {
+					arrayOfWorkouts.push(workout);
+				}
+			}
+		});
+		return arrayOfWorkouts;
 	} catch (error) {
 		throw new Error(error);
 	}
@@ -392,8 +404,7 @@ export const getWorkoutOnDay = async (userID, dayStart, dayEnd) => {
 			workoutRef,
 			where("owner", "==", userID),
 			where("date", ">=", dayStart),
-			where("date", "<=", dayEnd),
-
+			where("date", "<=", dayEnd)
 		);
 		const querySnapshot = await getDocs(q);
 		if (!querySnapshot.empty) {
@@ -417,7 +428,6 @@ export const firebaseFilterWorkoutOnDates = async (userID, from, to) => {
 			where("date", ">=", fromTimestamp),
 			where("date", "<=", toTimestamp),
 			orderBy("date", "desc")
-
 		);
 		const querySnapshot = await getDocs(q);
 

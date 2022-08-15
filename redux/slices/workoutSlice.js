@@ -20,8 +20,12 @@ const initialState = {
 	filteredExercises: {}, // set exercises that the user has filtered by here
 	filteredWorkouts: {},
 	exerciseTypes: {},
-	useFilter: false,
-	currentFilterState: {},
+	filterInfo: {
+		usingFilter: false,
+		type: "",
+		filterQuery: {},
+		error: "",
+	},
 };
 
 export const getExerciseTypes = createAsyncThunk(
@@ -109,7 +113,7 @@ export const getExercisesByType = createAsyncThunk(
 );
 
 export const getExercisesByTypeForList = createAsyncThunk(
-	"workout/getExercisesByType",
+	"workout/getExercisesByTypeForList",
 	async ({ exerciseTypes, userID }, thunkAPI) => {
 		try {
 			const exercisesResponse = await firebaseGetExercisesByTypes(
@@ -125,7 +129,10 @@ export const getExercisesByTypeForList = createAsyncThunk(
 				thunkAPI.dispatch(
 					getWorkoutsFilteredByExerciseType(workoutIDs)
 				);
-				return exercisesResponse;
+				return {
+					exercises: exercisesResponse,
+					exerciseTypes: exerciseTypes,
+				};
 			} else {
 				return null;
 			}
@@ -182,7 +189,10 @@ export const getWorkoutsBasedOnDateInterval = createAsyncThunk(
 				datePayload.from,
 				datePayload.to
 			);
-			return workouts;
+			return {
+				workouts: workouts,
+				dates: { from: datePayload.from, to: datePayload.to },
+			};
 		} catch (error) {
 			console.log("Error workoutslice");
 		}
@@ -193,8 +203,18 @@ export const workoutSlice = createSlice({
 	name: "workout",
 	initialState,
 	reducers: {
-		resetFilteredExercises: (state) => (state.filteredExercises = {}),
-		resetFilteredWorkouts: (state) => (state.filteredWorkouts = {}),
+		resetFilter: (state) => {
+			(state.filterInfo.usingFilter = false),
+				(state.filterInfo.type = ""),
+				(state.filterInfo.filterQuery = {}),
+				(state.filterInfo.error = "");
+		},
+		resetFilteredExercises: (state) => {
+			state.filteredExercises = {};
+		},
+		resetFilteredWorkouts: (state) => {
+			state.filteredWorkouts = {};
+		},
 
 		resetWorkoutState: (state) => {
 			state.exercises = {};
@@ -264,10 +284,8 @@ export const workoutSlice = createSlice({
 			} else {
 				snapshot.forEach((doc) => {
 					const exercise = doc.data();
-					console.log("exercise");
 					exercise.date = exercise.date.seconds * 1000;
 					exercise.id = doc.id;
-					console.log(exercise);
 					state.filteredExercises[exercise.id] = exercise;
 				});
 			}
@@ -282,22 +300,42 @@ export const workoutSlice = createSlice({
 		builder.addCase(
 			getWorkoutsFilteredByExerciseType.fulfilled,
 			(state, action) => {
-				console.log("BUILDER");
+				// console.log("BUILDER", action.payload);
+
 				if (action.payload) {
 					const workouts = action.payload;
-					workouts.forEach((doc) => {
-						console.log(doc.data());
-						const workoutID = doc.id;
-						const workoutData = doc.data();
-						if (workoutData !== undefined) {
-							const timeStampInMillis =
-								workoutData.date.seconds * 1000;
-							workoutData.date = timeStampInMillis;
-							workoutData.id = workoutID;
-							state.filteredWorkouts[workoutID] = workoutData;
+					if (workouts.length === 0) {
+						state.filteredWorkouts = {};
+						state.filterInfo.error = "No workouts matching filter";
+					} else {
+						for (let workout of workouts) {
+							workout.date = workout.date.seconds * 1000;
+							state.filteredWorkouts[workout.id] = workout;
 						}
-					});
+						// workouts.forEach((doc) => {
+						// 	console.log(doc.data());
+
+						// 	const workoutID = doc.id;
+						// 	const workoutData = doc.data();
+						// 	if (workoutData !== undefined) {
+						// 		const timeStampInMillis =
+						// 			workoutData.date.seconds * 1000;
+						// 		workoutData.date = timeStampInMillis;
+						// 		workoutData.id = workoutID;
+						// 		state.filteredWorkouts[workoutID] = workoutData;
+						// 	}
+						// });
+					}
 				}
+			}
+		);
+		builder.addCase(
+			getWorkoutsBasedOnDateInterval.pending,
+			(state, action) => {
+				state.filterInfo.usingFilter = false;
+				state.filterInfo.type = "";
+				state.filterInfo.filterQuery = {};
+				state.filterInfo.error = "";
 			}
 		);
 
@@ -305,25 +343,65 @@ export const workoutSlice = createSlice({
 			getWorkoutsBasedOnDateInterval.fulfilled,
 			(state, action) => {
 				if (action.payload) {
-					const workouts = action.payload;
-					workouts.forEach((doc) => {
-						const workoutID = doc.id;
-						const workoutData = doc.data();
-						if (workoutData !== undefined) {
-							const timeStampInMillis =
-								workoutData.date.seconds * 1000;
-							workoutData.date = timeStampInMillis;
-							workoutData.id = workoutID;
-							state.filteredWorkouts[workoutID] = workoutData;
-						}
-					});
+					const workouts = action.payload.workouts;
+					if (workouts.empty) {
+						state.filterInfo.usingFilter = true;
+						state.filterInfo.type = "Date";
+						state.filterInfo.filterQuery = {
+							from: action.payload.dates.from,
+							to: action.payload.dates.to,
+						};
+						state.filterInfo.error = "No workouts matching filter";
+						state.filteredWorkouts = {};
+					} else {
+						state.filterInfo.usingFilter = true;
+						state.filterInfo.type = "Date";
+						state.filterInfo.filterQuery = {
+							from: action.payload.dates.from,
+							to: action.payload.dates.to,
+						};
+						workouts.forEach((doc) => {
+							const workoutID = doc.id;
+							const workoutData = doc.data();
+							if (workoutData !== undefined) {
+								const timeStampInMillis =
+									workoutData.date.seconds * 1000;
+								workoutData.date = timeStampInMillis;
+								workoutData.id = workoutID;
+								state.filteredWorkouts[workoutID] = workoutData;
+							}
+						});
+					}
+				}
+			}
+		);
+		builder.addCase(getExercisesByTypeForList.pending, (state, action) => {
+			state.filterInfo.usingFilter = false;
+			state.filterInfo.type = "";
+			state.filterInfo.filterQuery = {};
+			state.filterInfo.error = "";
+		});
+		builder.addCase(
+			getExercisesByTypeForList.fulfilled,
+			(state, action) => {
+				if (action.payload) {
+					const exerciseTypes = action.payload.exerciseTypes;
+					state.filterInfo.usingFilter = true;
+					state.filterInfo.type = "Exercises";
+					state.filterInfo.filterQuery = {
+						exerciseTypes: exerciseTypes,
+					};
 				}
 			}
 		);
 	},
 });
 
-export const { resetFilteredExercises, resetWorkoutState } =
-	workoutSlice.actions;
+export const {
+	resetFilteredExercises,
+	resetWorkoutState,
+	resetFilter,
+	resetFilteredWorkouts,
+} = workoutSlice.actions;
 
 export default workoutSlice.reducer;

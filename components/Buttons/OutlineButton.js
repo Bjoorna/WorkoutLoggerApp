@@ -29,7 +29,7 @@ const OutlineButton = (props) => {
 	const handleOnPressIn = () => {
 		// props.onButtonPress();
 		setIsPressed(true);
-		Vibration.vibrate(100);
+		// Vibration.vibrate(100);
 	};
 
 	if (isDisabled) {

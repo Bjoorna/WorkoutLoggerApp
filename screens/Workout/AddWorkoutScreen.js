@@ -218,7 +218,6 @@ const AddWorkoutDialogScreen = (props) => {
 			{!hideFAB && (
 				<FabButton
 					onPress={onShowAddWorkoutModal}
-					onLayout={onFabLayout}
 					iconName="add"
 					style={{
 						position: "absolute",

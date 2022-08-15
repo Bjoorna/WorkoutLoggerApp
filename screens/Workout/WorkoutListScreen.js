@@ -29,14 +29,22 @@ import FilterSelect from "../../components/FilterSelect";
 import AddWorkoutcreen from "./AddWorkoutScreen";
 
 import { transformObjectToWorkout } from "../../shared/utils/UtilFunctions";
-import {
+import workoutSlice, {
 	getExerciseTypes,
 	getWorkoutByUserID,
+	resetFilter,
+	resetFilteredExercises,
+	resetFilteredWorkouts,
 } from "../../redux/slices/workoutSlice";
 import { setHideTabBar } from "../../redux/slices/appSettingsSlice";
 import TopAppBar from "../../components/UI/TopAppBarComponent";
 import { render } from "react-dom";
 import { async } from "validate.js";
+import TitleText from "../../components/Text/Title";
+import BodyText from "../../components/Text/Body";
+import { format } from "date-fns";
+import { nanoid } from "@reduxjs/toolkit";
+import OutlineButton from "../../components/Buttons/OutlineButton";
 
 if (
 	Platform.OS === "android" &&
@@ -50,20 +58,12 @@ const WorkoutListScreen = (props) => {
 	const dispatch = useDispatch();
 	const userID = useSelector((state) => state.auth.userID);
 	const reduxWorkoutRef = useSelector((state) => state.workout.workouts);
-	const reduxFilteredExercises = useSelector(
-		(state) => state.workout.filteredExercises
-	);
-	const reduxFilteredWorkouts = useSelector(
-		(state) => state.workout.filteredWorkouts
-	);
 
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
 	const isHidingTabBar = useSelector((state) => state.appSettings.hideTabBar);
 	const [workouts, setWorkouts] = useState([]);
 
 	const [refreshing, setRefreshing] = useState(false);
-	const [showFilter, setShowFilter] = useState(false);
-	const [filterToggle, setFilterToggle] = useState(false);
 	const [styles, setStyles] = useState(
 		getStyles(useDarkMode ? Themes.dark : Themes.light)
 	);
@@ -73,7 +73,16 @@ const WorkoutListScreen = (props) => {
 	const [isScrolling, setIsScrolling] = useState(false);
 	const [exerciseTypesAvaliable, setExerciseTypesAvaliable] = useState(false);
 
-	const [showModal, setShowModal] = useState(false);
+	// filterInformation
+	const [showFilter, setShowFilter] = useState(false);
+	const [filterToggle, setFilterToggle] = useState(false);
+	const reduxFilteredExercises = useSelector(
+		(state) => state.workout.filteredExercises
+	);
+	const reduxFilteredWorkouts = useSelector(
+		(state) => state.workout.filteredWorkouts
+	);
+	const filterInfo = useSelector((state) => state.workout.filterInfo);
 
 	// layout
 	// const [fabPosition, setFabPosition] = useState({x: 0, y: 0});
@@ -107,21 +116,25 @@ const WorkoutListScreen = (props) => {
 		setRefreshing(true);
 		if (userID) {
 			getAsyncInfo();
-			// dispatch(getWorkoutByUserID(userID));
-			// dispatch(getExerciseTypes());
 		}
 	}, []);
 
 	useEffect(() => {
 		if (reduxFilteredWorkouts !== {}) {
 			const arrayOfWorkouts = Object.values(reduxFilteredWorkouts);
+			if (arrayOfWorkouts.length === 0 && filterInfo.error !== "") {
+				setWorkouts([]);
+				return;
+			}
 			setWorkouts(arrayOfWorkouts);
 		}
-	}, [reduxFilteredWorkouts]);
+	}, [reduxFilteredWorkouts, filterInfo]);
 
 	useEffect(() => {
 		const arrayOfWorkouts = Object.values(reduxWorkoutRef);
-		setWorkouts(arrayOfWorkouts);
+		console.log(arrayOfWorkouts.length);
+
+		setWorkouts([...arrayOfWorkouts]);
 		setRefreshing(false);
 	}, [reduxWorkoutRef]);
 
@@ -138,10 +151,6 @@ const WorkoutListScreen = (props) => {
 	}, [isHidingTabBar]);
 
 	useEffect(() => {
-		console.log(reduxFilteredExercises);
-	}, [reduxFilteredExercises]);
-
-	useEffect(() => {
 		setShowFilter(filterToggle);
 		if (filterToggle) {
 			dispatch(setHideTabBar(true));
@@ -154,10 +163,8 @@ const WorkoutListScreen = (props) => {
 	useEffect(() => {}, [exerciseTypesAvaliable]);
 
 	const onRefresh = useCallback(() => {
-		console.log(userID);
 		setRefreshing(true);
 		dispatch(getWorkoutByUserID(userID));
-		// dispatch(WorkoutActions.getUserWorkouts(userID));
 	}, []);
 
 	const toggle = () => {
@@ -188,25 +195,31 @@ const WorkoutListScreen = (props) => {
 		props.navigation.navigate("Calculator");
 	};
 
-	const onFabLayout = (event) => {
-		// console.log(event.nativeEvent);
-		// const layout = event.nativeEvent.layout;
-		// const fabWidth = layout.width;
-		// const fabHeight = layout.height;
-		// setFabPosition({x: 16, y: 0})
+	// const renderBackdrop = useCallback(
+	// 	(props) => (
+	// 		<BottomSheetBackdrop
+	// 			style={{ height: "100%" }}
+	// 			{...props}
+	// 			disappearsOnIndex={1}
+	// 			appearsOnIndex={2}
+	// 			opacity={1}
+	// 		/>
+	// 	),
+	// 	[]
+	// );
+
+	const onClearFilter = () => {
+		dispatch(resetFilter());
+		dispatch(resetFilteredExercises());
+		dispatch(resetFilteredWorkouts());
+
+		setStandardWorkouts();
 	};
-	const renderBackdrop = useCallback(
-		(props) => (
-			<BottomSheetBackdrop
-				style={{ height: "100%" }}
-				{...props}
-				disappearsOnIndex={1}
-				appearsOnIndex={2}
-				opacity={1}
-			/>
-		),
-		[]
-	);
+
+	const setStandardWorkouts = () => {
+		const arrayOfWorkouts = Object.values(reduxWorkoutRef);
+		setWorkouts(arrayOfWorkouts);
+	};
 
 	return (
 		<View style={styles.container}>
@@ -223,7 +236,6 @@ const WorkoutListScreen = (props) => {
 						bottom: 16,
 					}}
 					title="New Workout"
-					onLayout={onFabLayout}
 				/>
 			)}
 			<TopAppBar
@@ -240,8 +252,102 @@ const WorkoutListScreen = (props) => {
 						onPress={toggle}
 					/>,
 				]}
+				backgroundColor={
+					filterInfo.usingFilter
+						? currentTheme.surfaceE2
+						: currentTheme.surface
+				}
 			/>
 			<View style={styles.contentView}>
+				{filterInfo.usingFilter && (
+					<View style={styles.filterInformationContainer}>
+						{filterInfo.type === "Exercises" && (
+							<View style={{}}>
+								<TitleText
+									large={true}
+									style={{ color: currentTheme.onSurface }}
+								>
+									Filter:
+								</TitleText>
+								{filterInfo.filterQuery.exerciseTypes.map(
+									(exerciseType) => (
+										<View key={nanoid()}>
+											<BodyText
+												style={{
+													color: currentTheme.onSurface,
+												}}
+												large={false}
+											>
+												{exerciseType}
+											</BodyText>
+										</View>
+									)
+								)}
+								{filterInfo.error !== "" && (
+									<View>
+										<BodyText
+											style={{
+												color: currentTheme.error,
+											}}
+										>
+											{filterInfo.error}
+										</BodyText>
+									</View>
+								)}
+							</View>
+						)}
+						{filterInfo.type === "Date" && (
+							<View
+							// style={{
+							// 	flex: 1,
+							// }}
+							>
+								<View style={{ marginLeft: 12 }}>
+									<BodyText
+										style={{
+											color: currentTheme.onSurface,
+										}}
+										large={false}
+									>
+										From Date:{" "}
+										{format(
+											filterInfo.filterQuery.from,
+											"dd/MM/yyyy"
+										)}
+									</BodyText>
+									<BodyText
+										style={{
+											color: currentTheme.onSurface,
+										}}
+										large={false}
+									>
+										To Date:{" "}
+										{format(
+											filterInfo.filterQuery.to,
+											"dd/MM/yyyy"
+										)}
+									</BodyText>
+									{filterInfo.error !== "" && (
+										<View>
+											<BodyText
+												style={{
+													color: currentTheme.error,
+												}}
+											>
+												{filterInfo.error}
+											</BodyText>
+										</View>
+									)}
+								</View>
+							</View>
+						)}
+						<View style={{ marginTop: 12 }}>
+							<OutlineButton onButtonPress={onClearFilter}>
+								Clear filter
+							</OutlineButton>
+						</View>
+					</View>
+				)}
 				<FlatList
 					style={styles.flatListStyle}
 					data={workouts}
@@ -359,6 +465,14 @@ const getStyles = (theme) => {
 			// top: "90%"
 			// , right: 100,
 			zIndex: 1000,
+		},
+		filterInformationContainer: {
+			width: "100%",
+			minHeight: 100,
+			paddingHorizontal: 24,
+			paddingVertical: 12,
+
+			backgroundColor: theme.surfaceE2,
 		},
 	});
 };

@@ -36,7 +36,7 @@ const FabButton = ({title, onPress, iconName, style, backgroundColor, iconColor,
 			onPressOut={() => setIsPressed(false)}
 			onPress={onPress}
 			style={{ ...styles.fabButtonStyle, ...style }}
-			onLayout={event => onLayout(event)}
+			// onLayout={event => onLayout(event)}
 		>
 			{iconName && (
 				<View

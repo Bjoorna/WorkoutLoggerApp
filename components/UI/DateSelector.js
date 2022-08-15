@@ -4,6 +4,7 @@ import BodyText from "../Text/Body";
 
 import DateTimePicker from "@react-native-community/datetimepicker";
 import IconButton from "../Buttons/IconButton";
+import PropTypes from 'prop-types'
 
 const DateSelector = ({
 	currentTheme,
@@ -52,6 +53,13 @@ const DateSelector = ({
 		</View>
 	);
 };
+
+DateSelector.proptypes = {
+    currentDate: PropTypes.object,
+    selectedDate: PropTypes.instanceOf(Date),
+    onDateChange: PropTypes.func,
+    text: PropTypes.string
+}
 
 const getStyles = (theme) => {
 	return StyleSheet.create({
