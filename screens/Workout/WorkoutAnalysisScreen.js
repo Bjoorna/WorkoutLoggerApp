@@ -33,6 +33,10 @@ import {
 	VictoryLine,
 	VictoryTheme,
 	VictoryBar,
+	VictoryScatter,
+	VictoryAxis,
+	VictoryLegend,
+	VictoryLabel,
 } from "victory-native";
 import { format } from "date-fns";
 
@@ -76,10 +80,18 @@ const WorkoutAnalysisScreen = (props) => {
 		// componentdidmount
 		// setIsLoading(true);
 		const loadDeadlift = async () => {
-			dispatch(getExercisesByType({ exerciseTypes: ["Deadlift"], sortType: "asc" }));
+			dispatch(
+				getExercisesByType({
+					exerciseTypes: ["Deadlift"],
+					sortType: "asc",
+				})
+			);
 		};
 		// createExerciseTypeArray();
-		loadDeadlift();
+		const existingExercises = Object.values(exerciseStoreRef).length > 0;
+		if (!existingExercises) {
+			loadDeadlift();
+		}
 	}, []);
 
 	useEffect(() => {
@@ -88,33 +100,11 @@ const WorkoutAnalysisScreen = (props) => {
 
 	useEffect(() => {
 		const newExerciseArray = Object.values(exerciseStoreRef);
-		console.log(newExerciseArray);
+		// console.log(newExerciseArray);
 		for (let e of newExerciseArray) {
 			// console.log(e.date);
 		}
 		setExercises(newExerciseArray);
-		// const sortedByDate = newExerciseArray.sort((a, b) => a.date + b.date);
-		// for (let e of sortedByDate) {
-		// 	console.log(e.date);
-		// }
-
-		// if (newExerciseArray.length < 1) {
-		// 	return;
-		// }
-		// newExerciseArray.sort((a, b) => b - a);
-
-		// setExercises(newExerciseArray);
-		// if (newExerciseArray.length > 1) {
-		// 	createChartData(newExerciseArray);
-		// 	setOnlyOneExerciseRecorded(false);
-		// } else if (newExerciseArray.length === 1) {
-		// 	setOnlyOneExerciseRecorded(true);
-		// 	setChartDataObject(null);
-		// } else {
-		// 	setChartDataObject(null);
-		// 	setOnlyOneExerciseRecorded(false);
-		// }
-		// setIsLoading(false);
 	}, [exerciseStoreRef]);
 	useEffect(() => {
 		console.log(exercises);
@@ -122,7 +112,7 @@ const WorkoutAnalysisScreen = (props) => {
 		for (let exercise of exercises) {
 			const topSet = findTopSetInExercise(exercise.sets);
 			const e1rm = calculateE1RM(topSet);
-			const date = format(new Date(exercise.date), "d,MM");
+			const date = format(new Date(exercise.date), "d.MMM");
 			const dataPoint = {
 				weight: e1rm,
 				date: { display: date, dateNumber: exercise.date },
@@ -130,35 +120,25 @@ const WorkoutAnalysisScreen = (props) => {
 			// console.log(dataPoint);
 			dataArray.push(dataPoint);
 		}
-		const regPointArray = dataArray.map((point, index) => {
-			console.log(index);
-			return [Math.round(point.weight), index];
-		});
-		console.log(regPointArray);
-		if (regPointArray.length > 0) {
-			const linearRegression = regression.linear(regPointArray);
-			const linRegDisplayData = linearRegression.points.map(
-				(regPoint, index) => {
-					return [regPoint[0], index];
-				}
-			);
-			console.log("linear reg: ", linRegDisplayData);
-			// setRegressionLine(linRegDisplayData);
-		}
+		// const regPointArray = dataArray.map((point, index) => {
+		// 	// console.log(index);
+		// 	return [Math.round(point.weight), index];
+		// });
+		// // console.log(regPointArray);
+		// if (regPointArray.length > 0) {
+		// 	const linearRegression = regression.linear(regPointArray);
+		// 	const linRegDisplayData = linearRegression.points.map(
+		// 		(regPoint, index) => {
+		// 			return [regPoint[0], index];
+		// 		}
+		// 	);
+		// 	// console.log("linear reg: ", linRegDisplayData);
+		// 	// setRegressionLine(linRegDisplayData);
+		// }
 		setChartDataObject(dataArray);
 	}, [exercises]);
 
 	const createChartData = () => {};
-
-	// useEffect(() => {
-	// 	const selectedExercise = filterState.find(
-	// 		(exercise) => exercise.selected == true
-	// 	);
-	// 	if (selectedExercise) {
-	// 		// dispatch(resetFilteredExercises());
-	// 		loadExercise(selectedExercise.exercise);
-	// 	}
-	// }, [filterState]);
 
 	useEffect(() => {
 		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
@@ -166,94 +146,6 @@ const WorkoutAnalysisScreen = (props) => {
 		setChartSurfaceColorHexCode(hexToRGB(currentTheme.onSurface));
 		setChartDotColorHexCode(hexToRGB(currentTheme.tertiary));
 	}, [useDarkMode]);
-
-	const loadExercise = async (type) => {
-		setIsLoading(true);
-		setCurrentChartExercise(type);
-		console.log(type);
-		const typeArray = [];
-		typeArray.push(type);
-
-		const thunkResult = await dispatch(
-			getExercisesByType({ exerciseTypes: typeArray })
-		).unwrap();
-		// stop indicating that the app is loading if the query comes back empty
-		if (thunkResult === null) {
-			setChartDataObject(null);
-			setIsLoading(false);
-		}
-	};
-
-	// TODO make it so that when pressing a selected exercise, it is unselected
-	// const updateFilterState = (exercise, selectedState) => {
-	// 	// if the filterstate is not initiated
-	// 	if (filterState.length < 1) {
-	// 		const newFilterState = [];
-	// 		for (const ex of exerciseTypes) {
-	// 			const exerciseState = { exercise: ex, selected: false };
-	// 			newFilterState.push(exerciseState);
-	// 		}
-	// 		setFilterState(newFilterState);
-	// 	} else {
-	// 		const newFilterState = [...filterState];
-	// 		const isSelected = newFilterState.find(
-	// 			(arrayItem) => arrayItem.selected == true
-	// 		);
-	// 		if (isSelected) {
-	// 			isSelected.selected = !isSelected.selected;
-	// 			if (isSelected.exercise == exercise) {
-	// 				console.log("Cancel the same exercise");
-	// 			}
-	// 		}
-	// 		const updateStateOfExercise = newFilterState.find(
-	// 			(arrayItem) => arrayItem.exercise == exercise
-	// 		);
-	// 		if (updateStateOfExercise) {
-	// 			updateStateOfExercise.selected = true;
-	// 		}
-	// 		setFilterState(newFilterState);
-	// 	}
-	// };
-
-	// const createExerciseTypeArray = () => {
-	// 	let finalArray = [];
-	// 	for (let eData of ExerciseTypes) {
-	// 		finalArray = finalArray.concat(eData.data);
-	// 	}
-	// 	setExerciseTypes(finalArray);
-	// };
-
-	// const createChartData = (data) => {
-	// 	// Sort exercises before transformation
-	// 	data.sort((a, b) => a.date.seconds - b.date.seconds);
-	// 	const labelArray = [];
-	// 	const exerciseWeightArray = [];
-	// 	data.forEach((exercise) => {
-	// 		const date = new Date(exercise.date);
-	// 		const monthString = date.toDateString().split(" ")[1];
-	// 		// const dateString = date.toDateString();
-	// 		const dateString = date.getDate() + "" + monthString;
-	// 		// "" +
-	// 		// date.getFullYear().toString().slice(2);
-	// 		labelArray.push(dateString);
-	// 		exerciseWeightArray.push(exercise.weight);
-	// 	});
-	// 	const chartData = {
-	// 		labels: labelArray,
-	// 		datasets: [
-	// 			{
-	// 				data: exerciseWeightArray,
-	// 				color: (opacity = 1) =>
-	// 					`rgba(${chartDotColorHexCode[0]}, ${chartDotColorHexCode[1]}, ${chartDotColorHexCode[2]}, ${opacity})`,
-	// 				strokeWidth: 2,
-	// 			},
-	// 		],
-	// 		legend: [data[0].exercise],
-	// 	};
-	// 	setChartDataObject(chartData);
-	// };
-
-	const testClickPoint = (value, dataset, getColor) => {};
 
 	return (
 		<View style={styles.container}>
@@ -268,20 +160,36 @@ const WorkoutAnalysisScreen = (props) => {
 			</View>
 			<View style={styles.chartContainer}>
 				<VictoryChart
-					width={350}
+					width={400}
 					theme={VictoryTheme.grayscale}
 					style={{ grid: { stroke: "red", fill: "red" } }}
+					// padding= {{left: 300,}}
+					// domain={{
+					// 	x: [
+					// 		0,
+					// 		chartDataObject.length > 0
+					// 			? chartDataObject.length
+					// 			: 1,
+					// 	],
+					// 	y: [90, 150],
+					// }}
 				>
 					{/* <VictoryBar  data={chartDataObject} x="quarter" y="earnings" /> */}
 					<VictoryLine
 						animate={{ duration: 2000, onLoad: { duration: 1000 } }}
 						style={{
 							data: { stroke: currentTheme.tertiary },
-							axis: { stroke: "none", fill: "none" },
+							// axis: { stroke: "none", fill: "none" },
+							// labels: {
+							// 	fontSize: 15,
+							// 	// padding: -70,
+							// },
 						}}
 						data={chartDataObject}
 						x={["date", "display"]}
 						y="weight"
+
+						// labels={({datum}) => Math.round(datum.weight)}
 					/>
 					{/* <VictoryLine
 						data={regressionLine}
@@ -292,6 +200,37 @@ const WorkoutAnalysisScreen = (props) => {
 							axis: { stroke: "none", fill: "none" },
 						}}
 					/> */}
+					<VictoryScatter
+						animate={{ duration: 2000, onLoad: { duration: 1000 } }}
+						data={chartDataObject}
+						x={["date", "display"]}
+						y="weight"
+					/>
+					<VictoryAxis
+						dependentAxis
+						domain={[95, 120]}
+						label="Kilo"
+						style={{
+							axis: { stroke: currentTheme.onSurface },
+							axisLabel: {  padding: 30 },
+						}}
+					/>
+
+					<VictoryAxis
+						domain={[
+							0,
+							chartDataObject.length > 0
+								? chartDataObject.length
+								: 1,
+						]}
+						fixLabelOverlap={true}
+						label="Date"
+						style={{
+							axis: { stroke: currentTheme.onSurface },
+							axisLabel: {  padding: 30 },
+						}}
+
+					/>
 				</VictoryChart>
 			</View>
 			{/* <View style={styles.filterBox}>
@@ -337,7 +276,8 @@ const getStyles = (theme) => {
 			// alignItems: "center"
 		},
 		chartContainer: {
-			height: 300,
+			// height: 400,
+
 			width: "100%",
 			alignItems: "center",
 		},
