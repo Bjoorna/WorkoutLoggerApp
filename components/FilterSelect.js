@@ -26,6 +26,7 @@ import DateSelector from "./UI/DateSelector";
 
 import { isBefore, addMonths } from "date-fns";
 import LabelText from "./Text/Label";
+import BodyText from "./Text/Body";
 
 const FilterSelect = ({ exerciseTypesAvaliable }) => {
 	const exerciseTypes = useSelector((state) => state.workout.exerciseTypes);
@@ -90,7 +91,6 @@ const FilterSelect = ({ exerciseTypesAvaliable }) => {
 	useEffect(() => {
 		const isValid = verifyDateFilter(fromDate, toDate);
 		onSetDateFilterValid(isValid);
-
 	}, [fromDate, toDate]);
 
 	useEffect(() => {
@@ -111,7 +111,7 @@ const FilterSelect = ({ exerciseTypesAvaliable }) => {
 	}, [filterSegments]);
 
 	useEffect(() => {
-		console.log(exercisesToFilterBy);
+		console.log("exertofilterby: ", exercisesToFilterBy);
 	}, [exercisesToFilterBy]);
 
 	const onUnselectExercise = () => {
@@ -177,11 +177,13 @@ const FilterSelect = ({ exerciseTypesAvaliable }) => {
 		return isBefore(from, to);
 	};
 
-	const onFilterByDates = ()=> {
-		if(dateFilterValid){
-			dispatch(getWorkoutsBasedOnDateInterval({from: fromDate, to: toDate}));
+	const onFilterByDates = () => {
+		if (dateFilterValid) {
+			dispatch(
+				getWorkoutsBasedOnDateInterval({ from: fromDate, to: toDate })
+			);
 		}
-	}
+	};
 
 	return (
 		<View style={styles.container}>
@@ -216,13 +218,26 @@ const FilterSelect = ({ exerciseTypesAvaliable }) => {
 							)}
 							extraData={exercisesToFilterBy}
 						/>
+						{exercisesToFilterBy.length > 10 && (
+							<View style={styles.errorText}>
+								<BodyText
+									large={true}
+									style={{ color: currentTheme.error }}
+								>
+									Max 10 selected exercises in filter
+								</BodyText>
+							</View>
+						)}
 						<View style={styles.buttonRow}>
 							<TextButton onButtonPress={onClearFilter}>
 								Clear
 							</TextButton>
 							<TextButton
 								onButtonPress={onSubmitFilter}
-								disabled={exercisesToFilterBy.length < 1}
+								disabled={
+									exercisesToFilterBy.length < 1 ||
+									exercisesToFilterBy.length > 10
+								}
 							>
 								Filter
 							</TextButton>
@@ -230,7 +245,13 @@ const FilterSelect = ({ exerciseTypesAvaliable }) => {
 					</View>
 				)}
 				{activeFilterSegment.text === "Date" && (
-					<View style={{ flex: 1, flexDirection: "column", marginTop: 12 }}>
+					<View
+						style={{
+							flex: 1,
+							flexDirection: "column",
+							marginTop: 12,
+						}}
+					>
 						<View
 							style={{
 								marginBottom: 12,
@@ -359,7 +380,11 @@ const getStyles = (theme) => {
 			flexDirection: "row",
 			height: 100,
 			justifyContent: "space-around",
+
 		},
+		errorText: { 
+			marginTop: 10
+		}
 	});
 };
 
