@@ -95,11 +95,13 @@ export const deleteWorkout = createAsyncThunk(
 
 export const getExercisesByType = createAsyncThunk(
 	"workout/getExercisesByType",
-	async ({ exerciseTypes, userID }, thunkAPI) => {
+	async ({ exerciseTypes, sortType }, thunkAPI) => {
 		try {
+			const userID = thunkAPI.getState().auth.userID;
 			const exercisesResponse = await firebaseGetExercisesByTypes(
 				exerciseTypes,
-				userID
+				userID,
+				sortType
 			);
 			if (exercisesResponse != null) {
 				return exercisesResponse;
@@ -266,10 +268,12 @@ export const workoutSlice = createSlice({
 			const eData = action.payload;
 			eData.forEach((doc) => {
 				const exercise = doc.data();
-				const exerciseID = doc.id;
-				exercise.date = exercise.date.seconds * 1000;
-				exercise.id = doc.id;
-				state.exercises[exerciseID] = exercise;
+				if (exercise !== undefined) {
+					const exerciseID = doc.id;
+					exercise.date = exercise.date.seconds * 1000;
+					exercise.id = doc.id;
+					state.exercises[exerciseID] = exercise;
+				}
 			});
 		});
 

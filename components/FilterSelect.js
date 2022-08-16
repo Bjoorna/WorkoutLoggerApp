@@ -17,7 +17,6 @@ import { nanoid } from "@reduxjs/toolkit";
 import BottomSheet, { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import SelectExerciseListItem from "./UI/SelectExerciseListItem";
 import {
-	getExercisesByType,
 	getExercisesByTypeForList,
 	getExerciseTypes,
 	getWorkoutsBasedOnDateInterval,

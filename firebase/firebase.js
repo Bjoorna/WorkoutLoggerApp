@@ -266,13 +266,18 @@ export const firebaseWriteExercisesToDatabase = async (
 	}
 };
 
-export const firebaseGetExercisesByTypes = async (exerciseTypes, userID) => {
+export const firebaseGetExercisesByTypes = async (
+	exerciseTypes,
+	userID,
+	sortType
+) => {
 	try {
 		const exerciseCollection = collection(database, "exercises");
 		const exerciseQuery = query(
 			exerciseCollection,
 			where("owner", "==", userID),
-			where("exerciseName", "in", exerciseTypes)
+			where("exerciseName", "in", exerciseTypes),
+			orderBy("date", sortType)
 		);
 		const docs = await getDocs(exerciseQuery);
 		if (!docs.empty) {
@@ -348,17 +353,6 @@ export const firebaseGetWorkoutsBasedOnWorkoutIDs = async (workoutIDs) => {
 		throw new Error(error);
 	}
 };
-// export const getWorkoutsBasedOnWorkoutIDs = async (workoutIDs) => {
-// 	try {
-// 		const workoutRefs = workoutIDs.map((id) =>
-// 			getDoc(doc(database, "workouts", id))
-// 		);
-// 		const docSnaps = await Promise.all(workoutRefs);
-// 		return docSnaps;
-// 	} catch (error) {
-// 		throw new Error(error);
-// 	}
-// };
 
 export const firebaseGetExercisesInWorkout = async (exercises, userID) => {
 	try {
