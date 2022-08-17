@@ -89,7 +89,6 @@ const WorkoutListScreen = (props) => {
 	const bottomSheetRef = useRef(null);
 	const snapPoints = useMemo(() => ["25%", "50%", "75%"], []);
 	const handleSheetChanges = useCallback((index) => {
-		console.log(index);
 		if (index === -1) {
 			dispatch(setHideTabBar(false));
 
@@ -101,6 +100,16 @@ const WorkoutListScreen = (props) => {
 			// dispatch({type: SET_TAB_BAR_VALUE, value: true});
 		}
 	});
+	const renderBackdrop = useCallback(
+		(props) => (
+			<BottomSheetBackdrop
+				{...props}
+				disappearsOnIndex={-1}
+				appearsOnIndex={0}
+			/>
+		),
+		[]
+	);
 
 	// load workouts on page open
 	useEffect(() => {
@@ -194,18 +203,6 @@ const WorkoutListScreen = (props) => {
 		props.navigation.navigate("Calculator");
 	};
 
-	// const renderBackdrop = useCallback(
-	// 	(props) => (
-	// 		<BottomSheetBackdrop
-	// 			style={{ height: "100%" }}
-	// 			{...props}
-	// 			disappearsOnIndex={1}
-	// 			appearsOnIndex={2}
-	// 			opacity={1}
-	// 		/>
-	// 	),
-	// 	[]
-	// );
 
 	const onClearFilter = () => {
 		dispatch(resetFilter());
@@ -382,13 +379,13 @@ const WorkoutListScreen = (props) => {
 				/>
 			</View>
 			<BottomSheet
-				style={{ flex: 1 }}
 				ref={bottomSheetRef}
 				index={-1}
 				snapPoints={snapPoints}
 				onChange={handleSheetChanges}
 				enablePanDownToClose={true}
 				enableOverDrag={false}
+				backdropComponent={renderBackdrop}
 				handleStyle={{
 					backgroundColor: currentTheme.surfaceE4,
 					borderTopLeftRadius: 10,
