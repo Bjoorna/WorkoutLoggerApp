@@ -1,4 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, {
+	useEffect,
+	useState,
+	useMemo,
+	useRef,
+	useCallback,
+} from "react";
 import {
 	View,
 	StyleSheet,
@@ -6,6 +12,9 @@ import {
 	Dimensions,
 	ActivityIndicator,
 	FlatList,
+	UIManager,
+	Platform,
+	Pressable,
 } from "react-native";
 import DisplayText from "../../components/Text/Display";
 import { LineChart } from "react-native-chart-kit";
@@ -26,6 +35,7 @@ import {
 	getExercisesByType,
 	resetFilteredExercises,
 } from "../../redux/slices/workoutSlice";
+import { setHideTabBar } from "../../redux/slices/appSettingsSlice";
 import TopAppBar from "../../components/UI/TopAppBarComponent";
 
 import {
@@ -39,9 +49,27 @@ import {
 	VictoryLabel,
 } from "victory-native";
 import { format } from "date-fns";
+import BottomSheet, {
+	BottomSheetBackdropimport,
+	TouchableOpacity,
+	TouchableHighlight,
+	TouchableWithoutFeedback,
+	BottomSheetBackdrop,
+} from "@gorhom/bottom-sheet";
 
 import regression from "regression";
-// TODO rework the hex-to-rgb on chart so that it doesnt call 3 times for one color code
+import TitleText from "../../components/Text/Title";
+import LabelText from "../../components/Text/Label";
+import BodyText from "../../components/Text/Body";
+import IconButton from "../../components/Buttons/IconButton";
+import CustomBackdrop from "../../components/UI/BottomSheetBackdrop";
+if (
+	Platform.OS === "android" &&
+	UIManager.setLayoutAnimationEnabledExperimental
+) {
+	UIManager.setLayoutAnimationEnabledExperimental(true);
+}
+
 const WorkoutAnalysisScreen = (props) => {
 	const userID = useSelector((state) => state.auth.userID);
 	const exerciseStoreRef = useSelector(
@@ -50,6 +78,8 @@ const WorkoutAnalysisScreen = (props) => {
 
 	const dispatch = useDispatch();
 
+	const [yAxisDomains, setYAxisDomains] = useState([0, 1000]);
+	const [chartDates, setChartDates] = useState([new Date(), new Date()]);
 	const [exercises, setExercises] = useState([]);
 	const [exerciseTypes, setExerciseTypes] = useState([]);
 	const [filterState, setFilterState] = useState([]);
@@ -69,11 +99,25 @@ const WorkoutAnalysisScreen = (props) => {
 		useDarkMode ? Themes.dark : Themes.light
 	);
 
-	const [chartDotColorHexCode, setChartDotColorHexCode] = useState(
-		hexToRGB(currentTheme.tertiary)
-	);
-	const [chartSurfaceColorHexCode, setChartSurfaceColorHexCode] = useState(
-		hexToRGB(currentTheme.onSurface)
+	// BottomSheet stuff
+	const bottomSheetRef = useRef(null);
+	const snapPoints = useMemo(() => ["25%", "50%", "75%"], []);
+	const [showBottomSheet, setShowBottomSheet] = useState(false);
+	const handleSheetChanges = useCallback((index) => {
+		if (index === -1) {
+			dispatch(setHideTabBar(false));
+		}
+	});
+
+	const renderBackdrop = useCallback(
+		(props) => (
+			<BottomSheetBackdrop
+				{...props}
+				disappearsOnIndex={-1}
+				appearsOnIndex={0}
+			/>
+		),
+		[]
 	);
 
 	useEffect(() => {
@@ -95,6 +139,17 @@ const WorkoutAnalysisScreen = (props) => {
 	}, []);
 
 	useEffect(() => {
+		if (showBottomSheet) {
+			dispatch(setHideTabBar(true));
+			bottomSheetRef.current.snapToIndex(0);
+		} else {
+			dispatch(setHideTabBar(false));
+
+			bottomSheetRef.current.close();
+		}
+	}, [showBottomSheet]);
+
+	useEffect(() => {
 		// updateFilterState();
 	}, [exerciseTypes]);
 
@@ -107,11 +162,21 @@ const WorkoutAnalysisScreen = (props) => {
 		setExercises(newExerciseArray);
 	}, [exerciseStoreRef]);
 	useEffect(() => {
-		console.log(exercises);
+		// console.log(exercises);
+		if (exercises.length < 1) {
+			return;
+		}
 		const dataArray = [];
+		let lowerDomain = 100000;
+		let upperDomain = 0;
 		for (let exercise of exercises) {
 			const topSet = findTopSetInExercise(exercise.sets);
 			const e1rm = calculateE1RM(topSet);
+			if (e1rm < lowerDomain) {
+				lowerDomain = e1rm;
+			} else if (e1rm > upperDomain) {
+				upperDomain = e1rm;
+			}
 			const date = format(new Date(exercise.date), "d.MMM");
 			const dataPoint = {
 				weight: e1rm,
@@ -120,141 +185,198 @@ const WorkoutAnalysisScreen = (props) => {
 			// console.log(dataPoint);
 			dataArray.push(dataPoint);
 		}
-		// const regPointArray = dataArray.map((point, index) => {
-		// 	// console.log(index);
-		// 	return [Math.round(point.weight), index];
-		// });
-		// // console.log(regPointArray);
-		// if (regPointArray.length > 0) {
-		// 	const linearRegression = regression.linear(regPointArray);
-		// 	const linRegDisplayData = linearRegression.points.map(
-		// 		(regPoint, index) => {
-		// 			return [regPoint[0], index];
-		// 		}
-		// 	);
-		// 	// console.log("linear reg: ", linRegDisplayData);
-		// 	// setRegressionLine(linRegDisplayData);
-		// }
+		lowerDomain = lowerDomain - 10;
+		upperDomain = upperDomain + 10;
+		setYAxisDomains([Math.round(lowerDomain), Math.round(upperDomain)]);
+		setChartDates([
+			new Date(dataArray[0].date.dateNumber),
+			new Date(dataArray[dataArray.length - 1].date.dateNumber),
+		]);
 		setChartDataObject(dataArray);
 	}, [exercises]);
 
-	const createChartData = () => {};
+	useEffect(() => {}, [chartDates]);
 
 	useEffect(() => {
 		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
 		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
-		setChartSurfaceColorHexCode(hexToRGB(currentTheme.onSurface));
-		setChartDotColorHexCode(hexToRGB(currentTheme.tertiary));
+		// setChartSurfaceColorHexCode(hexToRGB(currentTheme.onSurface));
+		// setChartDotColorHexCode(hexToRGB(currentTheme.tertiary));
 	}, [useDarkMode]);
+	const createChartData = () => {};
 
 	return (
 		<View style={styles.container}>
-			<TopAppBar headlineText="Analysis" />
+			<TopAppBar
+				headlineText="Analysis"
+				trailingIcons={[
+					<IconButton
+						name="add"
+						onPress={() => setShowBottomSheet((state) => !state)}
+					/>,
+				]}
+			/>
 			<View style={styles.contentView}>
-				{isLoading && (
+				{/* {isLoading && (
 					<ActivityIndicator
 						color={currentTheme.primary}
 						size="large"
 					/>
-				)}
-			</View>
-			<View style={styles.chartContainer}>
-				<VictoryChart
-					width={400}
-					theme={VictoryTheme.grayscale}
-					style={{ grid: { stroke: "red", fill: "red" } }}
-					// padding= {{left: 300,}}
-					// domain={{
-					// 	x: [
-					// 		0,
-					// 		chartDataObject.length > 0
-					// 			? chartDataObject.length
-					// 			: 1,
-					// 	],
-					// 	y: [90, 150],
-					// }}
-				>
-					{/* <VictoryBar  data={chartDataObject} x="quarter" y="earnings" /> */}
-					<VictoryLine
-						animate={{ duration: 2000, onLoad: { duration: 1000 } }}
-						style={{
-							data: { stroke: currentTheme.tertiary },
-							// axis: { stroke: "none", fill: "none" },
-							// labels: {
-							// 	fontSize: 15,
-							// 	// padding: -70,
-							// },
-						}}
-						data={chartDataObject}
-						x={["date", "display"]}
-						y="weight"
-
-						// labels={({datum}) => Math.round(datum.weight)}
-					/>
-					{/* <VictoryLine
-						data={regressionLine}
-						x={1}
-						y={0}
-						style={{
-							data: { stroke: currentTheme.error },
-							axis: { stroke: "none", fill: "none" },
-						}}
-					/> */}
-					<VictoryScatter
-						animate={{ duration: 2000, onLoad: { duration: 1000 } }}
-						data={chartDataObject}
-						x={["date", "display"]}
-						y="weight"
-					/>
-					<VictoryAxis
-						dependentAxis
-						domain={[95, 120]}
-						label="Kilo"
-						style={{
-							axis: { stroke: currentTheme.onSurface },
-							axisLabel: {  padding: 30 },
-						}}
-					/>
-
-					<VictoryAxis
-						domain={[
-							0,
-							chartDataObject.length > 0
-								? chartDataObject.length
-								: 1,
-						]}
-						fixLabelOverlap={true}
-						label="Date"
-						style={{
-							axis: { stroke: currentTheme.onSurface },
-							axisLabel: {  padding: 30 },
-						}}
-
-					/>
-				</VictoryChart>
-			</View>
-			{/* <View style={styles.filterBox}>
-				<FlatList
-					style={{ marginVertical: 5 }}
-					horizontal={true}
-					keyExtractor={(item) => Math.random()}
-					data={filterState}
-					showsHorizontalScrollIndicator={false}
-					renderItem={(itemData) => (
-						<FilterChip
-							onChipPress={() =>
-								updateFilterState(
-									itemData.item.exercise,
-									itemData.item.selected
-								)
-							}
-							selected={itemData.item.selected}
+				)} */}
+				<View style={styles.analysisContainer}>
+					<View style={styles.filterInformation}>
+						<View style={styles.filterHeader}>
+							<TitleText
+								style={{ color: currentTheme.onSurface }}
+								large={true}
+							>
+								Filter information
+							</TitleText>
+						</View>
+						<View style={styles.filterStats}>
+							<View style={styles.filterStatsItem}>
+								<LabelText
+									style={{
+										color: currentTheme.onSurfaceVariant,
+									}}
+									large={true}
+								>
+									Exercise
+								</LabelText>
+								<BodyText
+									style={{ color: currentTheme.onSurface }}
+									large={true}
+								>
+									Deadlift
+								</BodyText>
+							</View>
+							<View style={styles.filterStatsItem}>
+								<LabelText
+									style={{
+										color: currentTheme.onSurfaceVariant,
+									}}
+									large={true}
+								>
+									Showing
+								</LabelText>
+								<BodyText
+									style={{ color: currentTheme.onSurface }}
+									large={true}
+								>
+									e1RM
+								</BodyText>
+							</View>
+							<View style={styles.filterStatsItem}>
+								<LabelText
+									style={{
+										color: currentTheme.onSurfaceVariant,
+									}}
+									large={true}
+								>
+									From
+								</LabelText>
+								<BodyText
+									style={{ color: currentTheme.onSurface }}
+									large={true}
+								>
+									{format(chartDates[0], "d/M/yy")}
+								</BodyText>
+							</View>
+							<View style={styles.filterStatsItem}>
+								<LabelText
+									style={{
+										color: currentTheme.onSurfaceVariant,
+									}}
+									large={true}
+								>
+									To
+								</LabelText>
+								<BodyText
+									style={{ color: currentTheme.onSurface }}
+									large={true}
+								>
+									{format(chartDates[1], "d/M/yy")}
+								</BodyText>
+							</View>
+						</View>
+					</View>
+					<View style={styles.chartContainer}>
+						<VictoryChart
+							width={400}
+							theme={VictoryTheme.grayscale}
 						>
-							{itemData.item.exercise}
-						</FilterChip>
-					)}
-				/>
-			</View> */}
+							<VictoryLine
+								animate={{
+									duration: 2000,
+									onLoad: { duration: 1000 },
+								}}
+								style={{
+									data: { stroke: currentTheme.tertiary },
+								}}
+								data={chartDataObject}
+								x={["date", "display"]}
+								y="weight"
+							/>
+							<VictoryScatter
+								animate={{
+									duration: 2000,
+									onLoad: { duration: 1000 },
+								}}
+								data={chartDataObject}
+								x={["date", "display"]}
+								y="weight"
+							/>
+							<VictoryAxis
+								dependentAxis
+								domain={[yAxisDomains[0], yAxisDomains[1]]}
+								label="Kilo"
+								style={{
+									axis: { stroke: currentTheme.onSurface },
+									axisLabel: { padding: 30 },
+								}}
+							/>
+
+							<VictoryAxis
+								// domain={[
+								// 	0,
+								// 	chartDataObject.length > 0
+								// 		? chartDataObject.length
+								// 		: 1,
+								// ]}
+								fixLabelOverlap={true}
+								label="Date"
+								style={{
+									axis: { stroke: currentTheme.onSurface },
+									axisLabel: { padding: 30 },
+								}}
+							/>
+						</VictoryChart>
+					</View>
+				</View>
+			</View>
+
+			<BottomSheet
+				ref={bottomSheetRef}
+				index={-1}
+				snapPoints={snapPoints}
+				onChange={handleSheetChanges}
+				enablePanDownToClose={true}
+				// enableOverDrag={false}
+				enableHandlePanningGesture={true}
+				backdropComponent={renderBackdrop}
+				handleStyle={{
+					backgroundColor: currentTheme.surfaceE4,
+					borderTopLeftRadius: 10,
+					borderTopRightRadius: 10,
+				}}
+				// handleIndicatorStyle={{
+				// 	backgroundColor: currentTheme.onSurface,
+				// }}
+			>
+				<View style={{ flex: 1 }}>
+					<LabelText>Hello</LabelText>
+				</View>
+			</BottomSheet>
 		</View>
 	);
 };
@@ -264,7 +386,6 @@ const getStyles = (theme) => {
 		container: {
 			flex: 1,
 			backgroundColor: theme.surface,
-			alignItems: "center",
 		},
 		contentView: {
 			alignItems: "center",
@@ -275,9 +396,36 @@ const getStyles = (theme) => {
 			backgroundColor: theme.surface,
 			// alignItems: "center"
 		},
-		chartContainer: {
-			// height: 400,
+		analysisContainer: {
+			height: 400,
+			width: "100%",
+			// backgroundColor: theme.surfaceVariant,
+			alignItems: "center",
+		},
+		filterInformation: {
+			height: 100,
+			width: "100%",
+			flexDirection: "column",
+			paddingHorizontal: 24,
+			paddingVertical: 12,
+			// borderWidth: 1,
+			// borderColor: theme.outline,
+			// borderRadius: 12
+		},
 
+		filterHeader: {},
+		filterStats: {
+			flex: 1,
+			flexDirection: "row",
+			justifyContent: "space-between",
+			// ,paddingHorizontal: 12,
+			paddingVertical: 6,
+		},
+		filterStatsItem: {
+			flexDirection: "column",
+		},
+		chartContainer: {
+			height: 300,
 			width: "100%",
 			alignItems: "center",
 		},

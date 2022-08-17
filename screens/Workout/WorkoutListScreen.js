@@ -38,8 +38,6 @@ import workoutSlice, {
 } from "../../redux/slices/workoutSlice";
 import { setHideTabBar } from "../../redux/slices/appSettingsSlice";
 import TopAppBar from "../../components/UI/TopAppBarComponent";
-import { render } from "react-dom";
-import { async } from "validate.js";
 import TitleText from "../../components/Text/Title";
 import BodyText from "../../components/Text/Body";
 import { format } from "date-fns";
@@ -91,6 +89,7 @@ const WorkoutListScreen = (props) => {
 	const bottomSheetRef = useRef(null);
 	const snapPoints = useMemo(() => ["25%", "50%", "75%"], []);
 	const handleSheetChanges = useCallback((index) => {
+		console.log(index);
 		if (index === -1) {
 			dispatch(setHideTabBar(false));
 

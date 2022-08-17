@@ -42,6 +42,7 @@ import appSettingsReducer from "./redux/slices/appSettingsSlice";
 import workoutReducer from "./redux/slices/workoutSlice";
 import userReducer from "./redux/slices/userSlice";
 import { async } from "validate.js";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 // import store from "./redux/store/store";
 
 // const rootReducer = combineReducers({
@@ -101,14 +102,23 @@ export default function App() {
 	return (
 		<Provider store={store}>
 			<PaperProvider theme={paperTheme}>
-				<View style={styles.baseScreen} onLayout={onLayoutRootView}>
+				<GestureHandlerRootView
+					style={styles.baseScreen}
+					onLayout={onLayoutRootView}
+				>
 					<StatusBarWrapper />
 					<BaseScreen />
-				</View>
+				</GestureHandlerRootView>
+				{/* <View style={styles.baseScreen} onLayout={onLayoutRootView}>
+					<StatusBarWrapper />
+					<BaseScreen />
+				</View> */}
 			</PaperProvider>
 		</Provider>
 	);
 }
+
+// 		<GestureHandlerRootView></GestureHandlerRootView>
 
 const getStyles = (theme) => {
 	return StyleSheet.create({
