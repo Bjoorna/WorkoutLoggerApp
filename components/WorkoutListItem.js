@@ -23,7 +23,9 @@ import {
 import { nanoid } from "@reduxjs/toolkit";
 import TitleText from "./Text/Title";
 import {
+	calculateAverageIntensity,
 	convertKiloToPound,
+	findTopSetInExercise,
 	getIntensity,
 } from "../shared/utils/UtilFunctions";
 // const theme = Themes.dark;
@@ -40,37 +42,13 @@ const ExerciseItem = ({ exercise, currentTheme }) => {
 	// const currentTheme = props.ocurrentTheme;
 
 	useEffect(() => {
-		findTopSet();
-		calcAvgIntensity();
+		setTopSet(findTopSetInExercise(exercise.sets));
+		setAvgIntensity(calculateAverageIntensity(exercise.sets));
 	}, [exercise]);
 
 	useEffect(() => {
 		setExerciseStyles(getExerciseStyles(currentTheme));
 	}, [currentTheme]);
-
-	const findTopSet = () => {
-		let topSetCandidate = exercise.sets[1];
-
-		for (let [set, setValue] of Object.entries(exercise.sets)) {
-			if (setValue.weight > topSetCandidate.weight) {
-				topSetCandidate = setValue;
-			}
-		}
-
-		setTopSet(topSetCandidate);
-	};
-
-	const calcAvgIntensity = () => {
-		let nrOfSets = 1;
-		let intensitySum = 0;
-		for (let set of Object.values(exercise.sets)) {
-			intensitySum += getIntensity(set.rpe, set.reps);
-			nrOfSets++;
-		}
-		const avgInt = intensitySum / nrOfSets;
-		setAvgIntensity(avgInt);
-		// const intensity = getIntensity(set1.rpe, set1.reps);
-	};
 
 	return (
 		<View style={exerciseStyles.exerciseItem}>
@@ -120,33 +98,6 @@ const ExerciseItem = ({ exercise, currentTheme }) => {
 				</BodyText>
 			</View>
 		</View>
-
-		// <View style={exerciseStyles.exerciseItem}>
-		// 	<View style={exerciseStyles.exerciseValues}>
-		// 		<BodyText
-		// 			style={{
-		// 				color: currentTheme.onSecondaryContainer,
-		// 				height: 20,
-		// 				overflow: "hidden",
-		// 			}}
-		// 		>
-		// 			{exercise.exercise}
-		// 		</BodyText>
-		// 		<LabelText style={{ color: currentTheme.onSecondaryContainer }}>
-		// 			{/* {isMetric ? exercise.weight : UtilFunctions.convertMass(exercise.weight, false)} {isMetric? "kg":"lbs"} */}
-		// 			{exercise.weight}kg
-		// 		</LabelText>
-		// 		<LabelText style={{ color: currentTheme.onSecondaryContainer }}>
-		// 			{exercise.reps} reps
-		// 		</LabelText>
-		// 		<LabelText style={{ color: currentTheme.onSecondaryContainer }}>
-		// 			{exercise.sets} sets
-		// 		</LabelText>
-		// 		<LabelText style={{ color: currentTheme.onSecondaryContainer }}>
-		// 			{exercise.rpe} RPE
-		// 		</LabelText>
-		// 	</View>
-		// </View>
 	);
 };
 
