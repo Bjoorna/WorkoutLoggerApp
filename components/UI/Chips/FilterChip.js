@@ -11,7 +11,7 @@ const theme = Themes.dark;
 /**
  * 
  * @param {boolean} selected - Set the selected state of the chip
- * @param {function} onChipPress - Pass a reference to the function being called when user presses the chip
+ * @param {function} onPress - Pass a reference to the function being called when user presses the chip
  * @param {string} text - Text to display
  */
 
