@@ -1,4 +1,3 @@
-
 import { nanoid } from "@reduxjs/toolkit";
 import React, { useState, useReducer, useEffect } from "react";
 import {
@@ -13,7 +12,10 @@ import {
 } from "react-native";
 import { TextInput as PaperInput, HelperText } from "react-native-paper";
 import { useSelector } from "react-redux";
-import { convertPoundToKilo, inputValueValidityCheck } from "../../shared/utils/UtilFunctions";
+import {
+	convertPoundToKilo,
+	inputValueValidityCheck,
+} from "../../shared/utils/UtilFunctions";
 import IconButton from "../Buttons/IconButton";
 import OutlineButton from "../Buttons/OutlineButton";
 import TextButton from "../Buttons/TextButton";
@@ -31,8 +33,11 @@ const SelectExerciseListItem = ({
 	const [sortedList, setSortedList] = useState([]);
 
 	useEffect(() => {
-		const sortData = data.data.sort((a, b) => a.localeCompare(b));
-		setSortedList(sortData);
+		if (data.data.length > 1) {
+			const arrayToSort = [...data.data];
+			const sortedData = arrayToSort.sort((a, b) => a.localeCompare(b));
+			setSortedList(sortedData);
+		}
 	}, []);
 
 	return (
@@ -47,7 +52,11 @@ const SelectExerciseListItem = ({
 							key={nanoid()}
 							text={text}
 							onPress={() => onPress(text)}
-							selected={currentlySelected.some(ex => ex ===text) ? true : false}
+							selected={
+								currentlySelected.some((ex) => ex === text)
+									? true
+									: false
+							}
 						/>
 					))}
 				</View>
@@ -56,4 +65,4 @@ const SelectExerciseListItem = ({
 	);
 };
 
-export default SelectExerciseListItem
+export default SelectExerciseListItem;

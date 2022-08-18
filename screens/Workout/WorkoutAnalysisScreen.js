@@ -15,6 +15,7 @@ import {
 	UIManager,
 	Platform,
 	Pressable,
+	useWindowDimensions,
 } from "react-native";
 import DisplayText from "../../components/Text/Display";
 import { LineChart } from "react-native-chart-kit";
@@ -63,6 +64,7 @@ import LabelText from "../../components/Text/Label";
 import BodyText from "../../components/Text/Body";
 import IconButton from "../../components/Buttons/IconButton";
 import CustomBackdrop from "../../components/UI/BottomSheetBackdrop";
+import AnalysisScreenFilter from "../../components/AnalysisScreenFilter";
 if (
 	Platform.OS === "android" &&
 	UIManager.setLayoutAnimationEnabledExperimental
@@ -71,15 +73,19 @@ if (
 }
 
 const WorkoutAnalysisScreen = (props) => {
-	const userID = useSelector((state) => state.auth.userID);
+	const windowDimensions = useWindowDimensions();
+	const dispatch = useDispatch();
+
 	const exerciseStoreRef = useSelector(
 		(state) => state.workout.filteredExercises
 	);
 
-	const dispatch = useDispatch();
+	// filter information
+	const [chartDates, setChartDates] = useState([new Date(), new Date()]);
+	const [statToShow, setStatToShow] = useState("e1RM");
+	const [onExercise, setOnExercise] = useState("");
 
 	const [yAxisDomains, setYAxisDomains] = useState([0, 1000]);
-	const [chartDates, setChartDates] = useState([new Date(), new Date()]);
 	const [exercises, setExercises] = useState([]);
 	const [exerciseTypes, setExerciseTypes] = useState([]);
 	const [filterState, setFilterState] = useState([]);
@@ -101,14 +107,17 @@ const WorkoutAnalysisScreen = (props) => {
 
 	// BottomSheet stuff
 	const bottomSheetRef = useRef(null);
-	const snapPoints = useMemo(() => ["25%", "50%", "75%"], []);
+	const snapPoints = useMemo(
+		() => ["25%", "50%", "75%", windowDimensions.height],
+		[]
+	);
 	const [showBottomSheet, setShowBottomSheet] = useState(false);
 	const handleSheetChanges = useCallback((index) => {
 		if (index === -1) {
 			dispatch(setHideTabBar(false));
+			setShowBottomSheet(false);
 		}
 	});
-
 	const renderBackdrop = useCallback(
 		(props) => (
 			<BottomSheetBackdrop
@@ -136,6 +145,7 @@ const WorkoutAnalysisScreen = (props) => {
 		if (!existingExercises) {
 			loadDeadlift();
 		}
+		// setStatToShow("e1RM");
 	}, []);
 
 	useEffect(() => {
@@ -148,6 +158,9 @@ const WorkoutAnalysisScreen = (props) => {
 			bottomSheetRef.current.close();
 		}
 	}, [showBottomSheet]);
+	useEffect(() => {
+		console.log("stattoshow: ", statToShow);
+	}, [statToShow]);
 
 	useEffect(() => {
 		// updateFilterState();
@@ -155,20 +168,21 @@ const WorkoutAnalysisScreen = (props) => {
 
 	useEffect(() => {
 		const newExerciseArray = Object.values(exerciseStoreRef);
-		// console.log(newExerciseArray);
+		console.log("ExerciseLenght", newExerciseArray.length);
+
 		for (let e of newExerciseArray) {
-			// console.log(e.date);
 		}
 		setExercises(newExerciseArray);
 	}, [exerciseStoreRef]);
+
 	useEffect(() => {
-		// console.log(exercises);
 		if (exercises.length < 1) {
 			return;
 		}
 		const dataArray = [];
 		let lowerDomain = 100000;
 		let upperDomain = 0;
+		const currentExercise = exercises[0].exerciseName;
 		for (let exercise of exercises) {
 			const topSet = findTopSetInExercise(exercise.sets);
 			const e1rm = calculateE1RM(topSet);
@@ -182,7 +196,6 @@ const WorkoutAnalysisScreen = (props) => {
 				weight: e1rm,
 				date: { display: date, dateNumber: exercise.date },
 			};
-			// console.log(dataPoint);
 			dataArray.push(dataPoint);
 		}
 		lowerDomain = lowerDomain - 10;
@@ -192,6 +205,7 @@ const WorkoutAnalysisScreen = (props) => {
 			new Date(dataArray[0].date.dateNumber),
 			new Date(dataArray[dataArray.length - 1].date.dateNumber),
 		]);
+		setOnExercise(currentExercise);
 		setChartDataObject(dataArray);
 	}, [exercises]);
 
@@ -200,10 +214,11 @@ const WorkoutAnalysisScreen = (props) => {
 	useEffect(() => {
 		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
 		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
-		// setChartSurfaceColorHexCode(hexToRGB(currentTheme.onSurface));
-		// setChartDotColorHexCode(hexToRGB(currentTheme.tertiary));
 	}, [useDarkMode]);
-	const createChartData = () => {};
+
+	const onChangeStatToShow = (stat) => {
+		setStatToShow(stat);
+	};
 
 	return (
 		<View style={styles.container}>
@@ -211,7 +226,7 @@ const WorkoutAnalysisScreen = (props) => {
 				headlineText="Analysis"
 				trailingIcons={[
 					<IconButton
-						name="add"
+						name={showBottomSheet ? "close" : "filter-outline"}
 						onPress={() => setShowBottomSheet((state) => !state)}
 					/>,
 				]}
@@ -247,7 +262,7 @@ const WorkoutAnalysisScreen = (props) => {
 									style={{ color: currentTheme.onSurface }}
 									large={true}
 								>
-									Deadlift
+									{onExercise}
 								</BodyText>
 							</View>
 							<View style={styles.filterStatsItem}>
@@ -257,13 +272,13 @@ const WorkoutAnalysisScreen = (props) => {
 									}}
 									large={true}
 								>
-									Showing
+									Showing stat
 								</LabelText>
 								<BodyText
 									style={{ color: currentTheme.onSurface }}
 									large={true}
 								>
-									e1RM
+									{statToShow}
 								</BodyText>
 							</View>
 							<View style={styles.filterStatsItem}>
@@ -374,7 +389,10 @@ const WorkoutAnalysisScreen = (props) => {
 				// }}
 			>
 				<View style={{ flex: 1 }}>
-					<LabelText>Hello</LabelText>
+					<AnalysisScreenFilter
+						onSetStat={onChangeStatToShow}
+						currentStat={statToShow}
+					/>
 				</View>
 			</BottomSheet>
 		</View>

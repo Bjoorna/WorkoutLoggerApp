@@ -20,6 +20,7 @@ const initialState = {
 	filteredExercises: {}, // set exercises that the user has filtered by here
 	filteredWorkouts: {},
 	exerciseTypes: {},
+	exerciseTypesDisplay: [],
 	filterInfo: {
 		usingFilter: false,
 		type: "",
@@ -297,7 +298,20 @@ export const workoutSlice = createSlice({
 
 		builder.addCase(getExerciseTypes.fulfilled, (state, action) => {
 			if (action.payload) {
-				state.exerciseTypes = action.payload;
+				const exerciseTypes = action.payload
+				const data = [];
+				for (let [key, value] of Object.entries(exerciseTypes)) {
+					const dataObject = {};
+					dataObject.title = key;
+					const exerciseList = [];
+					for (let ex of Object.values(value)) {
+						exerciseList.push(ex.value);
+					}
+					dataObject.data = exerciseList;
+					data.push(dataObject);
+				}
+				state.exerciseTypesDisplay = data;
+				state.exerciseTypes = exerciseTypes;
 			}
 		});
 
