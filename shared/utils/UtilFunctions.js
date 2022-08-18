@@ -39,7 +39,7 @@ export const getIntensity = (rpe, reps) => {
 };
 
 export const calculateAverageIntensity = (sets) => {
-	let nrOfSets = 1;
+	let nrOfSets = 0;
 	let intensitySum = 0;
 	for (let set of Object.values(sets)) {
 		intensitySum += getIntensity(set.rpe, set.reps);

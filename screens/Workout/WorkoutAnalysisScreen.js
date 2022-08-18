@@ -28,6 +28,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { ExerciseTypes } from "../../shared/utils/ExerciseTypes";
 
 import {
+	calculateAverageIntensity,
 	calculateE1RM,
 	findTopSetInExercise,
 	hexToRGB,
@@ -179,35 +180,36 @@ const WorkoutAnalysisScreen = (props) => {
 		if (exercises.length < 1) {
 			return;
 		}
-		const dataArray = [];
-		let lowerDomain = 100000;
-		let upperDomain = 0;
-		const currentExercise = exercises[0].exerciseName;
-		for (let exercise of exercises) {
-			const topSet = findTopSetInExercise(exercise.sets);
-			const e1rm = calculateE1RM(topSet);
-			if (e1rm < lowerDomain) {
-				lowerDomain = e1rm;
-			} else if (e1rm > upperDomain) {
-				upperDomain = e1rm;
-			}
-			const date = format(new Date(exercise.date), "d.MMM");
-			const dataPoint = {
-				weight: e1rm,
-				date: { display: date, dateNumber: exercise.date },
-			};
-			dataArray.push(dataPoint);
-		}
-		lowerDomain = lowerDomain - 10;
-		upperDomain = upperDomain + 10;
-		setYAxisDomains([Math.round(lowerDomain), Math.round(upperDomain)]);
-		setChartDates([
-			new Date(dataArray[0].date.dateNumber),
-			new Date(dataArray[dataArray.length - 1].date.dateNumber),
-		]);
-		setOnExercise(currentExercise);
-		setChartDataObject(dataArray);
-	}, [exercises]);
+		// const dataArray = [];
+		// let lowerDomain = 100000;
+		// let upperDomain = 0;
+		// const currentExercise = exercises[0].exerciseName;
+		// for (let exercise of exercises) {
+		// 	const topSet = findTopSetInExercise(exercise.sets);
+		// 	const e1rm = calculateE1RM(topSet);
+		// 	if (e1rm < lowerDomain) {
+		// 		lowerDomain = e1rm;
+		// 	} else if (e1rm > upperDomain) {
+		// 		upperDomain = e1rm;
+		// 	}
+		// 	const date = format(new Date(exercise.date), "d.MMM");
+		// 	const dataPoint = {
+		// 		weight: e1rm,
+		// 		date: { display: date, dateNumber: exercise.date },
+		// 	};
+		// 	dataArray.push(dataPoint);
+		// }
+		// lowerDomain = lowerDomain - 10;
+		// upperDomain = upperDomain + 10;
+		// setYAxisDomains([Math.round(lowerDomain), Math.round(upperDomain)]);
+		// setChartDates([
+		// 	new Date(dataArray[0].date.dateNumber),
+		// 	new Date(dataArray[dataArray.length - 1].date.dateNumber),
+		// ]);
+		// setOnExercise(currentExercise);
+		// setChartDataObject(dataArray);
+		generateDataForChart(exercises, statToShow);
+	}, [exercises, statToShow]);
 
 	useEffect(() => {}, [chartDates]);
 
@@ -215,6 +217,99 @@ const WorkoutAnalysisScreen = (props) => {
 		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
 		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
 	}, [useDarkMode]);
+
+	const generateDataForChart = (exercises, stat) => {
+		if (stat === "e1RM") {
+			const dataArray = [];
+			let lowerDomain = 100000;
+			let upperDomain = 0;
+			const currentExercise = exercises[0].exerciseName;
+			for (let exercise of exercises) {
+				const topSet = findTopSetInExercise(exercise.sets);
+				const e1rm = calculateE1RM(topSet);
+				if (e1rm < lowerDomain) {
+					lowerDomain = e1rm;
+				} else if (e1rm > upperDomain) {
+					upperDomain = e1rm;
+				}
+				const date = format(new Date(exercise.date), "d.MMM");
+				const dataPoint = {
+					weight: e1rm,
+					date: { display: date, dateNumber: exercise.date },
+				};
+				dataArray.push(dataPoint);
+			}
+			lowerDomain = lowerDomain - 10;
+			upperDomain = upperDomain + 10;
+			setYAxisDomains([Math.round(lowerDomain), Math.round(upperDomain)]);
+			setChartDates([
+				new Date(dataArray[0].date.dateNumber),
+				new Date(dataArray[dataArray.length - 1].date.dateNumber),
+			]);
+			setOnExercise(currentExercise);
+			setChartDataObject(dataArray);
+		} else if (stat === "Top set") {
+			const dataArray = [];
+			let lowerDomain = 100000;
+			let upperDomain = 0;
+			const currentExercise = exercises[0].exerciseName;
+			for (let exercise of exercises) {
+				const topSet = findTopSetInExercise(exercise.sets);
+				// const e1rm = calculateE1RM(topSet);
+				const topSetWeight = topSet.weight;
+				if (topSetWeight < lowerDomain) {
+					lowerDomain = topSetWeight;
+				} else if (topSetWeight > upperDomain) {
+					upperDomain = topSetWeight;
+				}
+				const date = format(new Date(exercise.date), "d.MMM");
+				const dataPoint = {
+					weight: topSetWeight,
+					date: { display: date, dateNumber: exercise.date },
+				};
+				dataArray.push(dataPoint);
+			}
+			lowerDomain = lowerDomain - 10;
+			upperDomain = upperDomain + 10;
+			setYAxisDomains([Math.round(lowerDomain), Math.round(upperDomain)]);
+			setChartDates([
+				new Date(dataArray[0].date.dateNumber),
+				new Date(dataArray[dataArray.length - 1].date.dateNumber),
+			]);
+			setOnExercise(currentExercise);
+			setChartDataObject(dataArray);
+		} else if (stat === "Avg Int") {
+			const dataArray = [];
+			let lowerDomain = 100000;
+			let upperDomain = 0;
+			const currentExercise = exercises[0].exerciseName;
+
+			for (let exercise of exercises) {
+				const avgInt = calculateAverageIntensity(exercise.sets);
+				if (avgInt < lowerDomain) {
+					lowerDomain = avgInt;
+				} else if (avgInt > upperDomain) {
+					upperDomain = avgInt;
+				}
+				const date = format(new Date(exercise.date), "d.MMM");
+				const dataPoint = {
+					weight: avgInt,
+					date: { display: date, dateNumber: exercise.date },
+				};
+				dataArray.push(dataPoint);
+			}
+			lowerDomain = lowerDomain - 10;
+			upperDomain = upperDomain + 10;
+			setYAxisDomains([Math.round(lowerDomain), Math.round(upperDomain)]);
+			setChartDates([
+				new Date(dataArray[0].date.dateNumber),
+				new Date(dataArray[dataArray.length - 1].date.dateNumber),
+			]);
+			setOnExercise(currentExercise);
+			setChartDataObject(dataArray);
+
+		}
+	};
 
 	const onChangeStatToShow = (stat) => {
 		setStatToShow(stat);
