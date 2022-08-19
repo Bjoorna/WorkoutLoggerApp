@@ -27,7 +27,7 @@ const FabButton = ({title, onPress, iconName, style, backgroundColor, iconColor,
 	const handleOnPressIn = () => {
 		// props.onButtonPress();
 		setIsPressed(true);
-		Vibration.vibrate(100);
+		// Vibration.vibrate(100);
 	};
 
 	return (

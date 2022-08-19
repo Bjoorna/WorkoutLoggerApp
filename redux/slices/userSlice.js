@@ -1,5 +1,8 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { firebaseGetUser, firebaseUpdateUserField } from "../../firebase/firebase";
+import {
+	firebaseGetUser,
+	firebaseUpdateUserField,
+} from "../../firebase/firebase";
 import { setUseDarkMode } from "./appSettingsSlice";
 
 export const getUserData = createAsyncThunk(
@@ -7,22 +10,19 @@ export const getUserData = createAsyncThunk(
 	async (_, thunkApi) => {
 		try {
 			let userID;
-			if(_) {
-				userID = _
-			}else{
+			if (_) {
+				userID = _;
+			} else {
 				userID = thunkApi.getState().auth.userID;
 			}
 			// const userID = thunkApi.getState().auth.userID;
 			const userData = await firebaseGetUser(userID);
 			if (userData) {
-				console.log(userData);
+				// console.log(userData);
 				thunkApi.dispatch(setUseDarkMode(userData.useDarkMode));
 				return userData;
 			}
-	
-		} catch (error) {
-			
-		}
+		} catch (error) {}
 	}
 );
 
@@ -41,7 +41,7 @@ export const updateUserField = createAsyncThunk(
 
 const initialState = {
 	user: {},
-	error: null
+	error: null,
 };
 export const userSlice = createSlice({
 	name: "user",
@@ -52,12 +52,13 @@ export const userSlice = createSlice({
 		},
 		resetUser(state) {
 			state.user = {};
-		}
+		},
 	},
 	extraReducers: (builder) => {
 		builder.addCase(getUserData.fulfilled, (state, action) => {
-			console.log("UserSlice getuserdata fulfilled");
-			state.user = action.payload;
+			const user = action.payload;
+			user.birthday = user.birthday.seconds * 1000;
+			state.user = user;
 		});
 
 		builder.addCase(getUserData.rejected, (state, action) => {
@@ -66,15 +67,15 @@ export const userSlice = createSlice({
 			console.log(action);
 		});
 
-		builder.addCase(updateUserField.fulfilled, (state,action) => {
+		builder.addCase(updateUserField.fulfilled, (state, action) => {
 			console.log("user updated successfully");
 		});
 		builder.addCase(updateUserField.rejected, (state, action) => {
-			if(action.payload){
+			if (action.payload) {
 				console.log(action.payload);
 				state.error = action.payload;
 			}
-		})
+		});
 	},
 });
 

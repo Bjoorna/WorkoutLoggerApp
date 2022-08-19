@@ -19,9 +19,11 @@ import { getUserData, updateUserField } from "../../redux/slices/userSlice";
 
 import { Snackbar, Menu } from "react-native-paper";
 import { getExerciseTypes } from "../../redux/slices/workoutSlice";
+import { logoutUser } from "../../redux/slices/authSlice";
+
 const UserSettingsScreen = (props) => {
 	const userStoreRef = useSelector((state) => state.user);
-	const workoutStoreRef = useSelector(state => state.workout);
+	const workoutStoreRef = useSelector((state) => state.workout);
 	const userID = useSelector((state) => state.auth.userID);
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
 	const isMondayFirstDay = useSelector(
@@ -53,9 +55,8 @@ const UserSettingsScreen = (props) => {
 		};
 	}, []);
 	useEffect(() => {
-		console.log(workoutStoreRef.exerciseTypes)
+		console.log(workoutStoreRef.exerciseTypes);
 	}, [workoutStoreRef]);
-
 
 	// initialize userSettingsValues
 	useEffect(() => {
@@ -105,34 +106,20 @@ const UserSettingsScreen = (props) => {
 		}
 	};
 
-	const onToggleMondayFirstDay = () => {
-		dispatch({ type: SET_MONDAY_FIRSTDAY, value: !isMondayFirstDayValue });
-	};
-
-	const testGetUser = () => {
-		dispatch(getUserData());
-	};
+	// const onToggleMondayFirstDay = () => {
+	// 	dispatch({ type: SET_MONDAY_FIRSTDAY, value: !isMondayFirstDayValue });
+	// };
 
 	const onSnackBarDismissed = () => {
 		setSnackBarText("");
 		setSnackBarVisible(false);
 	};
 
-	const onShowMenu = () => {
-		setShowMenu(true);
+	const onLogoutUser = () => {
+		dispatch(logoutUser());
 	};
 
-	const onHideMenu = () => {
-		setShowMenu(false);
-	};
-
-	const onGetExerciseTypes = ()=> {
-		dispatch(getExerciseTypes())
-	}
-
-	const onScroll = ()=> {
-
-	}
+	const onScroll = () => {};
 	return (
 		<View style={styles.screen}>
 			<Snackbar
@@ -220,7 +207,7 @@ const UserSettingsScreen = (props) => {
 							onSwitchPressed={onToggleDarkMode}
 						/>
 					</View>
-					<View style={styles.userSettingsItem}>
+					{/* <View style={styles.userSettingsItem}>
 						<View style={styles.userSettingsText}>
 							<BodyText
 								large={true}
@@ -242,22 +229,7 @@ const UserSettingsScreen = (props) => {
 							isSwitchDisabled={false}
 							onSwitchPressed={onToggleMondayFirstDay}
 						/>
-					</View>
-					<View style={styles.userSettingsItem}>
-						<BodyText
-							large={true}
-							style={{ color: currentTheme.onSurface }}
-						>
-							Test Switch
-						</BodyText>
-						<CustomSwitch
-							isSwitchSelected={false}
-							isSwitchDisabled={false}
-							onSwitchPressed={() => {
-								console.log("TestSwitch");
-							}}
-						/>
-					</View>
+					</View> */}
 					<View style={styles.userSettingsItem}>
 						<View style={styles.userSettingsText}>
 							<BodyText
@@ -280,47 +252,14 @@ const UserSettingsScreen = (props) => {
 								large={true}
 								style={{ color: currentTheme.onSurface }}
 							>
-								GetUser
+								Logout user
 							</BodyText>
 						</View>
 
-						<FilledButton onButtonPress={testGetUser}>
-							Get
+						<FilledButton onButtonPress={onLogoutUser}>
+							Logout
 						</FilledButton>
 					</View>
-
-					<View style={styles.userSettingsItem}>
-						<View style={styles.userSettingsText}>
-							<BodyText
-								large={true}
-								style={{ color: currentTheme.onSurface }}
-							>
-								Menu
-							</BodyText>
-						</View>
-
-						<FilledButton onButtonPress={setShowMenu}>
-							Menu
-						</FilledButton>
-					</View>
-					<View style={styles.userSettingsItem}>
-						<View style={styles.userSettingsText}>
-							<BodyText
-								large={true}
-								style={{ color: currentTheme.onSurface }}
-							>
-								Get Exercise Types
-							</BodyText>
-						</View>
-
-						<FilledButton
-							onButtonPress={onGetExerciseTypes}
-						>
-							Get
-						</FilledButton>
-					</View>
-				
-
 				</View>
 				{/* <View style={styles.userSettingsItem}>
 					<BodyText large={true} style={styles.text}>
@@ -382,7 +321,7 @@ const getStyles = (theme) => {
 		},
 		userSettingsList: {
 			width: "100%",
-			flex:1,
+			flex: 1,
 			paddingHorizontal: 24,
 			marginTop: 10,
 		},

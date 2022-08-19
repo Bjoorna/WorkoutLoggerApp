@@ -298,7 +298,7 @@ export const workoutSlice = createSlice({
 
 		builder.addCase(getExerciseTypes.fulfilled, (state, action) => {
 			if (action.payload) {
-				const exerciseTypes = action.payload
+				const exerciseTypes = action.payload;
 				const data = [];
 				for (let [key, value] of Object.entries(exerciseTypes)) {
 					const dataObject = {};

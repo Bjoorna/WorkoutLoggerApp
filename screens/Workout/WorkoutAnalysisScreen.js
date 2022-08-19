@@ -65,7 +65,6 @@ import TitleText from "../../components/Text/Title";
 import LabelText from "../../components/Text/Label";
 import BodyText from "../../components/Text/Body";
 import IconButton from "../../components/Buttons/IconButton";
-import CustomBackdrop from "../../components/UI/BottomSheetBackdrop";
 import AnalysisScreenFilter from "../../components/AnalysisScreenFilter";
 if (
 	Platform.OS === "android" &&
@@ -158,9 +157,8 @@ const WorkoutAnalysisScreen = (props) => {
 			bottomSheetRef.current.close();
 		}
 	}, [showBottomSheet]);
-	useEffect(() => {
-		console.log("stattoshow: ", statToShow);
-	}, [statToShow]);
+
+	useEffect(() => {}, [statToShow]);
 
 	useEffect(() => {
 		// updateFilterState();
@@ -168,10 +166,7 @@ const WorkoutAnalysisScreen = (props) => {
 
 	useEffect(() => {
 		const newExerciseArray = Object.values(exerciseStoreRef);
-		console.log("ExerciseLenght", newExerciseArray.length);
 
-		for (let e of newExerciseArray) {
-		}
 		setExercises(newExerciseArray);
 	}, [exerciseStoreRef]);
 
@@ -296,16 +291,11 @@ const WorkoutAnalysisScreen = (props) => {
 					<IconButton
 						name={showBottomSheet ? "close" : "filter-outline"}
 						onPress={() => setShowBottomSheet((state) => !state)}
+						iconColor={currentTheme.onSurface}
 					/>,
 				]}
 			/>
 			<View style={styles.contentView}>
-				{/* {isLoading && (
-					<ActivityIndicator
-						color={currentTheme.primary}
-						size="large"
-					/>
-				)} */}
 				<View style={styles.analysisContainer}>
 					<View style={styles.filterInformation}>
 						<View style={styles.filterHeader}>
@@ -420,12 +410,6 @@ const WorkoutAnalysisScreen = (props) => {
 							/>
 
 							<VictoryAxis
-								// domain={[
-								// 	0,
-								// 	chartDataObject.length > 0
-								// 		? chartDataObject.length
-								// 		: 1,
-								// ]}
 								fixLabelOverlap={true}
 								label="Date"
 								style={{
