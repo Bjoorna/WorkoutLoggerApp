@@ -212,12 +212,12 @@ const AnalysisScreenFilter = ({
 			</View>
 			<View style={styles.buttonRow}>
 				<TextButton
-				// onButtonPress={onClearFilter}
+				// onPress={onClearFilter}
 				>
 					Clear
 				</TextButton>
 				<TextButton
-					// onButtonPress={onSubmitFilter}
+					// onPress={onSubmitFilter}
 					disabled={
 						exercisesToFilterBy.length < 1 ||
 						exercisesToFilterBy.length > 10

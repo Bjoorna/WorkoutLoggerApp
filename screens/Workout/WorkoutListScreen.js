@@ -338,7 +338,7 @@ const WorkoutListScreen = (props) => {
 							</View>
 						)}
 						<View style={{ marginTop: 12 }}>
-							<OutlineButton onButtonPress={onClearFilter}>
+							<OutlineButton onPress={onClearFilter}>
 								Clear filter
 							</OutlineButton>
 						</View>

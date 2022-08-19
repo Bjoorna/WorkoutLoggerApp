@@ -253,7 +253,7 @@ const WeightCalculatorScreen = (props) => {
 						</View>
 						<View style={styles.dialogActions}>
 							<TextButton
-								onButtonPress={() => setModalVisible(false)}
+								onPress={() => setModalVisible(false)}
 							>
 								Close
 							</TextButton>
@@ -634,8 +634,8 @@ const WeightCalculatorScreen = (props) => {
 						Estimated Weight
 					</TitleText>
 					<TextButton
-						onButtonPress={onResetForm}
-						style={{ marginLeft: "auto" }}
+						onPress={onResetForm}
+						contentStyle={{ marginLeft: "auto" }}
 					>
 						Clear
 					</TextButton>

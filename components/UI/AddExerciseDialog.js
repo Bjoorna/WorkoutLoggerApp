@@ -247,8 +247,8 @@ const AddExerciseDialog = ({ onAddExercise, currentTheme, closeDialog }) => {
 					</TitleText>
 					<OutlineButton
 						disabled={!canSubmit}
-						style={{ marginLeft: "auto" }}
-						onButtonPress={onSaveExercise}
+						contentStyle={{ marginLeft: "auto" }}
+						onPress={onSaveExercise}
 					>
 						Add
 					</OutlineButton>

@@ -2,11 +2,16 @@ import React, { useState, useEffect } from "react";
 import { Pressable, StyleSheet, Vibration } from "react-native";
 import { useSelector } from "react-redux";
 
-
 import { Themes } from "../../shared/Theme";
 import LabelText from "../Text/Label";
 
-const TextButton = (props) => {
+const TextButton = ({
+	disabled = false,
+	onPress,
+	shouldVibrate,
+	children,
+	contentStyle,
+}) => {
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
 	const [styles, setStyles] = useState(
 		getStyles(useDarkMode ? Themes.dark : Themes.light)
@@ -16,32 +21,26 @@ const TextButton = (props) => {
 	);
 
 	const [isPressed, setIsPressed] = useState(false);
+	const [isDisabled, setIsDisabled] = useState(disabled);
 
 	useEffect(() => {
 		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
 		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
 	}, [useDarkMode]);
-	const isDisabled = props.disabled;
 
 	const handleOnPressIn = () => {
-		// props.onButtonPress();
 		setIsPressed(true);
 		// Vibration.vibrate(100);
+	};
+	const handlePress = () => {
+		onPress();
 	};
 
 	if (isDisabled) {
 		return (
-			<Pressable
-				style={{
-					...styles.disabledButtonStyle,
-					...props.style,
-				}}
-			>
-				<LabelText
-					large={true}
-					style={{ ...styles.disabledText, ...props.textStyle }}
-				>
-					{props.children}
+			<Pressable style={[styles.disabledButtonStyle, contentStyle]}>
+				<LabelText large={true} style={styles.disabledText}>
+					{children}
 				</LabelText>
 			</Pressable>
 		);
@@ -50,18 +49,18 @@ const TextButton = (props) => {
 			<Pressable
 				style={
 					isPressed
-						? { ...styles.pressedButtonStyle, ...props.style }
-						: { ...styles.baseButtonStyle, ...props.style }
+						? [styles.pressedButtonStyle, contentStyle]
+						: [styles.baseButtonStyle, contentStyle]
 				}
 				onPressIn={handleOnPressIn}
 				onPressOut={() => setIsPressed(false)}
-				onPress={props.onButtonPress}
+				onPress={handlePress}
 			>
 				<LabelText
-					style={{ ...styles.text, ...props.textStyle }}
+					style={styles.text}
 					large={true}
 				>
-					{props.children}
+					{children}
 				</LabelText>
 			</Pressable>
 		);

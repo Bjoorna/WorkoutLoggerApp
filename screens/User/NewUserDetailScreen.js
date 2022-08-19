@@ -211,7 +211,7 @@ const NewUserDetailScreen = (props) => {
 						headlineText="Enter personal info"
 						trailingIcons={[
 							<OutlineButton
-								onButtonPress={onSubmitUserInfo}
+								onPress={onSubmitUserInfo}
 								disabled={userInfoState.name === ""}
 							>
 								Continue

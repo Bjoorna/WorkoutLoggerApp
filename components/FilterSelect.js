@@ -228,11 +228,11 @@ const FilterSelect = ({ exerciseTypesAvaliable }) => {
 							</View>
 						)}
 						<View style={styles.buttonRow}>
-							<TextButton onButtonPress={onClearFilter}>
+							<TextButton onPress={onClearFilter}>
 								Clear
 							</TextButton>
 							<TextButton
-								onButtonPress={onSubmitFilter}
+								onPress={onSubmitFilter}
 								disabled={
 									exercisesToFilterBy.length < 1 ||
 									exercisesToFilterBy.length > 10
@@ -289,11 +289,11 @@ const FilterSelect = ({ exerciseTypesAvaliable }) => {
 							{/* <LabelText style={{color: currentTheme.error, marginLeft: 12}}>Must be after From Date</LabelText> */}
 						</View>
 						<View style={styles.buttonRow}>
-							<TextButton onButtonPress={onClearFilter}>
+							<TextButton onPress={onClearFilter}>
 								Clear
 							</TextButton>
 							<TextButton
-								onButtonPress={onFilterByDates}
+								onPress={onFilterByDates}
 								disabled={!dateFilterValid}
 							>
 								Filter

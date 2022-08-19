@@ -5,7 +5,13 @@ import { hexToRGB } from "../../shared/utils/UtilFunctions";
 import { Themes } from "../../shared/Theme";
 import LabelText from "../Text/Label";
 
-const OutlineButton = (props) => {
+const OutlineButton = ({
+	disabled = false,
+	onPress,
+	shouldVibrate,
+	children,
+	contentStyle,
+}) => {
 	// Themes
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
 	const [styles, setStyles] = useState(
@@ -15,7 +21,12 @@ const OutlineButton = (props) => {
 		useDarkMode ? Themes.dark : Themes.light
 	);
 
-	const [rippleColor, setRippleColor] = useState(hexToRGB(currentTheme.error))
+	const [rippleColor, setRippleColor] = useState(
+		hexToRGB(currentTheme.error)
+	);
+
+	const [isPressed, setIsPressed] = useState(false);
+	const [isDisabled, setIsDisabled] = useState(disabled);
 
 	useEffect(() => {
 		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
@@ -23,8 +34,9 @@ const OutlineButton = (props) => {
 		setRippleColor(currentTheme.primary);
 	}, [useDarkMode]);
 
-	const [isPressed, setIsPressed] = useState(false);
-	const isDisabled = props.disabled;
+	useEffect(()=> {
+		setIsDisabled(disabled);
+	}, [disabled])
 
 	const handleOnPressIn = () => {
 		// props.onButtonPress();
@@ -32,39 +44,38 @@ const OutlineButton = (props) => {
 		// Vibration.vibrate(100);
 	};
 
+	const handlePress = () => {
+		onPress();
+	};
+
 	if (isDisabled) {
 		return (
-			<Pressable
-				style={{
-					...styles.disabledButtonStyle,
-					...props.style,
-				}}
-			>
+			<Pressable style={[styles.disabledButtonStyle, contentStyle]}>
 				<LabelText style={styles.disabledText}>
-					{props.children}
+					{children}
 				</LabelText>
 			</Pressable>
 		);
 	} else {
 		return (
 			// <View style={{ borderRadius: 20, overflow: "hidden" }}>
-				<Pressable
-					// android_ripple={{
-					// 	borderless: false,
-					// 	radius: 200,
-					// 	color: currentTheme.primary,
-					// 	// color: `rgba(${rippleColor[0]}, ${rippleColor[1]}, ${rippleColor[2]}, 1 )`,
-					// 	foreground: false,
-					// }}
-					style={{ ...styles.baseButtonStyle, ...props.style }}
-					onPressIn={handleOnPressIn}
-					onPressOut={() => setIsPressed(false)}
-					onPress={props.onButtonPress}
-				>
-					<LabelText style={styles.text} large={true}>
-						{props.children}
-					</LabelText>
-				</Pressable>
+			<Pressable
+				// android_ripple={{
+				// 	borderless: false,
+				// 	radius: 200,
+				// 	color: currentTheme.primary,
+				// 	// color: `rgba(${rippleColor[0]}, ${rippleColor[1]}, ${rippleColor[2]}, 1 )`,
+				// 	foreground: false,
+				// }}
+				style={ [styles.baseButtonStyle, contentStyle ]}
+				onPressIn={handleOnPressIn}
+				onPressOut={() => setIsPressed(false)}
+				onPress={handlePress}
+			>
+				<LabelText style={styles.text} large={true}>
+					{children}
+				</LabelText>
+			</Pressable>
 			// </View>
 		);
 	}
@@ -97,7 +108,7 @@ const getStyles = (theme) => {
 			paddingHorizontal: 24,
 			alignItems: "center",
 			justifyContent: "center",
-			borderWidth: .5,
+			borderWidth: 0.5,
 			borderStyle: "solid",
 			borderColor: theme.outline,
 		},

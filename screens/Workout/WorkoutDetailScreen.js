@@ -227,18 +227,18 @@ const WorkoutDetailScreen = (props) => {
 						{!editNote && (
 							<View style={styles.modalActions}>
 								<TextButton
-									textStyle={{ color: currentTheme.primary }}
+									// textStyle={{ color: currentTheme.primary }}
 									disabled={false}
-									onButtonPress={() => {
+									onPress={() => {
 										setShowNote(false);
 									}}
 								>
 									Close
 								</TextButton>
 								<TextButton
-									textStyle={{ color: currentTheme.primary }}
+									// textStyle={{ color: currentTheme.primary }}
 									disabled={false}
-									onButtonPress={() => setEditNote(true)}
+									onPress={() => setEditNote(true)}
 								>
 									Edit
 								</TextButton>
@@ -247,18 +247,18 @@ const WorkoutDetailScreen = (props) => {
 						{editNote && (
 							<View style={styles.modalActions}>
 								<TextButton
-									textStyle={{ color: currentTheme.primary }}
+									// textStyle={{ color: currentTheme.primary }}
 									disabled={false}
-									onButtonPress={() => {
+									onPress={() => {
 										setEditNote(false);
 									}}
 								>
 									Cancel
 								</TextButton>
 								<TextButton
-									textStyle={{ color: currentTheme.primary }}
+									// textStyle={{ color: currentTheme.primary }}
 									disabled={false}
-									onButtonPress={onUpdateNote}
+									onPress={onUpdateNote}
 								>
 									Save
 								</TextButton>
@@ -302,18 +302,18 @@ const WorkoutDetailScreen = (props) => {
 						</View>
 						<View style={styles.modalActions}>
 							<TextButton
-								textStyle={{ color: currentTheme.primary }}
+								// textStyle={{ color: currentTheme.primary }}
 								disabled={false}
-								onButtonPress={() => {
+								onPress={() => {
 									showModalHandler(false);
 								}}
 							>
 								Cancel
 							</TextButton>
 							<TextButton
-								textStyle={{ color: currentTheme.primary }}
+								// textStyle={{ color: currentTheme.primary }}
 								disabled={false}
-								onButtonPress={() => onDeleteWorkout()}
+								onPress={() => onDeleteWorkout()}
 							>
 								Delete
 							</TextButton>

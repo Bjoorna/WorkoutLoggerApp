@@ -262,18 +262,18 @@ const AddWorkoutDialogScreen = (props) => {
 						</View>
 						<View style={styles.closeDialogModalActions}>
 							<TextButton
-								textStyle={{ color: currentTheme.primary }}
+								// textStyle={{ color: currentTheme.primary }}
 								disabled={false}
-								onButtonPress={() => {
+								onPress={() => {
 									setShowCloseDialogModal(false);
 								}}
 							>
 								Cancel
 							</TextButton>
 							<TextButton
-								textStyle={{ color: currentTheme.primary }}
+								// textStyle={{ color: currentTheme.primary }}
 								disabled={false}
-								onButtonPress={onNavigateBack}
+								onPress={onNavigateBack}
 							>
 								Discard
 							</TextButton>
@@ -292,7 +292,7 @@ const AddWorkoutDialogScreen = (props) => {
 				}
 				trailingIcons={[
 					<TextButton
-						onButtonPress={onSaveWorkout}
+						onPress={onSaveWorkout}
 						disabled={exercises.length === 0 ? true : false}
 					>
 						Save
@@ -610,10 +610,10 @@ const ExerciseView = ({
 			</View>
 			{!addSet && (
 				<View style={styles.buttonRow}>
-					<TextButton onButtonPress={onRemoveExercise}>
+					<TextButton onPress={onRemoveExercise}>
 						Delete
 					</TextButton>
-					<TextButton onButtonPress={onToggleAddSet}>
+					<TextButton onPress={onToggleAddSet}>
 						Add set
 					</TextButton>
 				</View>
@@ -730,10 +730,10 @@ const ExerciseView = ({
 							marginTop: 10,
 						}}
 					>
-						<TextButton onButtonPress={onToggleAddSet}>
+						<TextButton onPress={onToggleAddSet}>
 							Discard
 						</TextButton>
-						<OutlineButton onButtonPress={onAddSet}>
+						<OutlineButton onPress={onAddSet}>
 							Add set
 						</OutlineButton>
 					</View>

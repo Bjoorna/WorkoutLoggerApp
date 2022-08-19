@@ -24,7 +24,7 @@ const ExerciseSummaryView = (props) => {
 			</LabelText>
 			<TextButton
 				textStyle={{ color: currentTheme.error }}
-				onButtonPress={props.removeExercise}
+				onPress={props.removeExercise}
 			>
 				Delete
 			</TextButton>

@@ -8,19 +8,22 @@ import { Themes } from "../../shared/Theme";
 import CustomSwitch from "../../components/UI/CustomSwitch";
 import LabelText from "../../components/Text/Label";
 
+import IconButton from "../../components/Buttons/IconButton";
 import FilledButton from "../../components/Buttons/FilledButton";
 import FilledTonalButton from  "../../components/Buttons/FilledTonalButton";
+import TextButton from "../../components/Buttons/TextButton";
+
 import {
 	setHideTabBar,
 	setUseDarkMode,
 } from "../../redux/slices/appSettingsSlice";
 import TopAppBar from "../../components/UI/TopAppBarComponent";
-import IconButton from "../../components/Buttons/IconButton";
 import { getUserData, updateUserField } from "../../redux/slices/userSlice";
 
 import { Snackbar, Menu } from "react-native-paper";
 import { getExerciseTypes } from "../../redux/slices/workoutSlice";
 import { logoutUser } from "../../redux/slices/authSlice";
+import OutlineButton from "../../components/Buttons/OutlineButton";
 
 const UserSettingsScreen = (props) => {
 	const userStoreRef = useSelector((state) => state.user);
@@ -237,12 +240,12 @@ const UserSettingsScreen = (props) => {
 								large={true}
 								style={{ color: currentTheme.onSurface }}
 							>
-								Dummy
+								Filled
 							</BodyText>
 						</View>
 
 						<FilledButton disabled={false} onPress={() => console.log("dummy")}>
-							Dummy
+							Filled
 						</FilledButton>
 					</View>
 					<View style={styles.userSettingsItem}>
@@ -259,6 +262,35 @@ const UserSettingsScreen = (props) => {
 							Filled tonal
 						</FilledTonalButton>
 					</View>
+					<View style={styles.userSettingsItem}>
+						<View style={styles.userSettingsText}>
+							<BodyText
+								large={true}
+								style={{ color: currentTheme.onSurface }}
+							>
+								Text Button
+							</BodyText>
+						</View>
+
+						<TextButton disabled={false} onPress={() => console.log("dummy")}>
+							Text
+						</TextButton>
+					</View>
+					<View style={styles.userSettingsItem}>
+						<View style={styles.userSettingsText}>
+							<BodyText
+								large={true}
+								style={{ color: currentTheme.onSurface }}
+							>
+								OutlineButton
+							</BodyText>
+						</View>
+
+						<OutlineButton disabled={false} onPress={() => console.log("dummy")}>
+							Outline
+						</OutlineButton>
+					</View>
+
 
 					<View style={styles.userSettingsItem}>
 						<View style={styles.userSettingsText}>

@@ -186,7 +186,7 @@ const AuthScreen = (props) => {
 						headlineText="Welcome"
 						trailingIcons={[
 							<OutlineButton
-								onButtonPress={() =>
+								onPress={() =>
 									props.navigation.navigate("NewUserScreen")
 								}
 							>
