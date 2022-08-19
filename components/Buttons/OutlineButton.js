@@ -48,7 +48,7 @@ const OutlineButton = ({
 		onPress();
 	};
 
-	if (isDisabled) {
+	if (disabled) {
 		return (
 			<Pressable style={[styles.disabledButtonStyle, contentStyle]}>
 				<LabelText style={styles.disabledText}>

@@ -40,7 +40,7 @@ const FilledTonalButton = ({
 		onPress();
 	};
 
-	if (isDisabled) {
+	if (disabled) {
 		return (
 			<Pressable style={[styles.disabledButtonStyle, contentStyle]}>
 				<LabelText style={styles.disabledText} large={true}>

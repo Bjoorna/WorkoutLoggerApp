@@ -29,6 +29,10 @@ const FilledButton = ({
 		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
 	}, [useDarkMode]);
 
+	useEffect(()=> {
+		setIsDisabled(disabled)
+	},[disabled])
+
 	const handleOnPressIn = () => {
 		setIsPressed(true);
 	};
@@ -37,7 +41,7 @@ const FilledButton = ({
 		onPress();
 	};
 
-	if (isDisabled) {
+	if (disabled) {
 		return (
 			<Pressable style={[styles.disabledButtonStyle, contentStyle]}>
 				<LabelText style={styles.disabledText} large={true}>

@@ -36,7 +36,7 @@ const TextButton = ({
 		onPress();
 	};
 
-	if (isDisabled) {
+	if (disabled) {
 		return (
 			<Pressable style={[styles.disabledButtonStyle, contentStyle]}>
 				<LabelText large={true} style={styles.disabledText}>
