@@ -90,10 +90,8 @@ const AddWorkoutDialogScreen = (props) => {
 
 	useEffect(() => {
 		const fabXPos = width / 2 - 56 / 2;
-		// const fabHeight = layout.height;
 		setFabPosition({ x: fabXPos, y: 16 });
 
-		// onAddTempData();
 
 		BackHandler.addEventListener("hardwareBackPress", backAction);
 		return () => {
@@ -106,6 +104,10 @@ const AddWorkoutDialogScreen = (props) => {
 		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
 		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
 	}, [useDarkMode]);
+
+	useEffect(()=> {
+		console.log(exercises);
+	}, [exercises])
 
 	// when the user wants to exit the screen
 	const handleBackBehavior = () => {
@@ -200,18 +202,52 @@ const AddWorkoutDialogScreen = (props) => {
 		const existingExercise = exercises.find(
 			({ exerciseName }) => exerciseName === nameOfExercise
 		);
-		if (existingExercise != undefined) {
-			const indexOfExercise = exercises.findIndex(
-				(exercise) => exercise === existingExercise
-			);
-			const setsInExercise = Object.keys(existingExercise.sets).length;
-			const nextExerciseState = { ...existingExercise };
-			nextExerciseState.sets[setsInExercise + 1] = set;
-			const nextExercisesState = [...exercises];
-			nextExercisesState[indexOfExercise] = nextExerciseState;
-			setExercises(nextExercisesState);
-		}
+		if (existingExercise === undefined) return;
+			
+		const indexOfExercise = exercises.findIndex(
+			(exercise) => exercise === existingExercise
+		);
+		const setsInExercise = Object.keys(existingExercise.sets).length;
+		const nextExerciseState = { ...existingExercise };
+		nextExerciseState.sets[setsInExercise + 1] = set;
+		const nextExercisesState = [...exercises];
+		nextExercisesState[indexOfExercise] = nextExerciseState;
+		setExercises(nextExercisesState);
 	};
+
+	const onRepeatSet = (nameOfExercise,set)=> {
+		const existingExercise = exercises.find(
+			({exerciseName}) => exerciseName === nameOfExercise
+		);
+		if(existingExercise === undefined) return;
+
+		const indexOfExercise = exercises.findIndex((exercise) => exercise === existingExercise);
+		
+		const nextSetNr = +set[0] + 1;
+		const setWeight = set[1][0]
+		const setReps = set[1][1]
+		const setRpe = set[1][2]
+		
+		const toSet = {
+			weight: setWeight,
+			reps: setReps,
+			rpe: setRpe
+		}
+		const nextSetsState = {...existingExercise.sets};
+		nextSetsState[nextSetNr] = toSet
+		const nextExerciseState = {...existingExercise, sets: nextSetsState};
+
+		const newExercisesState = [...exercises];
+		newExercisesState[indexOfExercise] = nextExerciseState;
+		setExercises(newExercisesState)
+
+		// const nextExerciseState = {...existingExercise};
+		// nextExerciseState[nextSetNr] = toSet;
+		
+		// console.log("ExName: " ,exerciseName);
+		// console.log("Add same set: ", set);
+		// const currentNrOfSets = Object.keys()
+	}
 
 	return (
 		<View style={styles.container}>
@@ -415,6 +451,7 @@ const AddWorkoutDialogScreen = (props) => {
 							onAddSetToExercise={onAddSetToExercise}
 							onHideFAB={onHideFAB}
 							onShowFAB={onShowFAB}
+							onRepeatSet={onRepeatSet}
 						/>
 					)}
 				/>
@@ -432,6 +469,7 @@ const ExerciseView = ({
 	onAddSetToExercise,
 	onHideFAB,
 	onShowFAB,
+	onRepeatSet
 }) => {
 	const [styles, setStyles] = useState(
 		getExerciseViewStyle(isDarkMode ? Themes.dark : Themes.light)
@@ -603,6 +641,7 @@ const ExerciseView = ({
 									{" "}
 									@{setData[1][2]}
 								</BodyText>
+								<IconButton name="repeat-outline" iconColor={currentTheme.onSurface} onPress={() =>onRepeatSet(exerciseData.exerciseName,set)} />
 							</View>
 						</View>
 					);
@@ -747,7 +786,8 @@ const getExerciseViewStyle = (theme) => {
 	return StyleSheet.create({
 		exerciseContainer: {
 			width: "100%",
-			// height: "100%",
+
+
 			marginRight: 20,
 			paddingHorizontal: 24,
 			paddingVertical: 3,
@@ -780,8 +820,7 @@ const getExerciseViewStyle = (theme) => {
 			alignItems: "center",
 			paddingVertical: 4,
 			paddingHorizontal: 8,
-			// height: 100,
-			// backgroundColor: theme.error
+
 		},
 		setNumber: { width: 50 },
 		setValues: {
