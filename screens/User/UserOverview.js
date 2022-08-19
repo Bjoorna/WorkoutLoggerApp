@@ -156,12 +156,6 @@ const UserOverviewScreen = (props) => {
 					</View>
 				</View>
 			</View>
-			{/* <OutlineButton
-				style={{ marginTop: 20 }}
-				onButtonPress={onLogoutUser}
-			>
-				Logout
-			</OutlineButton> */}
 		</SafeAreaView>
 	);
 };

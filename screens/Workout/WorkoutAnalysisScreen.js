@@ -24,6 +24,7 @@ import FilterChip from "../../components/UI/Chips/FilterChip";
 // import * as WorkoutActions from "../../store/actions/workout";
 
 import { Themes } from "../../shared/Theme";
+import { GetChartTheme } from "../../shared/VictoryChartsTheme";
 import { useDispatch, useSelector } from "react-redux";
 import { ExerciseTypes } from "../../shared/utils/ExerciseTypes";
 
@@ -51,6 +52,8 @@ import {
 	VictoryLegend,
 	VictoryLabel,
 } from "victory-native";
+// import {GetChartTheme} from "../../shared/VictoryChartThemes"
+
 import { format } from "date-fns";
 import BottomSheet, {
 	BottomSheetBackdropimport,
@@ -108,6 +111,10 @@ const WorkoutAnalysisScreen = (props) => {
 		useDarkMode ? Themes.dark : Themes.light
 	);
 
+	const [chartTheme, setChartTheme] = useState(
+		useDarkMode ? GetChartTheme.dark : GetChartTheme.light
+	);
+
 	// BottomSheet stuff
 	const bottomSheetRef = useRef(null);
 	const snapPoints = useMemo(
@@ -145,6 +152,7 @@ const WorkoutAnalysisScreen = (props) => {
 		if (!existingExercises) {
 			loadDeadlift();
 		}
+		console.log(VictoryTheme.grayscale);
 	}, []);
 
 	useEffect(() => {
@@ -182,7 +190,14 @@ const WorkoutAnalysisScreen = (props) => {
 	useEffect(() => {
 		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
 		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
+		setChartTheme(useDarkMode ? GetChartTheme.dark : GetChartTheme.light);
 	}, [useDarkMode]);
+
+	useEffect(() => {
+		console.log("chartTheme");
+
+		console.log(chartTheme);
+	}, [chartTheme]);
 
 	const generateDataForChart = (exercises, stat) => {
 		if (stat === "e1RM") {
@@ -376,8 +391,28 @@ const WorkoutAnalysisScreen = (props) => {
 					<View style={styles.chartContainer}>
 						<VictoryChart
 							width={400}
-							theme={VictoryTheme.grayscale}
+							// theme={VictoryTheme.grayscale}
+							theme={chartTheme}
+
 						>
+							<VictoryAxis
+								dependentAxis
+								domain={[yAxisDomains[0], yAxisDomains[1]]}
+								label={useMetric ? "Kilo" : "lbs"}
+								style={{
+									axis: { stroke: currentTheme.onSurface },
+									axisLabel: { padding: 30 },
+								}}
+							/>
+
+							<VictoryAxis
+								fixLabelOverlap={true}
+								label="Date"
+								style={{
+									axis: { stroke: currentTheme.onSurface },
+									axisLabel: { padding: 30 },
+								}}
+							/>
 							<VictoryLine
 								animate={{
 									duration: 2000,
@@ -398,24 +433,6 @@ const WorkoutAnalysisScreen = (props) => {
 								data={chartDataObject}
 								x={["date", "display"]}
 								y="weight"
-							/>
-							<VictoryAxis
-								dependentAxis
-								domain={[yAxisDomains[0], yAxisDomains[1]]}
-								label={useMetric ? "Kilo" : "lbs"}
-								style={{
-									axis: { stroke: currentTheme.onSurface },
-									axisLabel: { padding: 30 },
-								}}
-							/>
-
-							<VictoryAxis
-								fixLabelOverlap={true}
-								label="Date"
-								style={{
-									axis: { stroke: currentTheme.onSurface },
-									axisLabel: { padding: 30 },
-								}}
 							/>
 						</VictoryChart>
 					</View>
