@@ -294,7 +294,7 @@ const AuthScreen = (props) => {
 						</View>
 						<View>
 							<FilledButton
-								onButtonPress={onSubmitLogin}
+								onPress={onSubmitLogin}
 								disabled={!isFormValid}
 							>
 								Login

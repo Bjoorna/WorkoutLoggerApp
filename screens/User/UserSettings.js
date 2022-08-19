@@ -8,7 +8,8 @@ import { Themes } from "../../shared/Theme";
 import CustomSwitch from "../../components/UI/CustomSwitch";
 import LabelText from "../../components/Text/Label";
 
-import FilledButton from "../../components/Buttons/FilledTonalButton";
+import FilledButton from "../../components/Buttons/FilledButton";
+import FilledTonalButton from  "../../components/Buttons/FilledTonalButton";
 import {
 	setHideTabBar,
 	setUseDarkMode,
@@ -240,12 +241,25 @@ const UserSettingsScreen = (props) => {
 							</BodyText>
 						</View>
 
-						<FilledButton
-							onButtonPress={() => console.log("dummy")}
-						>
+						<FilledButton disabled={false} onPress={() => console.log("dummy")}>
 							Dummy
 						</FilledButton>
 					</View>
+					<View style={styles.userSettingsItem}>
+						<View style={styles.userSettingsText}>
+							<BodyText
+								large={true}
+								style={{ color: currentTheme.onSurface }}
+							>
+								Filled tonal
+							</BodyText>
+						</View>
+
+						<FilledTonalButton disabled={false} onPress={() => console.log("dummy")}>
+							Filled tonal
+						</FilledTonalButton>
+					</View>
+
 					<View style={styles.userSettingsItem}>
 						<View style={styles.userSettingsText}>
 							<BodyText
@@ -256,7 +270,7 @@ const UserSettingsScreen = (props) => {
 							</BodyText>
 						</View>
 
-						<FilledButton onButtonPress={onLogoutUser}>
+						<FilledButton onPress={onLogoutUser}>
 							Logout
 						</FilledButton>
 					</View>

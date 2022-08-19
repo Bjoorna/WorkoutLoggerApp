@@ -6,7 +6,13 @@ import { Themes } from "../../shared/Theme";
 import LabelText from "../Text/Label";
 
 // TODO style onPress to conform to material standards
-const FilledTonalButton = (props) => {
+const FilledTonalButton = ({
+	disabled = false,
+	onPress,
+	shouldVibrate,
+	children,
+	contentStyle,
+}) => {
 	// Themes
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
 	const [styles, setStyles] = useState(
@@ -16,44 +22,42 @@ const FilledTonalButton = (props) => {
 		useDarkMode ? Themes.dark : Themes.light
 	);
 
+	const [isPressed, setIsPressed] = useState(false);
+	const [isDisabled, setIsDisabled] = useState(disabled);
+
 	useEffect(() => {
 		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
 		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
 	}, [useDarkMode]);
 
-	const [isPressed, setIsPressed] = useState(false);
-	const shouldVibrate = props.vibration;
-	const isDisabled = props.disabled;
 
 	const handleOnPressIn = () => {
-		// props.onButtonPress();
 		setIsPressed(true);
 		// Vibration.vibrate(100);
 	};
 
+	const handlePress = () => {
+		onPress();
+	};
+
 	if (isDisabled) {
 		return (
-			<Pressable
-				style={{
-					...styles.disabledButtonStyle,
-					...props.style,
-				}}
-			>
+			<Pressable style={[styles.disabledButtonStyle, contentStyle]}>
 				<LabelText style={styles.disabledText} large={true}>
-					{props.children}
+					{children}
 				</LabelText>
 			</Pressable>
 		);
 	} else {
 		return (
 			<Pressable
-				style={{ ...styles.baseButtonStyle, ...props.style }}
+				style={[styles.baseButtonStyle, contentStyle]}
 				onPressIn={handleOnPressIn}
 				onPressOut={() => setIsPressed(false)}
-				onPress={props.onButtonPress}
+				onPress={handlePress}
 			>
 				<LabelText style={styles.text} large={true}>
-					{props.children}
+					{children}
 				</LabelText>
 			</Pressable>
 		);

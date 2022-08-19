@@ -345,7 +345,7 @@ const NewUserScreen = (props) => {
 
 						<View>
 							<FilledButton
-								onButtonPress={onSubmitNewUser}
+								onPress={onSubmitNewUser}
 								disabled={!isFormValid}
 							>
 								Login
