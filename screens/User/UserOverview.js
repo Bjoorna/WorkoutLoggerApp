@@ -119,7 +119,7 @@ const UserOverviewScreen = (props) => {
 						{useMetric && (
 							<HeadlineText style={styles.infoText} large={true}>
 								{userHeight > 0 ? userHeight : "N/A"}
-								{useMetric ? "kg" : ""}
+								{useMetric ? "cm" : ""}
 							</HeadlineText>
 						)}
 					</View>

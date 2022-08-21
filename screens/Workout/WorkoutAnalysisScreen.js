@@ -152,7 +152,6 @@ const WorkoutAnalysisScreen = (props) => {
 		if (!existingExercises) {
 			loadDeadlift();
 		}
-		console.log(VictoryTheme.grayscale);
 	}, []);
 
 	useEffect(() => {
@@ -194,9 +193,6 @@ const WorkoutAnalysisScreen = (props) => {
 	}, [useDarkMode]);
 
 	useEffect(() => {
-		console.log("chartTheme");
-
-		console.log(chartTheme);
 	}, [chartTheme]);
 
 	const generateDataForChart = (exercises, stat) => {

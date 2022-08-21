@@ -38,6 +38,13 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
 	const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
 
 	useEffect(() => {
+		const newIndex = state.index;
+		const newLabelValues = [...labelIndicatorWidths];
+		newLabelValues[onTabIndex].setValue(defaultLabelWidthBeforeAnim);
+		setLabelIndicatorWidth(newLabelValues);
+		setOnTabIndex(state.index);
+		animateLabel(labelIndicatorWidths[newIndex]);
+
 		const keyboardShowListener = Keyboard.addListener(
 			"keyboardDidShow",
 			() => {
@@ -54,6 +61,7 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
 			keyboardShowListener.remove();
 			keyboardHideListener.remove();
 		};
+
 	}, []);
 
 	useEffect(()=> {

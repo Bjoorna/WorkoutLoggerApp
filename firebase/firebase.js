@@ -68,6 +68,8 @@ export const firebaseInitSaveUserData = async (userData, userID) => {
 		// no need to merge since the document wont exist
 		await setDoc(docRef, userData);
 	} catch (error) {
+		console.log(error);
+
 		throw new Error(error.code);
 	}
 };
@@ -98,6 +100,8 @@ export const firebaseUpdateUserField = async (userID, data) => {
 		const userDocRef = doc(database, "users", userID);
 		await updateDoc(userDocRef, data);
 	} catch (error) {
+		console.log(error);
+
 		throw new Error(error.code);
 	}
 };
@@ -112,6 +116,7 @@ export const firebaseGetUser = async (userID) => {
 			console.log("User dont exists");
 		}
 	} catch (error) {
+		console.log(error);
 		throw new Error(error);
 	}
 };
@@ -507,6 +512,8 @@ export const firebaseLoginWithEmailAndPassword = async (email, password) => {
 		);
 		return userCredentials.user;
 	} catch (error) {
+		console.log(error);
+
 		throw new Error(error.code);
 	}
 };

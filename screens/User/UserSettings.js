@@ -59,7 +59,6 @@ const UserSettingsScreen = (props) => {
 		};
 	}, []);
 	useEffect(() => {
-		console.log(workoutStoreRef.exerciseTypes);
 	}, [workoutStoreRef]);
 
 	// initialize userSettingsValues
