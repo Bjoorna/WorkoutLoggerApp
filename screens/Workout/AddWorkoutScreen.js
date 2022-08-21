@@ -54,7 +54,7 @@ const AddWorkoutDialogScreen = (props) => {
 	const [styles, setStyles] = useState(
 		getStyles(useDarkMode ? Themes.dark : Themes.light)
 	);
-	
+
 	const [currentTheme, setCurrentTheme] = useState(
 		useDarkMode ? Themes.dark : Themes.light
 	);
@@ -92,7 +92,6 @@ const AddWorkoutDialogScreen = (props) => {
 		const fabXPos = width / 2 - 56 / 2;
 		setFabPosition({ x: fabXPos, y: 16 });
 
-
 		BackHandler.addEventListener("hardwareBackPress", backAction);
 		return () => {
 			BackHandler.removeEventListener("hardwareBackPress", backAction);
@@ -105,9 +104,9 @@ const AddWorkoutDialogScreen = (props) => {
 		setCurrentTheme(useDarkMode ? Themes.dark : Themes.light);
 	}, [useDarkMode]);
 
-	useEffect(()=> {
-		console.log(exercises);
-	}, [exercises])
+	useEffect(() => {
+		// console.log(exercises);
+	}, [exercises]);
 
 	// when the user wants to exit the screen
 	const handleBackBehavior = () => {
@@ -203,7 +202,7 @@ const AddWorkoutDialogScreen = (props) => {
 			({ exerciseName }) => exerciseName === nameOfExercise
 		);
 		if (existingExercise === undefined) return;
-			
+
 		const indexOfExercise = exercises.findIndex(
 			(exercise) => exercise === existingExercise
 		);
@@ -215,39 +214,53 @@ const AddWorkoutDialogScreen = (props) => {
 		setExercises(nextExercisesState);
 	};
 
-	const onRepeatSet = (nameOfExercise,set)=> {
+	const onRepeatSet = (nameOfExercise, set) => {
 		const existingExercise = exercises.find(
-			({exerciseName}) => exerciseName === nameOfExercise
+			({ exerciseName }) => exerciseName === nameOfExercise
 		);
-		if(existingExercise === undefined) return;
+		if (existingExercise === undefined) return;
 
-		const indexOfExercise = exercises.findIndex((exercise) => exercise === existingExercise);
-		
+		const indexOfExercise = exercises.findIndex(
+			(exercise) => exercise === existingExercise
+		);
+
 		const nextSetNr = +set[0] + 1;
-		const setWeight = set[1][0]
-		const setReps = set[1][1]
-		const setRpe = set[1][2]
-		
+		const setWeight = set[1][0];
+		const setReps = set[1][1];
+		const setRpe = set[1][2];
+
 		const toSet = {
 			weight: setWeight,
 			reps: setReps,
-			rpe: setRpe
+			rpe: setRpe,
+		};
+
+		const copySetState = { ...existingExercise.sets };
+		const newSet = { ...copySetState };
+
+		const setKeys = Object.keys(copySetState);
+		const nrOfSets = setKeys.length;
+
+		// sets KEY is 1indexed
+		if (nextSetNr - 1 < nrOfSets) {
+			const keysOfSetsToMove = setKeys.filter(
+				(key) => key > nextSetNr - 1
+			);
+			newSet[+nextSetNr] = toSet;
+			for (let key of keysOfSetsToMove) {
+				newSet[+key + 1] = copySetState[key];
+			}
+		} else {
+			newSet[nextSetNr] = toSet;
+			console.log("No need to shuffle");
 		}
-		const nextSetsState = {...existingExercise.sets};
-		nextSetsState[nextSetNr] = toSet
-		const nextExerciseState = {...existingExercise, sets: nextSetsState};
+
+		const nextExerciseState = { ...existingExercise, sets: newSet };
 
 		const newExercisesState = [...exercises];
 		newExercisesState[indexOfExercise] = nextExerciseState;
-		setExercises(newExercisesState)
-
-		// const nextExerciseState = {...existingExercise};
-		// nextExerciseState[nextSetNr] = toSet;
-		
-		// console.log("ExName: " ,exerciseName);
-		// console.log("Add same set: ", set);
-		// const currentNrOfSets = Object.keys()
-	}
+		setExercises(newExercisesState);
+	};
 
 	return (
 		<View style={styles.container}>
@@ -469,7 +482,7 @@ const ExerciseView = ({
 	onAddSetToExercise,
 	onHideFAB,
 	onShowFAB,
-	onRepeatSet
+	onRepeatSet,
 }) => {
 	const [styles, setStyles] = useState(
 		getExerciseViewStyle(isDarkMode ? Themes.dark : Themes.light)
@@ -641,7 +654,21 @@ const ExerciseView = ({
 									{" "}
 									@{setData[1][2]}
 								</BodyText>
-								<IconButton name="repeat-outline" iconColor={currentTheme.onSurface} onPress={() =>onRepeatSet(exerciseData.exerciseName,set)} />
+								<IconButton
+									name="repeat-outline"
+									iconColor={currentTheme.primary}
+									onPress={() =>
+										onRepeatSet(
+											exerciseData.exerciseName,
+											set
+										)
+									}
+								/>
+								<IconButton
+									name="close"
+									iconColor={currentTheme.error}
+									onPress={() => console.log("delete set")}
+								/>
 							</View>
 						</View>
 					);
@@ -649,12 +676,8 @@ const ExerciseView = ({
 			</View>
 			{!addSet && (
 				<View style={styles.buttonRow}>
-					<TextButton onPress={onRemoveExercise}>
-						Delete
-					</TextButton>
-					<TextButton onPress={onToggleAddSet}>
-						Add set
-					</TextButton>
+					<TextButton onPress={onRemoveExercise}>Delete</TextButton>
+					<TextButton onPress={onToggleAddSet}>Add set</TextButton>
 				</View>
 			)}
 			{addSet && (
@@ -787,7 +810,6 @@ const getExerciseViewStyle = (theme) => {
 		exerciseContainer: {
 			width: "100%",
 
-
 			marginRight: 20,
 			paddingHorizontal: 24,
 			paddingVertical: 3,
@@ -820,7 +842,6 @@ const getExerciseViewStyle = (theme) => {
 			alignItems: "center",
 			paddingVertical: 4,
 			paddingHorizontal: 8,
-
 		},
 		setNumber: { width: 50 },
 		setValues: {
