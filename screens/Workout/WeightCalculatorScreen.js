@@ -33,6 +33,7 @@ import { setHideTabBar } from "../../redux/slices/appSettingsSlice";
 import TopAppBar from "../../components/UI/TopAppBarComponent";
 
 import { useNavigation } from "@react-navigation/core";
+import LabelText from "../../components/Text/Label";
 
 const RESET = "RESET";
 const ADD_VALUE = "ADD_VALUE";
@@ -62,7 +63,6 @@ const WeightCalculatorScreen = (props) => {
 	const dispatch = useDispatch();
 	const navigation = useNavigation();
 
-	const rpeCalc = new RPEMap();
 	const [calculatorState, dispatchCalculator] = useReducer(
 		calculatorReducer,
 		baseState
@@ -73,6 +73,7 @@ const WeightCalculatorScreen = (props) => {
 	const [isFormValid, setIsFormValid] = useState(false);
 	const [useMetric, setUseMetric] = useState(true);
 	const [modalVisible, setModalVisible] = useState(false);
+	const [showEstimationWarning, setShowEstimationWarning] = useState(false);
 
 	const knownWeightRef = useRef(null);
 	const knownRepsRef = useRef(null);
@@ -104,6 +105,7 @@ const WeightCalculatorScreen = (props) => {
 
 	useEffect(() => {
 		let validValue = true;
+
 		for (const value of Object.values(calculatorState)) {
 			if (value.error === true || value.value === null) {
 				validValue = false;
@@ -112,6 +114,16 @@ const WeightCalculatorScreen = (props) => {
 		}
 		setIsFormValid(validValue);
 		if (validValue) {
+			const largeRepRange =
+				calcRepDiff(
+					calculatorState["knownReps"].value,
+					calculatorState["wantReps"].value
+				) > 4;
+			if (largeRepRange) {
+				setShowEstimationWarning(true);
+			} else {
+				setShowEstimationWarning(false);
+			}
 			calculcateValue();
 		}
 	}, [calculatorState]);
@@ -127,15 +139,16 @@ const WeightCalculatorScreen = (props) => {
 	const calculcateValue = () => {
 		if (isFormValid) {
 			const intensity = getIntensity(
-				calculatorState["knownRPE"].value,
-				calculatorState["knownReps"].value
+				parseFloat(calculatorState["knownRPE"].value),
+				parseFloat(calculatorState["knownReps"].value)
 			);
 			const e1RM = Math.round(
-				calculatorState["knownWeight"].value / (intensity / 100)
+				parseFloat(calculatorState["knownWeight"].value) /
+					(intensity / 100)
 			);
 			const wantedIntensity = getIntensity(
-				calculatorState["wantRPE"].value,
-				calculatorState["wantReps"].value
+				parseFloat(calculatorState["wantRPE"].value),
+				parseFloat(calculatorState["wantReps"].value)
 			);
 			const eWeight = Math.round(e1RM * (wantedIntensity / 100));
 			setCalcWeight(eWeight);
@@ -144,10 +157,12 @@ const WeightCalculatorScreen = (props) => {
 		}
 	};
 
+	const calcRepDiff = (a, b) => {
+		return Math.abs(a - b);
+	};
+
 	const onValueEntered = (text, type) => {
-		// const value = event.nativeEvent.text;
-		const value = text;
-		const sanitizedValue = Number(value.replace(/,/g, "."));
+		const sanitizedValue = text.replace(",", ".");
 		const isValid = inputValueValidityCheck(type, sanitizedValue);
 		if (isValid) {
 			dispatchCalculator({
@@ -244,17 +259,26 @@ const WeightCalculatorScreen = (props) => {
 									large={true}
 									style={{
 										color: currentTheme.onSurfaceVariant,
+										marginBottom: 10,
 									}}
 								>
 									The app will then calculate an estimate for
 									what weight you should train with.
 								</BodyText>
+								<BodyText
+									large={true}
+									style={{
+										color: currentTheme.onSurfaceVariant,
+									}}
+								>
+									Estimates where the difference in rep range
+									are large, e.g, 2 known reps and 6 wanted
+									reps, might not be accurate
+								</BodyText>
 							</ScrollView>
 						</View>
 						<View style={styles.dialogActions}>
-							<TextButton
-								onPress={() => setModalVisible(false)}
-							>
+							<TextButton onPress={() => setModalVisible(false)}>
 								Close
 							</TextButton>
 						</View>
@@ -640,6 +664,16 @@ const WeightCalculatorScreen = (props) => {
 						Clear
 					</TextButton>
 				</View>
+				{showEstimationWarning && (
+					<LabelText
+						large={true}
+						style={{ color: currentTheme.error }}
+					>
+						Large difference in rep ranges might result in
+						inaccurate estimate
+					</LabelText>
+				)}
+
 				<View style={styles.resultView}>
 					<View
 						style={{

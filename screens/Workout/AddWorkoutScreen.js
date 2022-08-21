@@ -664,11 +664,6 @@ const ExerciseView = ({
 										)
 									}
 								/>
-								<IconButton
-									name="close"
-									iconColor={currentTheme.error}
-									onPress={() => console.log("delete set")}
-								/>
 							</View>
 						</View>
 					);
