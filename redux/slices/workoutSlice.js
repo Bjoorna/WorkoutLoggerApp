@@ -12,10 +12,12 @@ import {
 	firebaseGetWorkoutByID,
 	firebaseGetWorkoutsBasedOnWorkoutIDs,
 	firebaseFilterWorkoutOnDates,
+	firebaseGetWorkoutsOnCursor,
 } from "../../firebase/firebase";
 
 const initialState = {
 	workouts: {},
+	dateCursor: 0,
 	exercises: {},
 	filteredExercises: {}, // set exercises that the user has filtered by here
 	filteredWorkouts: {},
@@ -55,6 +57,21 @@ export const getWorkoutByUserID = createAsyncThunk(
 		// 	console.log("less than one");
 		// }
 		return workoutResponse;
+	}
+);
+
+export const getWorkoutsOnCursor = createAsyncThunk(
+	"workout/getWorkoutsOnCursor",
+	async (_, thunkAPI) => {
+		try {
+			const userID = thunkAPI.getState().auth.userID;
+			const dateCursor = thunkAPI.getState().workout.dateCursor;
+			const workoutQuery = await firebaseGetWorkoutsOnCursor(userID, dateCursor);
+			return workoutQuery;
+		} catch (error) {
+			console.log(error);
+		}
+
 	}
 );
 
@@ -236,15 +253,38 @@ export const workoutSlice = createSlice({
 		// Workouts
 		builder.addCase(getWorkoutByUserID.fulfilled, (state, action) => {
 			const snapshot = action.payload;
+			let newDateCursor = Date.now();
 			snapshot.forEach((doc) => {
 				const workoutID = doc.id;
 				const workoutData = doc.data();
 				const timeStampInMillis = workoutData.date.seconds * 1000;
+				if (timeStampInMillis < newDateCursor) {
+					newDateCursor = timeStampInMillis;
+				}
 				workoutData.date = timeStampInMillis;
 				workoutData.id = workoutID;
+				state.dateCursor = newDateCursor;
 				state.workouts[workoutID] = workoutData;
 			});
 		});
+
+		builder.addCase(getWorkoutsOnCursor.fulfilled, (state, action) => {
+			const snapshot = action.payload;
+			let newDateCursor = Date.now();
+
+			snapshot.forEach((doc) => {
+				const workoutID = doc.id;
+				const workoutData = doc.data();
+				const timeStampInMillis = workoutData.date.seconds * 1000;
+				if (timeStampInMillis < newDateCursor) {
+					newDateCursor = timeStampInMillis;
+				}
+				workoutData.date = timeStampInMillis;
+				workoutData.id = workoutID;
+				state.dateCursor = newDateCursor;
+				state.workouts[workoutID] = workoutData;
+			});
+		})
 
 		// TODO add getworkout that is saved
 		builder.addCase(saveWorkout.fulfilled, (state, action) => {

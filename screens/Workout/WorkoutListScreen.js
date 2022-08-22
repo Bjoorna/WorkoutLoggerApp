@@ -32,6 +32,7 @@ import { transformObjectToWorkout } from "../../shared/utils/UtilFunctions";
 import workoutSlice, {
 	getExerciseTypes,
 	getWorkoutByUserID,
+	getWorkoutsOnCursor,
 	resetFilter,
 	resetFilteredExercises,
 	resetFilteredWorkouts,
@@ -60,6 +61,7 @@ const WorkoutListScreen = (props) => {
 	const useDarkMode = useSelector((state) => state.appSettings.useDarkMode);
 	const isHidingTabBar = useSelector((state) => state.appSettings.hideTabBar);
 	const [workouts, setWorkouts] = useState([]);
+	const [filteredWorkoutDisplay, setFilteredWorkoutsDisplay] = useState([]);
 
 	const [refreshing, setRefreshing] = useState(false);
 	const [styles, setStyles] = useState(
@@ -73,6 +75,7 @@ const WorkoutListScreen = (props) => {
 
 	// filterInformation
 	const [showFilter, setShowFilter] = useState(false);
+	const [showFilteredWorkouts, setShowFilteredWorkouts] = useState(false);
 	const [filterToggle, setFilterToggle] = useState(false);
 	const reduxFilteredExercises = useSelector(
 		(state) => state.workout.filteredExercises
@@ -128,23 +131,26 @@ const WorkoutListScreen = (props) => {
 	}, []);
 
 	useEffect(() => {
+		const arrayOfWorkouts = Object.values(reduxWorkoutRef);
+
+		setWorkouts([...arrayOfWorkouts]);
+		setShowFilteredWorkouts(false);
+
+		setRefreshing(false);
+	}, [reduxWorkoutRef]);
+
+	useEffect(() => {
+		console.log("FILTERD WORKOUTS: ", reduxFilteredWorkouts);
 		if (reduxFilteredWorkouts !== {}) {
 			const arrayOfWorkouts = Object.values(reduxFilteredWorkouts);
 			if (arrayOfWorkouts.length === 0 && filterInfo.error !== "") {
-				setWorkouts([]);
+				setFilteredWorkoutsDisplay([]);
 				return;
 			}
-			setWorkouts(arrayOfWorkouts);
+			setShowFilteredWorkouts(true);
+			setFilteredWorkoutsDisplay(arrayOfWorkouts);
 		}
 	}, [reduxFilteredWorkouts, filterInfo]);
-
-	useEffect(() => {
-		const arrayOfWorkouts = Object.values(reduxWorkoutRef);
-		console.log(arrayOfWorkouts.length);
-
-		setWorkouts([...arrayOfWorkouts]);
-		setRefreshing(false);
-	}, [reduxWorkoutRef]);
 
 	useEffect(() => {
 		setStyles(getStyles(useDarkMode ? Themes.dark : Themes.light));
@@ -203,18 +209,23 @@ const WorkoutListScreen = (props) => {
 		props.navigation.navigate("Calculator");
 	};
 
-
 	const onClearFilter = () => {
 		dispatch(resetFilter());
 		dispatch(resetFilteredExercises());
 		dispatch(resetFilteredWorkouts());
 
 		setStandardWorkouts();
+		setShowFilteredWorkouts(false);
 	};
 
 	const setStandardWorkouts = () => {
 		const arrayOfWorkouts = Object.values(reduxWorkoutRef);
 		setWorkouts(arrayOfWorkouts);
+	};
+
+	const onReachedEnd = (test) => {
+		// console.log(test);
+		dispatch(getWorkoutsOnCursor());
 	};
 
 	return (
@@ -344,39 +355,80 @@ const WorkoutListScreen = (props) => {
 						</View>
 					</View>
 				)}
-				<FlatList
-					style={styles.flatListStyle}
-					data={workouts}
-					keyExtractor={(item) => item.id}
-					onScroll={(e) => scrollHandler(e)}
-					ListFooterComponent={<View></View>}
-					ListFooterComponentStyle={{ height: 80 }}
-					ItemSeparatorComponent={() => {
-						return (
-							<View
-								style={{
-									width: "100%",
-									borderBottomWidth: 1,
-									borderBottomColor: currentTheme.outline,
-								}}
-							></View>
-						);
-					}}
-					refreshControl={
-						<RefreshControl
-							refreshing={refreshing}
-							onRefresh={onRefresh}
-							colors={[currentTheme.onPrimary]}
-							progressBackgroundColor={currentTheme.primary}
-						/>
-					}
-					renderItem={(itemData) => (
-						<WorkoutListItem
-							userID={userID}
-							workoutID={itemData.item.id}
-						/>
-					)}
-				/>
+				{!showFilteredWorkouts && (
+					<FlatList
+						style={styles.flatListStyle}
+						data={workouts}
+						keyExtractor={(item) => item.id}
+						onScroll={(e) => scrollHandler(e)}
+						ListFooterComponent={<View></View>}
+						ListFooterComponentStyle={{ height: 80 }}
+						onEndReached={(test) => onReachedEnd(test)}
+						onEndReachedThreshold={0.2}
+						ItemSeparatorComponent={() => {
+							return (
+								<View
+									style={{
+										width: "100%",
+										borderBottomWidth: 1,
+										borderBottomColor: currentTheme.outline,
+									}}
+								></View>
+							);
+						}}
+						refreshControl={
+							<RefreshControl
+								refreshing={refreshing}
+								onRefresh={onRefresh}
+								colors={[currentTheme.onPrimary]}
+								progressBackgroundColor={currentTheme.primary}
+							/>
+						}
+						renderItem={(itemData) => (
+							<WorkoutListItem
+								userID={userID}
+								workoutID={itemData.item.id}
+							/>
+						)}
+					/>
+				)}
+				{showFilteredWorkouts && (
+					<FlatList
+						style={styles.flatListStyle}
+						data={filteredWorkoutDisplay}
+						keyExtractor={(item) => item.id}
+						onScroll={(e) => scrollHandler(e)}
+						ListFooterComponent={<View></View>}
+						ListFooterComponentStyle={{ height: 80 }}
+						// onEndReached={(test) => onReachedEnd(test)}
+						// onEndReachedThreshold={0.2}
+						ItemSeparatorComponent={() => {
+							return (
+								<View
+									style={{
+										width: "100%",
+										borderBottomWidth: 1,
+										borderBottomColor: currentTheme.outline,
+									}}
+								></View>
+							);
+						}}
+						refreshControl={
+							<RefreshControl
+								refreshing={refreshing}
+								onRefresh={onRefresh}
+								colors={[currentTheme.onPrimary]}
+								progressBackgroundColor={currentTheme.primary}
+							/>
+						}
+						renderItem={(itemData) => (
+							<WorkoutListItem
+								userID={userID}
+								workoutID={itemData.item.id}
+							/>
+						)}
+					/>
+				)}
 			</View>
 			<BottomSheet
 				ref={bottomSheetRef}

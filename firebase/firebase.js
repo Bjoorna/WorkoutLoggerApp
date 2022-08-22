@@ -15,6 +15,8 @@ import {
 	limit,
 	updateDoc,
 	deleteDoc,
+	startAt,
+	startAfter,
 } from "firebase/firestore";
 import {
 	getAuth,
@@ -324,8 +326,8 @@ export const firebaseGetUserWorkouts = async (userID) => {
 		const q = query(
 			collection(database, "workouts"),
 			where("owner", "==", userID),
-			orderBy("date", "desc")
-			// limit(3)
+			orderBy("date", "desc"),
+			limit(10)
 		);
 		const querySnapshot = await getDocs(q);
 		return querySnapshot;
@@ -335,7 +337,26 @@ export const firebaseGetUserWorkouts = async (userID) => {
 	}
 };
 
-export const firebaseGetWorkoutsBasedOnWorkoutIDs = async (workoutIDs) => {
+export const firebaseGetWorkoutsOnCursor = async (userID, dateCursor) => {
+	try {
+		if (dateCursor) {
+			const timestamp = Timestamp.fromMillis(dateCursor);
+			const q = query(
+				collection(database, "workouts"),
+				where("owner", "==", userID),
+				orderBy("date", "desc"),
+				startAfter(timestamp),
+				limit(10)
+			);
+			const querySnapshot = await getDocs(q);
+			return querySnapshot;
+		}
+	} catch (error) {
+		throw new Error(error.code);
+	}
+};
+
+export const firebaseGetWorkoutsBasedOnWorkoutIDs = async (workoutIDs, userID) => {
 	try {
 		const workoutRefs = workoutIDs.map((id) =>
 			getDoc(doc(database, "workouts", id))
